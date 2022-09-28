@@ -58,7 +58,7 @@ def remove_application(context):
             )
             click.echo(f"Deleting package '{actual_data_source}/{folder}' from DMSS...")
             try:
-                dmss_api.explorer_remove_by_path(actual_data_source, directory=folder)
+                dmss_api.document_remove_by_path(actual_data_source, directory=folder)
             except Exception as error:
                 if error.status == 404:
                     click.echo(emoji.emojize(f":warning: Could not find '{folder}' in DMSS..."))
@@ -146,7 +146,7 @@ def init_application(context):
         click.echo(f"_____ DONE importing blueprints and entities {tuple(settings.get('packages', []))}_____")
 
         try:
-            application_id = dmss_api.explorer_add_simple("DemoDS", settings)
+            application_id = dmss_api.document_add_simple("DemoDS", settings)
             click.echo(f"Added application '{settings['name']}'")
             return application_id
         except (ApplicationException, KeyError) as error:
@@ -169,7 +169,7 @@ def init_application(context):
 
     try:
         portal_name = "portal"
-        application_id = dmss_api.explorer_add_simple("DemoDS", {
+        application_id = dmss_api.document_add_simple("DemoDS", {
             "type": "system/SIMOS/Portal",
             "name": portal_name,
             "applications": application_ids
