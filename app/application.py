@@ -3,6 +3,9 @@ import json
 from typing import Dict, Union, List
 import re
 from pathlib import Path
+import click
+
+DATA_SOURCE_DEF_FILE_EXT: str = "json"
 
 
 def _parse_alias_file(file_path: str) -> Dict[str, str]:
@@ -80,3 +83,35 @@ def _load_app_settings(home: str):
         print(f"Successfully loaded app '{app}'")
 
     return application_settings
+
+
+def get_app_dir_structure(path: Path) -> [Path, Path]:
+    # Check for presence of expected directories, 'data_sources' and 'data'
+    data_sources_dir = path.joinpath("data_sources")
+    data_dir = path.joinpath("data")
+    if not data_sources_dir.is_dir() or not data_dir.is_dir():
+        click.echo(f"The directory '{path.name}' does not have the expected structure. It should contain two directories;")
+        click.echo(f"""
+            ├── data
+            └── data_sources
+        """)
+        exit(1)
+
+    return data_sources_dir, data_dir
+
+
+def get_data_source_definition_files(path: Path) -> list[str]:
+    """
+    Get all JSON files found in <path>
+    """
+    return [filename for filename in os.listdir(path) if filename.endswith(f".{DATA_SOURCE_DEF_FILE_EXT}")]
+
+
+def get_subdirectories(path: Path) -> list[str]:
+    """
+    Get all subdirectories found in <path>
+    """
+    if not isinstance(path, Path):
+        path = Path(path)
+
+    return [dirname for dirname in os.listdir(path) if path.joinpath(dirname).is_dir()]
