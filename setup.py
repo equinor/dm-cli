@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name = 'dm',
-    version = '0.0.1',
+    version = '0.0.2',
     author = '',
     author_email = '',
     license = 'MIT',

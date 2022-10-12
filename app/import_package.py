@@ -6,7 +6,7 @@ from typing import Any, List, Tuple
 from uuid import UUID, uuid4
 from zipfile import ZipFile
 
-#from progress.bar import IncrementalBar
+from progress.bar import IncrementalBar
 
 from .domain import Package
 from .enums import SIMOS
@@ -235,12 +235,12 @@ def import_package_tree(root_package: Package, data_source_id: str) -> None:
     root_package.traverse_documents(lambda document: documents_to_upload.append(document))
     root_package.traverse_package(lambda package: documents_to_upload.append(package.to_dict()))
 
-    #with IncrementalBar(
-    #    f"Importing {root_package.name}",
-    #    max=len(documents_to_upload),
-    #    suffix="%(percent).0f%% - [%(eta)ds/%(elapsed)ds]",
-    #) as bar:
-    for document in documents_to_upload:
-        document = upload_blobs_in_document(document, data_source_id)
-        dmss_api.document_add_simple(data_source_id, document)
-    #    bar.next()
+    with IncrementalBar(
+       f"\tImporting {root_package.name}",
+       max=len(documents_to_upload),
+       suffix="%(percent).0f%% - [%(eta)ds/%(elapsed)ds]",
+    ) as bar:
+        for document in documents_to_upload:
+            document = upload_blobs_in_document(document, data_source_id)
+            dmss_api.document_add_simple(data_source_id, document)
+        bar.next()
