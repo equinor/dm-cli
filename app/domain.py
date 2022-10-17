@@ -5,7 +5,9 @@ from .enums import SIMOS
 
 
 class Package:
-    def __init__(self, name: str, description: str = "", uid: UUID = None, is_root: bool = False):
+    def __init__(
+        self, name: str, description: str = "", uid: UUID = None, is_root: bool = False
+    ):
         self.name = name
         self.description = description
         self.uid = uid if uid else uuid4()
@@ -19,7 +21,9 @@ class Package:
         return self.__getattribute__(item)
 
     def search(self, filename: str) -> Union["Package", dict]:
-        return next((child for child in self.content if child["name"] == filename), None)
+        return next(
+            (child for child in self.content if child["name"] == filename), None
+        )
 
     def to_dict(self):
         return {
@@ -31,7 +35,9 @@ class Package:
             "content": self._content_to_ref_dict(),
         }
 
-    def traverse_documents(self, func: Callable, update: bool = False, **kwargs) -> None:
+    def traverse_documents(
+        self, func: Callable, update: bool = False, **kwargs
+    ) -> None:
         """
         Traverses the Package structure, calling the passed function on every non-Package node
         @param func: A function that takes the document node as it's first parameter
@@ -71,14 +77,26 @@ class Package:
         for child in self.content:
             if isinstance(child, Package):
                 result.append(
-                    {"_id": str(child.uid), "name": child.name, "type": SIMOS.PACKAGE.value, "contained": True}
+                    {
+                        "_id": str(child.uid),
+                        "name": child.name,
+                        "type": SIMOS.PACKAGE.value,
+                        "contained": True,
+                    }
                 )
             else:  # Assume the child is a dict
                 if "name" in child:
                     result.append(
-                        {"_id": child["_id"], "name": child["name"], "type": child["type"], "contained": True}
+                        {
+                            "_id": child["_id"],
+                            "name": child["name"],
+                            "type": child["type"],
+                            "contained": True,
+                        }
                     )
 
                 else:
-                    result.append({"_id": child["_id"], "type": child["type"], "contained": True})
+                    result.append(
+                        {"_id": child["_id"], "type": child["type"], "contained": True}
+                    )
         return result

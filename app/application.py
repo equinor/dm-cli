@@ -1,8 +1,9 @@
-import os
 import json
-from typing import Dict, Union, List
+import os
 import re
 from pathlib import Path
+from typing import Dict, List, Union
+
 import click
 
 DATA_SOURCE_DEF_FILE_EXT: str = "json"
@@ -18,7 +19,9 @@ def _parse_alias_file(file_path: str) -> Dict[str, str]:
                 if line.lstrip()[0] == "#":  # Skip commented lines
                     continue
                 if not re.search(pattern, line):
-                    raise ValueError(f"The alias file '{file_path}' is invalid. Invalid line '{line}'")
+                    raise ValueError(
+                        f"The alias file '{file_path}' is invalid. Invalid line '{line}'"
+                    )
                 key, value = line.split("=", 1)
                 result[key] = value
 
@@ -34,7 +37,11 @@ def _replace_aliases_in_settings(settings: dict) -> dict:
         if reference[0] == "/":  # Don't replace relative references
             return reference
         reference_data_source = reference.split("/", 1)[0]
-        return reference.replace(reference_data_source, aliases.get(reference_data_source, reference_data_source), 1)
+        return reference.replace(
+            reference_data_source,
+            aliases.get(reference_data_source, reference_data_source),
+            1,
+        )
 
     aliases = settings["dataSourceAliases"]
 
@@ -56,7 +63,9 @@ def _replace_aliases_in_settings(settings: dict) -> dict:
 
 def _load_app_settings(home: str):
     """Load application settings from under the specified home directory."""
-    applications = next(os.walk(home))[1]  # Every folder under home represents a separate application
+    applications = next(os.walk(home))[
+        1
+    ]  # Every folder under home represents a separate application
 
     application_settings: Dict[str, dict] = {}
 
@@ -71,7 +80,9 @@ def _load_app_settings(home: str):
                 code_gen_folder = Path(f"{home}/{app}/code_generators")
                 if code_gen_folder.is_dir():
                     app_settings["codeGenerators"] = os.listdir(str(code_gen_folder))
-                application_settings[app_settings["name"]] = _replace_aliases_in_settings(app_settings)
+                application_settings[
+                    app_settings["name"]
+                ] = _replace_aliases_in_settings(app_settings)
         except FileNotFoundError:
             raise FileNotFoundError(
                 f"No settings file found for the app '{app}'."
@@ -79,7 +90,9 @@ def _load_app_settings(home: str):
                 f"'{home}/{{name-of-app}}/'"
             )
         except KeyError as e:
-            raise KeyError(f"The settings file for the '{app}' application is invalid: {e}")
+            raise KeyError(
+                f"The settings file for the '{app}' application is invalid: {e}"
+            )
         print(f"Successfully loaded app '{app}'")
 
     return application_settings
@@ -90,11 +103,15 @@ def get_app_dir_structure(path: Path) -> [Path, Path]:
     data_sources_dir = path.joinpath("data_sources")
     data_dir = path.joinpath("data")
     if not data_sources_dir.is_dir() or not data_dir.is_dir():
-        click.echo(f"The directory '{path.name}' does not have the expected structure. It should contain two directories;")
-        click.echo(f"""
+        click.echo(
+            f"The directory '{path.name}' does not have the expected structure. It should contain two directories;"
+        )
+        click.echo(
+            f"""
             ├── data
             └── data_sources
-        """)
+        """
+        )
         exit(1)
 
     return data_sources_dir, data_dir
@@ -104,7 +121,11 @@ def get_data_source_definition_files(path: Path) -> list[str]:
     """
     Get all JSON files found in <path>
     """
-    return [filename for filename in os.listdir(path) if filename.endswith(f".{DATA_SOURCE_DEF_FILE_EXT}")]
+    return [
+        filename
+        for filename in os.listdir(path)
+        if filename.endswith(f".{DATA_SOURCE_DEF_FILE_EXT}")
+    ]
 
 
 def get_subdirectories(path: Path) -> list[str]:
