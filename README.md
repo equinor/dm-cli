@@ -38,7 +38,7 @@ Commands:
   reset  Reset all data sources (deletes and reuploads packages)
 ```
 
-For each of the `commands` listed above, you can run `dm <COMMAND> --help` to see subcommand-specific help messages, e.g. `dm ds import --help` or `dm pkg --help` 
+For each of the `commands` listed above, you can run `dm <COMMAND> --help` to see subcommand-specific help messages, e.g. `dm ds import --help` or `dm pkg --help`
 
 #### Expected directory structure
 Certain commands expect a specific directory structure, such as the commands `dm reset`, `dm init`, and `dm ds reset`.

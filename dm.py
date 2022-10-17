@@ -116,11 +116,11 @@ def reset_data_source(context, data_source: str, path: str):
     """
     app_dir = Path(path)
     if not app_dir.is_dir():
-        raise FileNotFoundError(f"The path '{path}' is not a directory.")    
+        raise FileNotFoundError(f"The path '{path}' is not a directory.")
 
     # Check for presence of expected directories, 'data_sources' and 'data'
     data_sources_dir, data_dir = get_app_dir_structure(app_dir)
-    
+
     # Check for the data source definition file (json)
     data_source_path = data_sources_dir.joinpath(f"{data_source}.{DATA_SOURCE_DEF_FILE_EXT}")
     if not data_source_path.is_file():
@@ -201,7 +201,7 @@ def import_packages(context, path: str, data_source: str):
         click.echo(
             emoji.emojize(f"\t:warning: No packages were found in '{data_source_data_dir}'.")
         )
-    
+
     def thread_function(package_name: str):
         filepath = data_source_data_dir.joinpath(package_name)
         context.invoke(import_package, data_source=data_source, path=filepath)
@@ -262,7 +262,7 @@ def delete_packages(context, data_source: str, path: str):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(thread_function, packages)
 
-    
+
 @cli.command(help="Initialize the data sources and import all packages.")
 @click.argument("path", required=False, default=".")
 @click.pass_context
