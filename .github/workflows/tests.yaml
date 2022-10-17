@@ -13,7 +13,7 @@ jobs:
       - name: Install pre-commit
         run: pip install pre-commit
 
-      - name: Run prettier formatting
-        run: pre-commit run prettier --all-files
+      - name: Run pre-commit
+        run: pre-commit run --all-files
 
   # TODO run tests
