@@ -39,7 +39,8 @@ class Package:
         self, func: Callable, update: bool = False, **kwargs
     ) -> None:
         """
-        Traverses the Package structure, calling the passed function on every non-Package node
+        Traverses the Package structure, calling the passed function on every non-Package node.
+
         @param func: A function that takes the document node as it's first parameter
         @param update: Whether or not to set the tree node to be the return value from the passed function
         @param kwargs: Keyword arguments to be passed to 'func'
@@ -55,7 +56,8 @@ class Package:
 
     def traverse_package(self, func: Callable, update: bool = False, **kwargs) -> None:
         """
-        Traverses the Package structure, calling the passed function on every Package node
+        Traverses the Package structure, calling the passed function on every Package node.
+
         @param func: A function that takes the Package node as it's first parameter
         @param update: Whether or not to set the tree node to be the return value from the passed function
         @param kwargs: Keyword arguments to be passed to 'func'
