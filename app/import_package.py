@@ -55,16 +55,16 @@ def replace_relative_references(
     key: str, value, reference_table: dict = None, zip_file: ZipFile = None
 ) -> Any:
     """
-    Takes a key-value pair, and returns the passed value, with relative
-    references updated with absolute ones found in the 'reference_table'.
+    Takes a key-value pair and returns the passed value, with relative references updated with absolute ones found in the 'reference_table'.
+
     For Blob-entities. Insert the binary data from the file into the entity.
     It digs down on complex types.
+
     @param reference_table: A dict like so; {"fileName": {"id": newUUID, "absolute": ds/root-package/file}
     @param key: Name of the attribute being checked in the document
     @param value: Value of the attribute being checked in the document
     @return: The passed value, with relative references updated with absolute ones
     """
-
     if key in keys_to_check:
         if key == "_id":
             try:
@@ -181,8 +181,10 @@ def package_tree_from_zip(
     data_source_id: str, package_name: str, zip_package: io.BytesIO
 ) -> Package:
     """
-    Converts a Zip-folder into a Data Modelling Tool Package structure. Inserting UUID4's between any references,
-    and converting relative paths to absolute paths
+    Converts a Zip-folder into a Data Modelling Tool Package structure.
+
+    Inserting UUID4's between any references, and converting relative paths to absolute paths.
+
     @param package_name: name of the package
     @param data_source_id: A string with the name/id of an existing data source to import package to
     @param zip_package: A zip-folder represented as an in-memory io.BytesIO object
@@ -248,9 +250,7 @@ def package_tree_from_zip(
 
 
 def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
-    """
-    Uploads any 'system/SIMOS/Blob' types in the document, and replacing the data with created uuid's
-    """
+    """Uploads any 'system/SIMOS/Blob' types in the document, and replacing the data with created uuid's."""
     try:
         if document["type"] == SIMOS.BLOB.value:
             blob_id = document.get("_blob_id", str(uuid4()))

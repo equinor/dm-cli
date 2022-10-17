@@ -63,9 +63,8 @@ def _replace_aliases_in_settings(settings: dict) -> dict:
 
 def _load_app_settings(home: str):
     """Load application settings from under the specified home directory."""
-    applications = next(os.walk(home))[
-        1
-    ]  # Every folder under home represents a separate application
+    # Every folder under home represents a separate application
+    applications = next(os.walk(home))[1]
 
     application_settings: Dict[str, dict] = {}
 
@@ -86,7 +85,7 @@ def _load_app_settings(home: str):
         except FileNotFoundError:
             raise FileNotFoundError(
                 f"No settings file found for the app '{app}'."
-                f"Each application requires a 'settings.json' file located at "
+                "Each application requires a 'settings.json' file located at "
                 f"'{home}/{{name-of-app}}/'"
             )
         except KeyError as e:
@@ -107,7 +106,7 @@ def get_app_dir_structure(path: Path) -> [Path, Path]:
             f"The directory '{path.name}' does not have the expected structure. It should contain two directories;"
         )
         click.echo(
-            f"""
+            """
             ├── data
             └── data_sources
         """
@@ -118,9 +117,7 @@ def get_app_dir_structure(path: Path) -> [Path, Path]:
 
 
 def get_data_source_definition_files(path: Path) -> list[str]:
-    """
-    Get all JSON files found in <path>
-    """
+    """Get all JSON files found in <path>."""
     return [
         filename
         for filename in os.listdir(path)
@@ -129,9 +126,7 @@ def get_data_source_definition_files(path: Path) -> list[str]:
 
 
 def get_subdirectories(path: Path) -> list[str]:
-    """
-    Get all subdirectories found in <path>
-    """
+    """Get all subdirectories found in <path>."""
     if not isinstance(path, Path):
         path = Path(path)
 
