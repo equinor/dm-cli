@@ -9,8 +9,8 @@ with open("requirements.txt", "r") as fh:
     requirements = fh.read()
 
 setup(
-    name = 'dm',
-    version = '0.0.2',
+    name = 'dm-cli',
+    version = '0.1.3',
     author = '',
     author_email = '',
     license = 'MIT',
@@ -28,7 +28,7 @@ setup(
     ],
     entry_points = '''
         [console_scripts]
-        cooltool=dm:cli
+        dm=dm:cli
     ''',
     scripts=[
         'dm'
