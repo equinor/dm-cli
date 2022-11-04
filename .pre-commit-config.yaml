@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: black
         language_version: python3.8
-        files: ^app/.*\.py$
+        files: .*\.py$
         additional_dependencies: ["click==8.0.4"]
 
   - repo: https://github.com/PyCQA/bandit
@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: bandit
         args: [-l, --recursive, -x, tests, --skip, B311]
-        files: ^app/.*\.py$
+        files: ^.*\.py$
 
 
   - repo: https://github.com/pycqa/isort
@@ -33,13 +33,13 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-        files: ^app/.*\.py$
+        files: ^.*\.py$
 
   - repo: https://gitlab.com/pycqa/flake8
     rev: "5.0.0"
     hooks:
       - id: flake8
-        files: ^app/.*\.py$
+        files: ^./dm_cli/.*\.py$
         additional_dependencies:
           - flake8-print==5.0.0
           - flake8-docstrings==1.6.0
