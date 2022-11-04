@@ -9,6 +9,7 @@ jobs:
     uses: ./.github/workflows/tests.yaml
 
   publish-packages:
+      needs: tests
       uses: ./.github/workflows/publish.yaml
       secrets:
         PYPI_DM_CLI_TOKEN: ${{ secrets.PYPI_DM_CLI_TOKEN }}
