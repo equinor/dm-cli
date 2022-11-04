@@ -77,7 +77,11 @@ test_documents = {
         "name": "myTurbine",
         "type": "/WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
-        "Mooring": {"_id": "apekatt", "type": "/Moorings/Mooring", "name": "myTurbineMooring"},
+        "Mooring": {
+            "_id": "apekatt",
+            "type": "/Moorings/Mooring",
+            "name": "myTurbineMooring",
+        },
     },
     "MyRootPackage/test_pdf.pdf": None,
     "MyRootPackage/myPDF.json": {
@@ -113,13 +117,21 @@ test_documents = {
         "name": "myTurbine2",
         "type": "/WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
-        "Mooring": {"_id": "apekatt", "type": "/Moorings/Mooring", "name": "myTurbineMooring"},
+        "Mooring": {
+            "_id": "apekatt",
+            "type": "/Moorings/Mooring",
+            "name": "myTurbineMooring",
+        },
     },
     "MyRootPackage/B/myTurbine3.json": {
         "name": "myTurbine3",
         "type": "/WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
-        "Mooring": {"_id": "apekatt", "type": "/Moorings/Mooring", "name": "myTurbineMooring"},
+        "Mooring": {
+            "_id": "apekatt",
+            "type": "/Moorings/Mooring",
+            "name": "myTurbineMooring",
+        },
     },
     "MyRootPackage/C/": None,
     "MyRootPackage/D/E/": None,
@@ -134,14 +146,18 @@ class ImportPackageTest(unittest.TestCase):
                 if Path(path).suffix == ".json":
                     zip_file.writestr(path, json.dumps(document).encode())
                 elif Path(path).suffix == ".pdf":
-                    zip_file.write(f"{Path(__file__).parent}/../test_data/{Path(path).name}", path)
+                    zip_file.write(
+                        f"{Path(__file__).parent}/../test_data/{Path(path).name}", path
+                    )
                 elif path[-1] == "/":
                     zip_file.write(Path(__file__).parent, path)
 
         memory_file.seek(0)
 
         root_package = package_tree_from_zip(
-            data_source_id="test_data_source", package_name="MyRootPackage", zip_package=memory_file
+            data_source_id="test_data_source",
+            package_name="MyRootPackage",
+            zip_package=memory_file,
         )
         folder_A = root_package.search("A")
         folder_Moorings = root_package.search("Moorings")
@@ -151,13 +167,22 @@ class ImportPackageTest(unittest.TestCase):
 
         assert myTurbine2["type"] == "test_data_source/MyRootPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
-        assert myTurbine2["Mooring"]["type"] == "test_data_source/MyRootPackage/Moorings/Mooring"
+        assert (
+            myTurbine2["Mooring"]["type"]
+            == "test_data_source/MyRootPackage/Moorings/Mooring"
+        )
         assert myTurbine2["Mooring"]["_id"] == myTurbineMooring["_id"]
 
         windTurbine = root_package.search("WindTurbine")
         assert isinstance(UUID(windTurbine["_id"]), UUID)
-        assert windTurbine["attributes"][0]["attributeType"] == "test_data_source/MyRootPackage/Moorings/Mooring"
-        assert windTurbine["extends"] == ["system/SIMOS/DefaultUiRecipes", "system/SIMOS/NamedEntity"]
+        assert (
+            windTurbine["attributes"][0]["attributeType"]
+            == "test_data_source/MyRootPackage/Moorings/Mooring"
+        )
+        assert windTurbine["extends"] == [
+            "system/SIMOS/DefaultUiRecipes",
+            "system/SIMOS/NamedEntity",
+        ]
 
         specialMooring = folder_Moorings.search("SpecialMooring")
         assert len(specialMooring["extends"]) == 2

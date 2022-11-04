@@ -1,7 +1,6 @@
 import concurrent.futures
 import io
 import json
-import os
 import traceback
 from pathlib import Path
 from zipfile import ZipFile
@@ -9,16 +8,17 @@ from zipfile import ZipFile
 import click
 import emoji
 
-from app.application import (
+from dm_cli.application import (
     get_app_dir_structure,
     get_data_source_definition_files,
     get_subdirectories,
     DATA_SOURCE_DEF_FILE_EXT,
 )
-from app.dmss import dmss_api
-from app.import_package import (ApplicationException, import_package_tree,
+from dm_cli.dmss import dmss_api
+from dmss_api.exceptions import ApiException
+from dm_cli.import_package import (ApplicationException, import_package_tree,
                                 package_tree_from_zip)
-from app.zip_all import zip_all
+from dm_cli.zip_all import zip_all
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -31,7 +31,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 )
 @click.option(
     "-u", "--url",
-    default="http://localhost:8000", type=str,
+    default="http://localhost:5000", type=str,
     help="URL to the Data Modelling Storage Service (DMSS)."
 )
 @click.pass_context
