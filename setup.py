@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="dm-cli",
-    version="0.1.5",
+    version="0.1.6-rc1",
     author="",
     author_email="",
     license="MIT",
@@ -25,10 +25,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
     ],
-    entry_points="""
-        [console_scripts]
-        dm=dm:cli
-    """,
     scripts=[
         "dm_cli/bin/dm",
     ],
