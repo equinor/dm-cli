@@ -1,4 +1,3 @@
-# https://medium.com/nerd-for-tech/how-to-build-and-distribute-a-cli-tool-with-python-537ae41d9d78
 
 from setuptools import setup
 
@@ -10,7 +9,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="dm-cli",
-    version="0.1.6-rc1",
+    version="0.1.6",
     author="",
     author_email="",
     license="MIT",
