@@ -91,11 +91,17 @@ def replace_relative_references(
                     try:
                         extends_list.append(reference_table[value[i]]["absolute"])
                     except KeyError:
-                        raise ApplicationException(
-                            "Import failed",
-                            debug=f"Failed to find the relative reference '{value[i]}' in the reference table.",
-                            data=value,
-                        )
+                        # key not found - search deeper for relative references
+                        try:
+                            for key in reference_table:
+                                if reference_table[key]["filename"].endswith(f"{value[i]}.json"):
+                                    extends_list.append(reference_table[key]["absolute"])
+                        except:
+                            raise ApplicationException(
+                                "Import failed",
+                                debug=f"Failed to find the relative reference '{value[i]}' in the reference table.",
+                                data=value,
+                            )
                 else:
                     extends_list.append(blueprint)
             return extends_list
@@ -103,8 +109,12 @@ def replace_relative_references(
             try:
                 return reference_table[value]["absolute"]
             except KeyError:
+                # key not found - search deeper for relative references
+                for key in reference_table:
+                    if reference_table[key]["filename"].endswith(f"{value}.json"):
+                        return reference_table[key]["absolute"]
                 raise ApplicationException(
-                    f"IMPORT ERROR: Failed to find the relative reference '{value[i]}' in the reference table."
+                    f"IMPORT ERROR: Failed to find the relative reference '{value}' in the reference table."
                 )
 
     # If the value is a complex type, dig down recursively
