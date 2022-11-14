@@ -55,7 +55,7 @@ class Dependency:
 
     alias: str
     # Different ways we support to fetch dependencies.
-    # sys: This DMSS instance
+    # sys: Internally within the DMSS instance
     # http: A public HTTP GET call
     protocol: TDependencyProtocol
     address: str
@@ -72,7 +72,8 @@ keys_to_check = (
 
 def resolve_dependency(type_ref: str, dependencies: List[Dependency]) -> str:
     """Takes a type reference and a list of dependencies. Returns the address for
-    the Blueprint, prefixed with which protocol should be used to fetch it"""
+    the Blueprint, prefixed with which protocol should be used to fetch it.
+    Expected format is ALIAS:ADDRESS"""
     tag, path = type_ref.split(":", 1)
     path = path.strip(" /")
     dependency = next((d for d in dependencies if d.alias == tag), None)
