@@ -33,7 +33,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 )
 @click.option(
     "-u", "--url",
-    default="http://localhost:5000", type=str,
+    default="http://localhost:8000", type=str,
     help="URL to the Data Modelling Storage Service (DMSS)."
 )
 @click.pass_context

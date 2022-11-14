@@ -1,0 +1,11 @@
+{
+  "name": "TestBP",
+  "type": "system/SIMOS/Blueprint",
+  "extends": ["system/SIMOS/NamedEntity"],
+  "description": "",
+  "attributes": [
+
+  ],
+  "uiRecipes": [
+  ]
+}
