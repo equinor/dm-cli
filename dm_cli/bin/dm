@@ -171,7 +171,7 @@ def import_package(context, path: str, data_source: str):
     memory_file.seek(0)
 
     try:
-        root_package = package_tree_from_zip(data_source, data_source_data_dir.name, memory_file)
+        root_package = package_tree_from_zip(data_source, memory_file)
         # Import the package into the data source defined in _aliases_, or using the data_source folder name
         # TODO: Fix aliasing
         import_package_tree(root_package, data_source)

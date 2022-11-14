@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import UUID
 from zipfile import ZipFile
 
-from app.import_package import package_tree_from_zip
+from dm_cli.import_package import package_tree_from_zip
 
 """
 ROOT
@@ -30,15 +30,31 @@ ROOT
 """
 
 test_documents = {
+    "MyRootPackage/package.json": {
+        "name": "MyRootPackage",
+        "type": "CORE:Package",
+        "_meta_": {
+            "type": "CORE:Meta",
+            "version": "0.0.1",
+            "dependencies": [
+                {
+                    "alias": "CORE",
+                    "address": "system/SIMOS",
+                    "version": "0.0.1",
+                    "protocol": "sys",
+                }
+            ],
+        },
+    },
     "MyRootPackage/WindTurbine.json": {
         "name": "WindTurbine",
-        "type": "system/SIMOS/Blueprint",
-        "extends": ["system/SIMOS/DefaultUiRecipes", "system/SIMOS/NamedEntity"],
+        "type": "CORE:Blueprint",
+        "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
         "description": "",
         "attributes": [
             {
                 "name": "Mooring",
-                "type": "system/SIMOS/BlueprintAttribute",
+                "type": "CORE:BlueprintAttribute",
                 "attributeType": "/Moorings/Mooring",
                 "optional": True,
                 "contained": False,
@@ -47,13 +63,13 @@ test_documents = {
     },
     "MyRootPackage/Moorings/Mooring.json": {
         "name": "Mooring",
-        "type": "system/SIMOS/Blueprint",
-        "extends": ["system/SIMOS/DefaultUiRecipes", "system/SIMOS/NamedEntity"],
+        "type": "CORE:Blueprint",
+        "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
         "description": "",
         "attributes": [
             {
                 "name": "Bigness",
-                "type": "system/SIMOS/BlueprintAttribute",
+                "type": "CORE:BlueprintAttribute",
                 "description": "How big? Very",
                 "attributeType": "integer",
             }
@@ -61,13 +77,13 @@ test_documents = {
     },
     "MyRootPackage/Moorings/SpecialMooring.json": {
         "name": "SpecialMooring",
-        "type": "system/SIMOS/Blueprint",
-        "extends": ["system/SIMOS/DefaultUiRecipes", "/Moorings/Mooring"],
+        "type": "CORE:Blueprint",
+        "extends": ["CORE:DefaultUiRecipes", "/Moorings/Mooring"],
         "description": "",
         "attributes": [
             {
                 "name": "Smallness",
-                "type": "system/SIMOS/BlueprintAttribute",
+                "type": "CORE:BlueprintAttribute",
                 "description": "How small? Not that small really",
                 "attributeType": "integer",
             }
@@ -86,21 +102,21 @@ test_documents = {
     "MyRootPackage/test_pdf.pdf": None,
     "MyRootPackage/myPDF.json": {
         "name": "MyPdf",
-        "type": "system/SIMOS/blob_types/PDF",
+        "type": "CORE:blob_types/PDF",
         "description": "Test",
-        "blob": {"name": "/test_pdf.pdf", "type": "system/SIMOS/Blob"},
+        "blob": {"name": "/test_pdf.pdf", "type": "CORE:Blob"},
         "author": "Stig Oskar",
         "size": 4003782,
         "tags": ["Marine", "Renewable"],
     },
     "MyRootPackage/myNestedPDF.json": {
         "name": "myNestedPDF",
-        "type": "system/SIMOS/Something",
+        "type": "CORE:Something",
         "description": "Test",
         "something": {
             "name": "bla",
             "type": "somethign/some/Thing",
-            "blob": {"name": "/test_pdf.pdf", "type": "system/SIMOS/Blob"},
+            "blob": {"name": "/test_pdf.pdf", "type": "CORE:Blob"},
         },
         "author": "Stig Oskar",
         "size": 4003782,
@@ -156,7 +172,6 @@ class ImportPackageTest(unittest.TestCase):
 
         root_package = package_tree_from_zip(
             data_source_id="test_data_source",
-            package_name="MyRootPackage",
             zip_package=memory_file,
         )
         folder_A = root_package.search("A")
@@ -165,11 +180,11 @@ class ImportPackageTest(unittest.TestCase):
         folder_SubFolder = folder_A.search("SubFolder")
         myTurbine2 = folder_SubFolder.search("myTurbine2")
 
-        assert myTurbine2["type"] == "test_data_source/MyRootPackage/WindTurbine"
+        assert myTurbine2["type"] == "sys://test_data_source/MyRootPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
         assert (
             myTurbine2["Mooring"]["type"]
-            == "test_data_source/MyRootPackage/Moorings/Mooring"
+            == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
         )
         assert myTurbine2["Mooring"]["_id"] == myTurbineMooring["_id"]
 
@@ -177,11 +192,11 @@ class ImportPackageTest(unittest.TestCase):
         assert isinstance(UUID(windTurbine["_id"]), UUID)
         assert (
             windTurbine["attributes"][0]["attributeType"]
-            == "test_data_source/MyRootPackage/Moorings/Mooring"
+            == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
         )
         assert windTurbine["extends"] == [
-            "system/SIMOS/DefaultUiRecipes",
-            "system/SIMOS/NamedEntity",
+            "sys://system/SIMOS/DefaultUiRecipes",
+            "sys://system/SIMOS/NamedEntity",
         ]
 
         specialMooring = folder_Moorings.search("SpecialMooring")

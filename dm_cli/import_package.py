@@ -43,6 +43,25 @@ class ApplicationException(Exception):
         }
 
 
+from dataclasses import dataclass
+from typing import Literal, NewType
+
+TDependencyProtocol = NewType("TDependencyProtocol", Literal["sys", "http"])
+
+
+@dataclass(frozen=True)
+class Dependency:
+    """Class for any dependencies (external types) a entity references"""
+
+    alias: str
+    # Different ways we support to fetch dependencies.
+    # sys: This DMSS instance
+    # http: A public HTTP GET call
+    protocol: TDependencyProtocol
+    address: str
+    version: str = ""
+
+
 keys_to_check = (
     "type",
     "attributeType",
@@ -51,8 +70,34 @@ keys_to_check = (
 )  # These keys may contain a reference
 
 
+def resolve_dependency(type_ref: str, dependencies: List[Dependency]) -> str:
+    """Takes a type reference and a list of dependencies. Returns the address for
+    the Blueprint, prefixed with which protocol should be used to fetch it"""
+    tag, path = type_ref.split(":", 1)
+    path = path.strip(" /")
+    dependency = next((d for d in dependencies if d.alias == tag), None)
+    if not dependency:
+        raise ApplicationException(
+            f"No dependency with alias '{tag}' was found in the entities dependencies list"
+        )
+
+    if dependency.protocol == "sys":
+        address = dependency.address.strip(" /")
+        return f"sys://{address}/{path}"
+    if dependency.protocol == "http":
+        raise NotImplementedError
+
+    raise ApplicationException(
+        f"Protocol '{dependency.protocol}' is not a valid protocol for resolving dependencies"
+    )
+
+
 def replace_relative_references(
-    key: str, value, reference_table: dict = None, zip_file: ZipFile = None
+    key: str,
+    value,
+    reference_table: dict = None,
+    zip_file: ZipFile = None,
+    dependencies: List[Dependency] | None = None,
 ) -> Any:
     """
     Takes a key-value pair and returns the passed value, with relative references updated with absolute ones found in the 'reference_table'.
@@ -86,6 +131,9 @@ def replace_relative_references(
         if key == "extends":  # 'extends' is a list
             extends_list = []
             for i, blueprint in enumerate(value):
+                if ":" in blueprint:
+                    extends_list.append(resolve_dependency(blueprint, dependencies))
+                    continue
                 # Relative references start with a "/", if not, they are absolute references
                 if blueprint[0] == "/":
                     try:
@@ -96,44 +144,57 @@ def replace_relative_references(
                             debug=f"Failed to find the relative reference '{value[i]}' in the reference table.",
                             data=value,
                         )
-                else:
-                    extends_list.append(blueprint)
+                    continue
+                extends_list.append(blueprint)
             return extends_list
+        if ":" in value:
+            return resolve_dependency(value, dependencies)
         if value[0] == "/":
             try:
-                return reference_table[value]["absolute"]
+                return f"sys://{reference_table[value]['absolute']}"
             except KeyError:
                 raise ApplicationException(
-                    f"IMPORT ERROR: Failed to find the relative reference '{value[i]}' in the reference table."
+                    f"IMPORT ERROR: Failed to find the relative reference '{value}' in the reference table."
                 )
 
     # If the value is a complex type, dig down recursively
-    if (
-        isinstance(value, dict) and value.get("type") == SIMOS.BLOB.value
-    ):  # Add blob data to the blob-entity
-        if (
-            value["name"][0] == "/"
-        ):  # It's a relative reference to the blob file. Get root_package_name...
-            root_package_name = f"{zip_file.filelist[0].filename.split('/', 1)[0]}"
-            # '_blob_data' is a temporary key for keeping the binary data
-            return {
-                "_blob_data_": zip_file.read(f"{root_package_name}{value['name']}"),
-                **value,
-            }
-        else:
-            return {"_blob_data_": zip_file.read(value["name"]), **value}
     if isinstance(value, dict):
+        # First check if the type is a blob type
+        if (
+            replace_relative_references(
+                "type", value["type"], reference_table, zip_file, dependencies
+            )
+            == SIMOS.BLOB.value
+        ):
+            # Add blob data to the blob-entity
+            if (
+                value["name"][0] == "/"
+            ):  # It's a relative reference to the blob file. Get root_package_name...
+                root_package_name = f"{zip_file.filelist[0].filename.split('/', 1)[0]}"
+                # '_blob_data' is a temporary key for keeping the binary data
+                return {
+                    "_blob_data_": zip_file.read(f"{root_package_name}{value['name']}"),
+                    **value,
+                    "type": SIMOS.BLOB.value,
+                }
+
+            return {"_blob_data_": zip_file.read(value["name"]), **value}
+
         return {
-            k: replace_relative_references(k, v, reference_table, zip_file)
+            k: replace_relative_references(
+                k, v, reference_table, zip_file, dependencies
+            )
             for k, v in value.items()
         }
     if isinstance(value, list):
         return [
-            replace_relative_references(key, v, reference_table, zip_file)
+            replace_relative_references(key, v, reference_table, zip_file, dependencies)
             for v in value
         ]
 
-    return value  # This means it's a primitive type, return it as is
+    return (
+        value  # This means it's a primitive type with an absolute path, return it as is
+    )
 
 
 def add_file_to_package(
@@ -177,23 +238,42 @@ def add_package_to_package(path: Path, package: Package) -> None:
     return add_package_to_package(Path(new_path), sub_folder)
 
 
-def package_tree_from_zip(
-    data_source_id: str, package_name: str, zip_package: io.BytesIO
-) -> Package:
+def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Package:
     """
-    Converts a Zip-folder into a Data Modelling Tool Package structure.
+    Converts a Zip-folder into a DMSS Package structure.
 
-    Inserting UUID4's between any references, and converting relative paths to absolute paths.
+    Inserting UUID4's between any references, converting relative paths to absolute paths,
+    and dependencyAliases to absolute addresses.
 
-    @param package_name: name of the package
     @param data_source_id: A string with the name/id of an existing data source to import package to
     @param zip_package: A zip-folder represented as an in-memory io.BytesIO object
     @return: A Package object with sub folders(Package) and documents(dict)
     """
-    root_package = Package(name=package_name, is_root=True)
     reference_table = {}
 
     with ZipFile(zip_package) as zip_file:
+        folder_name = zip_file.filelist[0].filename.split("/", 1)[0]
+
+        # Find the root packages package.json file
+        package_file = next(
+            (
+                z
+                for z in zip_file.filelist
+                if z.filename == f"{folder_name}/package.json"
+            ),
+            None,
+        )
+
+        package_entity = (
+            json.loads(zip_file.read(package_file.filename)) if package_file else {}
+        )
+        dependencies = [
+            Dependency(**d)
+            for d in package_entity.get("_meta_", {}).get("dependencies", [])
+        ]
+        root_package = Package(
+            name=package_entity.get("name", folder_name), is_root=True
+        )
         # Construct a nested Package object of the package to import
         for file_info in zip_file.filelist:
             filename = file_info.filename.split("/", 1)[1]  # Remove RootPackage prefix
@@ -205,7 +285,7 @@ def package_tree_from_zip(
             if Path(filename).suffix != ".json":
                 continue
             try:
-                json_doc = json.loads(zip_file.read(f"{package_name}/{filename}"))
+                json_doc = json.loads(zip_file.read(f"{folder_name}/{filename}"))
             except JSONDecodeError:
                 raise Exception(
                     f"Failed to load the file '{filename}' as a JSON document"
@@ -230,7 +310,7 @@ def package_tree_from_zip(
                         "filename": filename,
                         "alias": alias,
                         "id": str(uid),
-                        "absolute": f"{data_source_id}/{package_name}{relative_path}",
+                        "absolute": f"{data_source_id}/{package_entity.get('name', folder_name)}{relative_path}",
                     }
                 }
             )
@@ -239,9 +319,14 @@ def package_tree_from_zip(
         root_package.traverse_documents(
             lambda document: {
                 k: replace_relative_references(
-                    k, v, reference_table=reference_table, zip_file=zip_file
+                    k,
+                    v,
+                    reference_table=reference_table,
+                    zip_file=zip_file,
+                    dependencies=dependencies,
                 )
                 for k, v in document.items()
+                if k != "_meta_"  # Don't update references in "_meta_"
             },
             update=True,
         )
