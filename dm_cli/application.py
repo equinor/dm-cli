@@ -116,7 +116,7 @@ def get_app_dir_structure(path: Path) -> [Path, Path]:
     return data_sources_dir, data_dir
 
 
-def get_data_source_definition_files(path: Path) -> list[str]:
+def get_data_source_definition_files(path: Path) -> List[str]:
     """Get all JSON files found in <path>."""
     return [
         filename
@@ -125,7 +125,7 @@ def get_data_source_definition_files(path: Path) -> list[str]:
     ]
 
 
-def get_subdirectories(path: Path) -> list[str]:
+def get_subdirectories(path: Path) -> List[str]:
     """Get all subdirectories found in <path>."""
     if not isinstance(path, Path):
         path = Path(path)
