@@ -1,0 +1,20 @@
+{
+  "type": "CORE:Blueprint",
+  "name": "Wheel",
+  "attributes": [
+    {
+      "name": "brand",
+      "optional": false,
+      "attributeType": "string",
+      "type": "CORE:BlueprintAttribute"
+    },
+    {
+      "name": "dimensions",
+      "attributeType": "string",
+      "type": "CORE:BlueprintAttribute",
+      "label": "string"
+    }
+  ],
+  "storageRecipes": [],
+  "uiRecipes": []
+}

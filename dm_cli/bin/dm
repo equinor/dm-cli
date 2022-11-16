@@ -148,7 +148,7 @@ def pkg_cli(context):
 @click.argument("path", required=True)
 @click.argument("data_source", required=True)
 @click.pass_context
-def import_package(context, path: str, data_source: str):
+def import_package(context, path: str, data_source: str) -> bool:
     """
     Import the package <path> to the given data source
     """
@@ -177,11 +177,12 @@ def import_package(context, path: str, data_source: str):
         import_package_tree(root_package, data_source)
         click.echo(f"\tImported package '{data_source}/{data_source_data_dir.name}'")
     except ApplicationException as error:
-        raise ApplicationException(error.body)
+        click.echo(error.message)
+        return False
     except Exception as error:
         traceback.print_exc()
-        raise Exception(f"\tSomething went wrong trying to upload the package '{data_source}/{data_source_data_dir.name}' to DMSS; {error}")
-
+        click.echo(f"\tSomething went wrong trying to upload the package '{data_source}/{data_source_data_dir.name}' to DMSS; {error}")
+        return False
 
 @pkg_cli.command("import-all", help="Import all packages found in the directory given by <path> to the given data source")
 @click.argument("path", required=True)
@@ -204,12 +205,15 @@ def import_packages(context, path: str, data_source: str):
             emoji.emojize(f"\t:warning: No packages were found in '{data_source_data_dir}'.")
         )
 
-    def thread_function(package_name: str):
+    def thread_function(package_name: str) -> bool:
         filepath = data_source_data_dir.joinpath(package_name)
-        context.invoke(import_package, data_source=data_source, path=filepath)
+        return context.invoke(import_package, data_source=data_source, path=filepath)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(thread_function, packages_to_import)
+        results = executor.map(thread_function, packages_to_import)
+        for r in results:
+            if not r:
+                exit(1)  # If any of the parallel functions did not return True, they fail, and so we exit with 1
 
 
 @pkg_cli.command("delete", help="Delete the package <package> in the given data source.")
