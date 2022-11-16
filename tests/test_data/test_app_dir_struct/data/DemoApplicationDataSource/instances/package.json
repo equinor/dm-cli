@@ -1,0 +1,22 @@
+{
+  "name": "instances",
+  "type": "CORE:Package",
+  "_meta_": {
+    "type": "CORE:Meta",
+    "version": "0.0.1",
+    "dependencies": [
+      {
+        "alias": "CORE",
+        "address": "system/SIMOS",
+        "version": "0.0.1",
+        "protocol": "sys"
+      },
+      {
+        "alias": "TEST-MODELS",
+        "address": "DemoApplicationDataSource/models",
+        "version": "0.0.1",
+        "protocol": "sys"
+      }
+    ]
+  }
+}
