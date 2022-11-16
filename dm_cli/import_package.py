@@ -294,7 +294,7 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
             uid, alias = add_file_to_package(Path(filename), root_package, json_doc)
 
             # Use the "name" attribute as the last element in the
-            # reference path, so filename and "name" dont need to match
+            # reference path, so filename and "name" don't need to match
             if "name" in json_doc:
                 if "/" in filename:
                     relative_path = (
@@ -311,7 +311,7 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
                         "filename": filename,
                         "alias": alias,
                         "id": str(uid),
-                        "absolute": f"{data_source_id}/{package_entity.get('name', folder_name)}{relative_path}",
+                        "absolute": f"sys://{data_source_id}/{package_entity.get('name', folder_name)}{relative_path}",
                     }
                 }
             )

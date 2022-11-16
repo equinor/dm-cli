@@ -1,0 +1,29 @@
+{
+  "name": "ExtendedApplication",
+  "type": "CORE:Blueprint",
+  "extends": ["/DemoApplication"],
+  "description": "",
+  "attributes": [
+    {
+      "name": "label2",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
+      "optional": true
+    },
+    {
+      "name": "dataSources2",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
+      "dimensions": "*",
+      "optional": false
+    }
+  ],
+  "uiRecipes": [
+    {
+      "name": "Default",
+      "type": "CORE:UiRecipe",
+      "plugin": "demoApp",
+      "category": "Application"
+    }
+  ]
+}

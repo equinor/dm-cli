@@ -183,6 +183,7 @@ def import_package(context, path: str, data_source: str) -> bool:
         traceback.print_exc()
         click.echo(f"\tSomething went wrong trying to upload the package '{data_source}/{data_source_data_dir.name}' to DMSS; {error}")
         return False
+    return True
 
 @pkg_cli.command("import-all", help="Import all packages found in the directory given by <path> to the given data source")
 @click.argument("path", required=True)
