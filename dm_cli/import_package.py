@@ -159,7 +159,7 @@ def replace_relative_references(
                 )
 
     # If the value is a complex type, dig down recursively
-    if isinstance(value, dict):
+    if isinstance(value, dict) and value != {}:
         # First check if the type is a blob type
         if (
             replace_relative_references(
