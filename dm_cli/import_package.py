@@ -152,7 +152,7 @@ def replace_relative_references(
             return resolve_dependency(value, dependencies)
         if value[0] == "/":
             try:
-                return f"sys://{reference_table[value]['absolute']}"
+                return reference_table[value]["absolute"]
             except KeyError:
                 raise ApplicationException(
                     f"IMPORT ERROR: Failed to find the relative reference '{value}' in the reference table."

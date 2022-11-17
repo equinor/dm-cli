@@ -11,9 +11,9 @@
       "optional": true
     },
     {
-      "name": "dataSources2",
+      "name": "wheels",
       "type": "CORE:BlueprintAttribute",
-      "attributeType": "string",
+      "attributeType": "/CarPackage/Wheel",
       "dimensions": "*",
       "optional": false
     }
