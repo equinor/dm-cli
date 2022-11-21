@@ -2,7 +2,7 @@ import io
 import json
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Union
 from uuid import UUID, uuid4
 from zipfile import ZipFile
 
@@ -98,7 +98,7 @@ def replace_relative_references(
     value,
     reference_table: dict = None,
     zip_file: ZipFile = None,
-    dependencies: List[Dependency] | None = None,
+    dependencies: Union[List[Dependency], None] = None,
 ) -> Any:
     """
     Takes a key-value pair and returns the passed value, with relative references updated with absolute ones found in the 'reference_table'.
