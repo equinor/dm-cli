@@ -1,0 +1,10 @@
+ {
+  "_id": "47b4d893-3ab4-4ad2-9bd9-9614acb066c4",
+  "type": "TEST-MODELS:ExternalFile",
+  "name": "example-file-as-blob",
+  "blob": {
+    "name": "/nameList.txt",
+    "type": "CORE:Blob",
+    "_blob_id": "05af2773-6118-4bfd-a427-9485b30fc9db"
+  }
+}
