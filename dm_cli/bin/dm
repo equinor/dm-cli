@@ -53,9 +53,11 @@ def ds_cli(context):
 @ds_cli.command("import", help="Import a datasource, where <path> is the path to a data source definition (JSON).")
 @click.argument("path", required=True)
 @click.pass_context
-def import_data_source(context, path: str):
+def import_data_source(context, path: str, fail_if_ds_exists=True):
     """
-    Import a single data source definition to DMSS
+    Import a single data source definition to DMSS.
+
+    The flag fail_if_ds_exists can be used to throw an error if data source already exists.
     """
     data_source_path = Path(path)
     if not data_source_path.is_file():
@@ -71,7 +73,10 @@ def import_data_source(context, path: str):
             dmss_api.data_source_save(document["name"], data_source_request=document)
             click.echo(f"\tImported data source '{document['name']}'")
         except (ApiException, KeyError) as error:
-            if error.status == 400:
+            if fail_if_ds_exists and error.status == 400:
+                raise ImportError(f"\tA data source with name {document['name']} already exists. "
+                                  f"Please run the command 'dm reset' to fix the issue.")
+            elif error.status == 400:
                 click.echo(
                     emoji.emojize(
                         f"\t:warning: Could not import data source '{document['name']}'. "
@@ -135,7 +140,7 @@ def reset_data_source(context, data_source: str, path: str):
     # Delete all packages in the data source
     context.invoke(delete_packages, data_source=data_source, path=data_source_data_dir)
     # Import all packages in the data source
-    context.invoke(init, path=path)
+    context.invoke(init, path=path, FAIL_IF_DS_EXISTS=False)
 
 
 @cli.group("pkg", help="Subcommand for working with packages")
@@ -231,7 +236,7 @@ def delete_package(context, data_source: str, package: str, silent: bool = False
 
     try:
         # Delete the document in DMSS
-        dmss_api.document_remove_by_path(data_source, directory=package)
+        response = dmss_api.document_remove_by_path(data_source, directory=package)
         if not silent:
             click.echo(f"\tDeleted package '{data_source}/{package}'")
     except Exception as error:
@@ -270,12 +275,13 @@ def delete_packages(context, data_source: str, path: str):
         executor.map(thread_function, packages)
 
 
-@cli.command(help="Initialize the data sources and import all packages.")
+@cli.command(help="Initialize the data sources and import all packages. (Only use this command if datasources do not exist in DMSS)")
 @click.argument("path", required=False, default=".")
 @click.pass_context
-def init(context, path: str):
+def init(context, path: str, fail_if_ds_exists=True):
     """
     Initialize the data sources and import all packages.
+    By default, fail_if_ds_exists is set to True. This function will not work if data source already exist in DMSS.
     """
     app_dir = Path(path)
     if not app_dir.is_dir():
@@ -306,7 +312,7 @@ def init(context, path: str):
             )
             continue
 
-        context.invoke(import_data_source, path=data_source_definition_filepath)
+        context.invoke(import_data_source, path=data_source_definition_filepath, fail_if_ds_exists=fail_if_ds_exists)
         context.invoke(import_packages, path=data_source_data_dir, data_source=data_source_name)
 
 
