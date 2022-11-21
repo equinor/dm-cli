@@ -16,4 +16,13 @@ jobs:
       - name: Run pre-commit
         run: pre-commit run --all-files
 
-  # TODO run tests
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: install requirements
+        run: pip install -r requirements.txt && pip install -r dev-requirements.txt && pip install .
+
+      - name: run pytest
+        run: pytest
