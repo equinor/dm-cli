@@ -1,0 +1,24 @@
+{
+  "name": "ExternalFile",
+  "type": "CORE:Blueprint",
+  "extends": ["CORE:NamedEntity"],
+  "description": "Blueprint with blob",
+  "attributes": [
+    {
+      "type": "CORE:BlueprintAttribute",
+      "name": "blob",
+      "description": "external file as blob",
+      "attributeType": "CORE:Blob",
+      "contained": true
+    },
+    {
+      "type": "CORE:BlueprintAttribute",
+      "name": "tag",
+      "description": "",
+      "attributeType": "string",
+      "optional": true
+    }
+  ],
+  "uiRecipes": [
+  ]
+}
