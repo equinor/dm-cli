@@ -273,7 +273,9 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
             for d in package_entity.get("_meta_", {}).get("dependencies", [])
         ]
         root_package = Package(
-            name=package_entity.get("name", folder_name), is_root=True
+            name=package_entity.get("name", folder_name),
+            is_root=True,
+            meta=package_entity.get("_meta_"),
         )
         # Construct a nested Package object of the package to import
         for file_info in zip_file.filelist:
@@ -336,7 +338,7 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
 
 
 def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
-    """Uploads any 'system/SIMOS/Blob' types in the document, and replacing the data with created uuid's."""
+    """Uploads any 'system/SIMOS/Blob' types in the document, and replaces the data with created uuid's."""
     try:
         if document["type"] == SIMOS.BLOB.value:
             blob_id = document.get("_blob_id", str(uuid4()))
@@ -356,6 +358,10 @@ def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
             f"The document; '{reduced_document}' is missing a required attribute: {error}"
         )
     for key, value in document.items():
+        if (
+            key == "_meta_"
+        ):  # meta data can never contain blob data. Skip for performance
+            return document
         if isinstance(value, dict) and value:
             document[key] = upload_blobs_in_document(value, data_source_id)
         if isinstance(value, list) and value:

@@ -6,13 +6,19 @@ from .enums import SIMOS
 
 class Package:
     def __init__(
-        self, name: str, description: str = "", uid: UUID = None, is_root: bool = False
+        self,
+        name: str,
+        description: str = "",
+        uid: UUID = None,
+        is_root: bool = False,
+        meta: dict = None,
     ):
         self.name = name
         self.description = description
         self.uid = uid if uid else uuid4()
         self.is_root = is_root
         self.content: List[Union[Package, dict]] = []
+        self.meta: Union[dict, None] = meta if meta else {}
 
     def __str__(self):
         return f"Name: {self.name}, Content: {len(self.content)}"
@@ -32,6 +38,7 @@ class Package:
             "name": self.name,
             "description": self.description,
             "isRoot": self.is_root,
+            "_meta_": self.meta,
             "content": self._content_to_ref_dict(),
         }
 
@@ -42,7 +49,7 @@ class Package:
         Traverses the Package structure, calling the passed function on every non-Package node.
 
         @param func: A function that takes the document node as it's first parameter
-        @param update: Whether or not to set the tree node to be the return value from the passed function
+        @param update: Whether to set the tree node to be the return value from the passed function
         @param kwargs: Keyword arguments to be passed to 'func'
         """
         for i, child in enumerate(self.content):
@@ -59,7 +66,7 @@ class Package:
         Traverses the Package structure, calling the passed function on every Package node.
 
         @param func: A function that takes the Package node as it's first parameter
-        @param update: Whether or not to set the tree node to be the return value from the passed function
+        @param update: Whether to set the tree node to be the return value from the passed function
         @param kwargs: Keyword arguments to be passed to 'func'
         """
         for i, child in enumerate(self.content):
