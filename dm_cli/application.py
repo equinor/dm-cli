@@ -98,6 +98,10 @@ def _load_app_settings(home: str):
 
 
 def get_app_dir_structure(path: Path) -> [Path, Path]:
+    app_dir = Path(path)
+    if not app_dir.is_dir():
+        raise FileNotFoundError(f"The path '{path}' is not a directory.")
+
     # Check for presence of expected directories, 'data_sources' and 'data'
     data_sources_dir = path.joinpath("data_sources")
     data_dir = path.joinpath("data")

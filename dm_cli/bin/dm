@@ -53,11 +53,9 @@ def ds_cli(context):
 @ds_cli.command("import", help="Import a datasource, where <path> is the path to a data source definition (JSON).")
 @click.argument("path", required=True)
 @click.pass_context
-def import_data_source(context, path: str, fail_if_ds_exists=True):
+def import_data_source(context, path: str):
     """
     Import a single data source definition to DMSS.
-
-    The flag fail_if_ds_exists can be used to throw an error if data source already exists.
     """
     data_source_path = Path(path)
     if not data_source_path.is_file():
@@ -73,10 +71,7 @@ def import_data_source(context, path: str, fail_if_ds_exists=True):
             dmss_api.data_source_save(document["name"], data_source_request=document)
             click.echo(f"\tImported data source '{document['name']}'")
         except (ApiException, KeyError) as error:
-            if fail_if_ds_exists and error.status == 400:
-                raise ImportError(f"\tA data source with name {document['name']} already exists. "
-                                  f"Please run the command 'dm reset' to fix the issue.")
-            elif error.status == 400:
+            if error.status == 400:
                 click.echo(
                     emoji.emojize(
                         f"\t:warning: Could not import data source '{document['name']}'. "
@@ -113,7 +108,7 @@ def import_data_sources(context, path: str):
         context.invoke(import_data_source, path=filepath)
 
 
-@ds_cli.command("reset", help="Reset the data source (deletes and reuploads packages).")
+@ds_cli.command("reset", help="Reset a single data source (deletes and reuploads packages).")
 @click.argument("data_source", required=True)
 @click.argument("path", required=False, default=".")
 @click.pass_context
@@ -137,10 +132,8 @@ def reset_data_source(context, data_source: str, path: str):
     if not data_source_data_dir.is_dir():
         raise FileNotFoundError(f"There is no data source directory for '{data_source}' in '{data_dir}'.")
 
-    # Delete all packages in the data source
-    context.invoke(delete_packages, data_source=data_source, path=data_source_data_dir)
     # Import all packages in the data source
-    context.invoke(init, path=path, FAIL_IF_DS_EXISTS=False)
+    context.invoke(init, path=path)
 
 
 @cli.group("pkg", help="Subcommand for working with packages")
@@ -275,20 +268,17 @@ def delete_packages(context, data_source: str, path: str):
         executor.map(thread_function, packages)
 
 
-@cli.command(help="Initialize the data sources and import all packages. (Only use this command if datasources do not exist in DMSS)")
+@cli.command(help="Initialize the data sources and import all packages.")
 @click.argument("path", required=False, default=".")
 @click.pass_context
-def init(context, path: str, fail_if_ds_exists=True):
+def init(context, path: str):
     """
     Initialize the data sources and import all packages.
-    By default, fail_if_ds_exists is set to True. This function will not work if data source already exist in DMSS.
+    The packages in a data sources will be deleted before data sources are imported.
     """
-    app_dir = Path(path)
-    if not app_dir.is_dir():
-        raise FileNotFoundError(f"The path '{path}' is not a directory.")
 
     # Check for presence of expected directories, 'data_sources' and 'data'
-    data_sources_dir, data_dir = get_app_dir_structure(app_dir)
+    data_sources_dir, data_dir = get_app_dir_structure(Path(path))
 
     data_source_definitions = get_data_source_definition_files(data_sources_dir)
     if not data_source_definitions:
@@ -312,7 +302,10 @@ def init(context, path: str, fail_if_ds_exists=True):
             )
             continue
 
-        context.invoke(import_data_source, path=data_source_definition_filepath, fail_if_ds_exists=fail_if_ds_exists)
+        # Delete all packages in the data source
+        context.invoke(delete_packages, data_source=data_source_name, path=data_source_data_dir)
+
+        context.invoke(import_data_source, path=data_source_definition_filepath)
         context.invoke(import_packages, path=data_source_data_dir, data_source=data_source_name)
 
 
@@ -323,12 +316,8 @@ def reset(context, path: str):
     """
     Reset all data sources (deletes and reuploads all packages)
     """
-    app_dir = Path(path)
-    if not app_dir.is_dir():
-        raise FileNotFoundError(f"The path '{path}' is not a directory.")
-
     # Check for presence of expected directories, 'data_sources' and 'data'
-    data_sources_dir, data_dir = get_app_dir_structure(app_dir)
+    data_sources_dir, data_dir = get_app_dir_structure(Path(path))
 
     data_source_definitions = get_data_source_definition_files(data_sources_dir)
     if not data_source_definitions:
