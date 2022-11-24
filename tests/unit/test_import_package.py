@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import UUID
 from zipfile import ZipFile
 
-from dm_cli.import_package import package_tree_from_zip
+from dm_cli.import_package import ApplicationException, package_tree_from_zip
 
 """
 ROOT
@@ -50,6 +50,18 @@ test_documents = {
         "name": "WindTurbine",
         "type": "CORE:Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
+        "_meta_": {
+            "type": "CORE:Meta",
+            "version": "0.0.1",
+            "dependencies": [
+                {
+                    "alias": "SINTEF",
+                    "address": "marine-modells.sintef.com/Signals",
+                    "version": "1.2.3",
+                    "protocol": "http",
+                }
+            ],
+        },
         "description": "",
         "attributes": [
             {
@@ -58,7 +70,14 @@ test_documents = {
                 "attributeType": "/Moorings/Mooring",
                 "optional": True,
                 "contained": False,
-            }
+            },
+            {
+                "name": "Signal",
+                "type": "CORE:BlueprintAttribute",
+                "attributeType": "SINTEF:Default",
+                "optional": True,
+                "contained": False,
+            },
         ],
     },
     "MyRootPackage/Moorings/Mooring.json": {
@@ -153,6 +172,65 @@ test_documents = {
     "MyRootPackage/D/E/": None,
 }
 
+test_documents_with_dependency_conflict = {
+    "MyRootPackage/package.json": {
+        "name": "MyRootPackage",
+        "type": "CORE:Package",
+        "_meta_": {
+            "type": "CORE:Meta",
+            "version": "0.0.1",
+            "dependencies": [
+                {
+                    "alias": "CORE",
+                    "address": "system/SIMOS",
+                    "version": "0.0.1",
+                    "protocol": "sys",
+                },
+                {
+                    "alias": "SINTEF",
+                    "address": "marine-modells.sintef.com/Signals",
+                    "version": "1.2.3",
+                    "protocol": "http",
+                },
+            ],
+        },
+    },
+    "MyRootPackage/WindTurbine.json": {
+        "name": "WindTurbine",
+        "type": "CORE:Blueprint",
+        "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
+        "_meta_": {
+            "type": "CORE:Meta",
+            "version": "0.0.1",
+            "dependencies": [
+                {
+                    "alias": "SINTEF",
+                    "address": "marine-modells.sintef.com/Signals/SpecialSignals",
+                    "version": "3.2.1",
+                    "protocol": "http",
+                }
+            ],
+        },
+        "description": "",
+        "attributes": [
+            {
+                "name": "Mooring",
+                "type": "CORE:BlueprintAttribute",
+                "attributeType": "/Moorings/Mooring",
+                "optional": True,
+                "contained": False,
+            },
+            {
+                "name": "Signal",
+                "type": "CORE:BlueprintAttribute",
+                "attributeType": "SINTEF:Default",
+                "optional": True,
+                "contained": False,
+            },
+        ],
+    },
+}
+
 
 class ImportPackageTest(unittest.TestCase):
     def test_package_tree_from_zip_with_relative_references(self):
@@ -194,6 +272,9 @@ class ImportPackageTest(unittest.TestCase):
             windTurbine["attributes"][0]["attributeType"]
             == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
         )
+        assert (
+            windTurbine["attributes"][1]["attributeType"]
+        ) == "http://marine-modells.sintef.com/Signals/Default"
         assert windTurbine["extends"] == [
             "sys://system/SIMOS/DefaultUiRecipes",
             "sys://system/SIMOS/NamedEntity",
@@ -206,3 +287,23 @@ class ImportPackageTest(unittest.TestCase):
         assert isinstance(myPDF["blob"]["_blob_data_"], bytes)
         assert len(myPDF["blob"]["_blob_data_"]) == 531540
         assert root_package.search("D").search("E")  # Two empty packages
+
+    def test_package_tree_from_zip_with_dependency_conflict(self):
+        memory_file = io.BytesIO()
+        with ZipFile(memory_file, mode="w") as zip_file:
+            for path, document in test_documents_with_dependency_conflict.items():
+                if Path(path).suffix == ".json":
+                    zip_file.writestr(path, json.dumps(document).encode())
+                elif Path(path).suffix == ".pdf":
+                    zip_file.write(
+                        f"{Path(__file__).parent}/../test_data/{Path(path).name}", path
+                    )
+                elif path[-1] == "/":
+                    zip_file.write(Path(__file__).parent, path)
+
+        memory_file.seek(0)
+
+        with self.assertRaises(ApplicationException):
+            package_tree_from_zip(
+                data_source_id="test_data_source", zip_package=memory_file
+            )

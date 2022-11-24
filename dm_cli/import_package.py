@@ -2,7 +2,7 @@ import io
 import json
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import Any, Dict, List, Tuple
 from uuid import UUID, uuid4
 from zipfile import ZipFile
 
@@ -61,6 +61,14 @@ class Dependency:
     address: str
     version: str = ""
 
+    def __eq__(self, other):
+        return (
+            self.alias == other.alias
+            and self.protocol == other.protocol
+            and self.address == other.address
+            and self.version == other.version
+        )
+
 
 keys_to_check = (
     "type",
@@ -70,23 +78,23 @@ keys_to_check = (
 )  # These keys may contain a reference
 
 
-def resolve_dependency(type_ref: str, dependencies: List[Dependency]) -> str:
-    """Takes a type reference and a list of dependencies. Returns the address for
+def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> str:
+    """Takes a type reference and dependencies. Returns the address for
     the Blueprint, prefixed with which protocol should be used to fetch it.
     Expected format is ALIAS:ADDRESS"""
     tag, path = type_ref.split(":", 1)
     path = path.strip(" /")
-    dependency = next((d for d in dependencies if d.alias == tag), None)
+    dependency = dependencies.get(tag)
     if not dependency:
         raise ApplicationException(
             f"No dependency with alias '{tag}' was found in the entities dependencies list"
         )
+    address = dependency.address.strip(" /")
 
     if dependency.protocol == "sys":
-        address = dependency.address.strip(" /")
         return f"sys://{address}/{path}"
     if dependency.protocol == "http":
-        raise NotImplementedError
+        return f"http://{address}/{path}"
 
     raise ApplicationException(
         f"Protocol '{dependency.protocol}' is not a valid protocol for resolving dependencies"
@@ -96,9 +104,9 @@ def resolve_dependency(type_ref: str, dependencies: List[Dependency]) -> str:
 def replace_relative_references(
     key: str,
     value,
+    dependencies: Dict[str, Dependency],
     reference_table: dict = None,
     zip_file: ZipFile = None,
-    dependencies: Union[List[Dependency], None] = None,
 ) -> Any:
     """
     Takes a key-value pair and returns the passed value, with relative references updated with absolute ones found in the 'reference_table'.
@@ -163,7 +171,7 @@ def replace_relative_references(
         # First check if the type is a blob type
         if (
             replace_relative_references(
-                "type", value["type"], reference_table, zip_file, dependencies
+                "type", value["type"], dependencies, reference_table, zip_file
             )
             == SIMOS.BLOB.value
         ):
@@ -183,13 +191,13 @@ def replace_relative_references(
 
         return {
             k: replace_relative_references(
-                k, v, reference_table, zip_file, dependencies
+                k, v, dependencies, reference_table, zip_file
             )
             for k, v in value.items()
         }
     if isinstance(value, list):
         return [
-            replace_relative_references(key, v, reference_table, zip_file, dependencies)
+            replace_relative_references(key, v, dependencies, reference_table, zip_file)
             for v in value
         ]
 
@@ -268,10 +276,7 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
         package_entity = (
             json.loads(zip_file.read(package_file.filename)) if package_file else {}
         )
-        dependencies = [
-            Dependency(**d)
-            for d in package_entity.get("_meta_", {}).get("dependencies", [])
-        ]
+        dependencies: Dict[str, Dependency] = {}
         root_package = Package(
             name=package_entity.get("name", folder_name),
             is_root=True,
@@ -294,6 +299,24 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
                     f"Failed to load the file '{filename}' as a JSON document"
                 )
             uid, alias = add_file_to_package(Path(filename), root_package, json_doc)
+
+            # Add dependencies from entity to the global dependencies list
+            entity_dependencies = {
+                v["alias"]: Dependency(**v)
+                for v in json_doc.get("_meta_", {}).get("dependencies", [])
+            }
+            alias_intersect = entity_dependencies.keys() & dependencies.keys()
+
+            # If there are duplicated aliases, raise error if they are not identical to the existing one
+            for duplicated_alias in alias_intersect:
+                if (
+                    entity_dependencies[duplicated_alias]
+                    != dependencies[duplicated_alias]
+                ):
+                    raise ApplicationException(
+                        f"Conflicting dependency alias(es) in file '{filename}'. '{alias_intersect}'"
+                    )
+            dependencies.update(entity_dependencies)
 
             # Use the "name" attribute as the last element in the
             # reference path, so filename and "name" don't need to match
@@ -324,9 +347,9 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
                 k: replace_relative_references(
                     k,
                     v,
+                    dependencies,
                     reference_table=reference_table,
                     zip_file=zip_file,
-                    dependencies=dependencies,
                 )
                 for k, v in document.items()
                 if k != "_meta_"  # Don't update references in "_meta_"
