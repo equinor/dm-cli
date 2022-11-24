@@ -175,7 +175,7 @@ def import_package(context, path: str, data_source: str) -> bool:
         import_package_tree(root_package, data_source)
         click.echo(f"\tImported package '{data_source}/{data_source_data_dir.name}'")
     except ApplicationException as error:
-        click.echo(error.message)
+        click.echo(f"\nERROR: {error.message}")
         return False
     except Exception as error:
         traceback.print_exc()
