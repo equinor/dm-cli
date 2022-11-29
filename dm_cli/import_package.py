@@ -166,8 +166,8 @@ def replace_relative_references(
                     f"IMPORT ERROR: Failed to find the relative reference '{value}' in the reference table."
                 )
 
-    # If the value is a complex type, dig down recursively
-    if isinstance(value, dict) and value != {}:
+    # If the value is a complex type, dig down recursively. Ignore the _meta_ key.
+    if key != "_meta_" and isinstance(value, dict) and value != {}:
         # First check if the type is a blob type
         if (
             replace_relative_references(
@@ -344,15 +344,14 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
         # Now that we have the entire package as a Package tree, traverse it, and replace relative references
         root_package.traverse_documents(
             lambda document: {
-                k: replace_relative_references(
-                    k,
-                    v,
+                key: replace_relative_references(
+                    key,
+                    value,
                     dependencies,
                     reference_table=reference_table,
                     zip_file=zip_file,
                 )
-                for k, v in document.items()
-                if k != "_meta_"  # Don't update references in "_meta_"
+                for key, value in document.items()
             },
             update=True,
         )

@@ -279,6 +279,10 @@ class ImportPackageTest(unittest.TestCase):
             "sys://system/SIMOS/DefaultUiRecipes",
             "sys://system/SIMOS/NamedEntity",
         ]
+        assert (
+            windTurbine["_meta_"]["version"] == "0.0.1"
+            and len(windTurbine["_meta_"]["dependencies"]) == 1
+        )
 
         specialMooring = folder_Moorings.search("SpecialMooring")
         assert len(specialMooring["extends"]) == 2
