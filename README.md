@@ -58,6 +58,9 @@ app
     └── DemoApplicationDataSource.json
 ```
 
+To add meta information to a package (for example to the models root package), a file with name "package.json" can be placed inside the folder.
+
+
 ### Supported reference syntax
 The CLI tool will understand and resolve these kind of type reference schemas during import.
 All values with one of these keys; `("type", "attributeType", "extends", "_blueprintPath_")` will be evaluated for resolution.

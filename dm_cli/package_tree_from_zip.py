@@ -37,7 +37,13 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
         )
 
         package_entity = json.loads(zip_file.read(package_file.filename)) if package_file else {}
+        if package_file in zip_file.filelist:
+            zip_file.filelist.remove(package_file)
         dependencies: Dict[str, Dependency] = {}
+        package_dependencies = {
+            v["alias"]: Dependency(**v) for v in package_entity.get("_meta_", {}).get("dependencies", [])
+        }
+        dependencies.update(package_dependencies)
         root_package = Package(
             name=package_entity.get("name", folder_name),
             is_root=True,

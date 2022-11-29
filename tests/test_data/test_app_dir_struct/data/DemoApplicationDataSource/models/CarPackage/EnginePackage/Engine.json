@@ -1,0 +1,14 @@
+{
+  "name": "Engine",
+  "type": "CORE:Blueprint",
+  "extends": ["CORE:NamedEntity"],
+  "description": "",
+  "attributes": [
+    {
+      "name": "hp",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string"
+    }
+  ],
+  "uiRecipes": []
+}
