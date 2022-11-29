@@ -75,6 +75,10 @@ def replace_relative_references(
 
 def add_file_to_package(path: Path, package: Package, document: dict) -> None:
     if len(path.parts) == 1:  # End of path means the actual document
+        if path.name.endswith("package.json"):
+            # if document is a package.json file, add meta info to package instead of adding it to content list.
+            package.meta = document["_meta_"]
+            return
         # Create a UUID if the document does not have one
         package.content.append({**document, "_id": document.get("_id", str(uuid4()))})
         return
@@ -132,7 +136,7 @@ def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
 
 def import_package_tree(root_package: Package, data_source_id: str) -> None:
     documents_to_upload: List[dict] = [root_package.to_dict()]
-    root_package.traverse_documents(lambda document: documents_to_upload.append(document))
+    root_package.traverse_documents(lambda document, **kwargs: documents_to_upload.append(document))
     root_package.traverse_package(lambda package: documents_to_upload.append(package.to_dict()))
 
     with IncrementalBar(
