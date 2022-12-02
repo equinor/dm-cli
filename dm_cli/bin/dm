@@ -18,8 +18,8 @@ from dm_cli.application import (
 )
 from dm_cli.dmss import dmss_api
 from dmss_api.exceptions import ApiException
-from dm_cli.import_package import (ApplicationException, import_package_tree,
-                                package_tree_from_zip)
+from dm_cli.import_package import (ApplicationException, import_package_tree)
+from package_tree_from_zip import package_tree_from_zip
 from dm_cli.zip_all import zip_all
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])

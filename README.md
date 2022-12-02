@@ -4,10 +4,10 @@
 
 # Data Modelling CLI Tool
 
-### Requirements
-This package requires Python 3.
+## Requirements
+This package requires Python >=3.8
 
-### Installing
+## Installing
 To install this CLI tool you can run the below command
 ```sh
 $ pip3 install dm-cli
@@ -20,7 +20,7 @@ $ pip3 install .
 
 Both the above commands would install the package globally and `dm` will be available on your system.
 
-### Usage
+## Usage
 
 ```sh
 $ dm --help
@@ -40,7 +40,7 @@ Commands:
 
 For each of the `commands` listed above, you can run `dm <COMMAND> --help` to see subcommand-specific help messages, e.g. `dm ds import --help` or `dm pkg --help`
 
-#### Expected directory structure
+### Expected directory structure
 Certain commands expect a specific directory structure, such as the commands `dm reset`, `dm init`, and `dm ds reset`.
 For these commands, the `path` argument must be the path to a directory with two subdirectories, `data_sources` and `data`.
 
@@ -57,7 +57,34 @@ app
     └── DemoApplicationDataSource.json
 ```
 
-#### General
+### Supported reference syntax
+The CLI tool will understand and resolve these kind of type reference schemas during import.
+All values with one of these keys; `("type", "attributeType", "extends", "_blueprintPath_")` will be evaluated for resolution.
+
+```bash
+# DMSS
+dmss://datasource/package/entity
+dmss://datasource/package/subfolder/entity
+
+# Alias - Require dependencies to be defined somewhere in the source tree
+ALIAS:packge/entity
+ALIAS:entity
+
+# Data Source - Relative from the destination data source
+/package/entity
+/package/subfolder/entity
+
+# Package - Relative from the source package
+entity
+subfolder/entity
+
+# TODO: Dotted - Relative from the file (UNIX directory traversal)
+./..entity
+../subfolder/entity
+../../subfolder/entity
+```
+
+### General
 Initialize the data sources
 
 *i.e. import datasources and their packages*
@@ -83,7 +110,7 @@ $ dm reset
 $ dm reset app/
 ```
 
-#### Datasources
+### Datasources
 Import a datasource
 
 ```sh
@@ -112,7 +139,7 @@ $ dm ds reset DemoApplicationDataSource
 $ dm ds reset DemoApplicationDataSource app/
 ```
 
-#### Packages
+### Packages
 Import a package
 > Note that importing a package will delete any preexisting package with the same name, if present in DMSS
 
@@ -150,7 +177,7 @@ $ dm pkg delete-all <data_source> <path>
 $ dm pkg delete-all DemoApplicationDataSource app/data/DemoApplicationDataSource
 ```
 
-### Development
+## Development
 > You need to have DMSS running locally.
 
 ```sh
@@ -160,10 +187,11 @@ $ pip3 install -e .
 $ dm init
 ```
 
-#### Testing
+### Testing
 
-1. Install the dev dependencies: `pip3 install -r dev-requirements.txt`
-2. Run the tests: `pytest`
+1. Install the dependencies: `pip3 install -r requirements.txt`
+2. Install the dev dependencies: `pip3 install -r dev-requirements.txt`
+3. Run the tests: `pytest`
 
-### Feedback
+## Feedback
 Please feel free to leave feedback in issues/PRs.
