@@ -19,6 +19,7 @@ repos:
         language_version: python3.8
         files: .*\.py$
         additional_dependencies: ["click==8.0.4"]
+        exclude: ^dm_cli/dmss_api/
         args:
           - --line-length=119
 
@@ -28,7 +29,7 @@ repos:
       - id: bandit
         args: [-l, --recursive, -x, tests, --skip, B311]
         files: ^.*\.py$
-
+        exclude: ^dm_cli/dmss_api/
 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
@@ -36,6 +37,7 @@ repos:
       - id: isort
         name: isort (python)
         files: ^.*\.py$
+        exclude: ^dm_cli/dmss_api/
         args: [ "--profile=black"]
 
   - repo: https://github.com/pycqa/flake8
@@ -43,6 +45,7 @@ repos:
     hooks:
       - id: flake8
         files: ^./dm_cli/.*\.py$
+        exclude: ^dm_cli/dmss_api/
         additional_dependencies:
           - flake8-print==5.0.0
           - flake8-docstrings==1.6.0

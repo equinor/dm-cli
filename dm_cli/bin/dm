@@ -348,5 +348,13 @@ def reset(context, path: str):
         )
 
 
+@cli.command(help="Create a named Ui-/StorageRecipe-lookup-table from all RecipeLinks in a package existing in DMSS (requires admin privileges)")
+@click.argument("name", required=True)
+@click.argument("path", required=True)
+@click.pass_context
+def create_lookup(context, name: str, path: str):
+    dmss_api.create_lookup(recipe_package=path, application=name)
+
+
 if __name__ == "__main__":
     cli()
