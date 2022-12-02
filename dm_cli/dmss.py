@@ -1,3 +1,3 @@
-from dmss_api.apis import DefaultApi
+from .dmss_api.api.default_api import DefaultApi
 
 dmss_api = DefaultApi()

@@ -32,6 +32,7 @@ Options:
   -h, --help        Show this message and exit.
 
 Commands:
+  create-lookup  Create a named Ui-/StorageRecipe-lookup-table from all...
   ds     Subcommand for working with data sources
   init   Initialize the data sources and import all packages.
   pkg    Subcommand for working with packages
@@ -175,6 +176,14 @@ Delete all packages
 # Delete all packages found in the directory given by <path>
 $ dm pkg delete-all <data_source> <path>
 $ dm pkg delete-all DemoApplicationDataSource app/data/DemoApplicationDataSource
+```
+
+### Recipe Lookup
+Create a named Ui-/StorageRecipe Lookup table from a package. Tell DMSS to look through a package,
+gather all RecipeLinks, and create a named lookup from that. The lookup can be used to associate recipes with an application.
+
+```sh
+dm create-lookup myApplicationName path/To/A/Package/With/RecipeLinks
 ```
 
 ## Development

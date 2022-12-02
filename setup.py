@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="dm-cli",
-    version="0.1.16",
+    version="0.1.17",
     author="",
     author_email="",
     license="MIT",
@@ -16,7 +16,13 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/equinor/dm-cli",
-    packages=["dm_cli"],
+    packages=[
+        "dm_cli",
+        "dm_cli/dmss_api",
+        "dm_cli/dmss_api/api",
+        "dm_cli/dmss_api/models",
+        "dm_cli/dmss_api/model",
+    ],
     install_requires=[requirements],
     python_requires=">=3.8",
     classifiers=[
