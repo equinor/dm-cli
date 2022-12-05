@@ -5,7 +5,8 @@ from pathlib import Path
 from uuid import UUID
 from zipfile import ZipFile
 
-from dm_cli.import_package import ApplicationException, package_tree_from_zip
+from dm_cli.package_tree_from_zip import package_tree_from_zip
+from dm_cli.utils import ApplicationException
 
 """
 ROOT
@@ -67,7 +68,7 @@ test_documents = {
             {
                 "name": "Mooring",
                 "type": "CORE:BlueprintAttribute",
-                "attributeType": "/Moorings/Mooring",
+                "attributeType": "Moorings/Mooring",
                 "optional": True,
                 "contained": False,
             },
@@ -97,7 +98,7 @@ test_documents = {
     "MyRootPackage/Moorings/SpecialMooring.json": {
         "name": "SpecialMooring",
         "type": "CORE:Blueprint",
-        "extends": ["CORE:DefaultUiRecipes", "/Moorings/Mooring"],
+        "extends": ["CORE:DefaultUiRecipes", "Moorings/Mooring"],
         "description": "",
         "attributes": [
             {
@@ -105,7 +106,13 @@ test_documents = {
                 "type": "CORE:BlueprintAttribute",
                 "description": "How small? Not that small really",
                 "attributeType": "integer",
-            }
+            },
+            {
+                "name": "ComplexTypeFromAnotherPacakge",
+                "type": "/AnotherPackage/MyType",
+                "description": "How big? Very",
+                "attributeType": "integer",
+            },
         ],
     },
     "MyRootPackage/myTurbine.json": {
@@ -114,7 +121,7 @@ test_documents = {
         "description": "This is a wind turbine demoing uncontained relationships",
         "Mooring": {
             "_id": "apekatt",
-            "type": "/Moorings/Mooring",
+            "type": "Moorings/Mooring",
             "name": "myTurbineMooring",
         },
     },
@@ -142,19 +149,19 @@ test_documents = {
         "tags": ["Marine", "Renewable"],
     },
     "MyRootPackage/Moorings/myTurbineMooring.json": {
-        "_id": "apekatt",
+        "_id": "fefff0e8-1581-4fa5-a9ed-9ab693e029ca",
         "name": "myTurbineMooring",
-        "type": "/Moorings/Mooring",
+        "type": "Moorings/Mooring",
         "description": "",
         "Bigness": 10,
     },
     "MyRootPackage/A/SubFolder/FileNameDoesNotMatch.json": {
         "name": "myTurbine2",
-        "type": "/WindTurbine",
+        "type": "WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
         "Mooring": {
-            "_id": "apekatt",
-            "type": "/Moorings/Mooring",
+            "_id": "fefff0e8-1581-4fa5-a9ed-9ab693e029ca",
+            "type": "Moorings/Mooring",
             "name": "myTurbineMooring",
         },
     },
@@ -163,8 +170,8 @@ test_documents = {
         "type": "/WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
         "Mooring": {
-            "_id": "apekatt",
-            "type": "/Moorings/Mooring",
+            "_id": "fefff0e8-1581-4fa5-a9ed-9ab693e029ca",
+            "type": "Moorings/Mooring",
             "name": "myTurbineMooring",
         },
     },
@@ -216,7 +223,7 @@ test_documents_with_dependency_conflict = {
             {
                 "name": "Mooring",
                 "type": "CORE:BlueprintAttribute",
-                "attributeType": "/Moorings/Mooring",
+                "attributeType": "Moorings/Mooring",
                 "optional": True,
                 "contained": False,
             },
@@ -240,9 +247,7 @@ class ImportPackageTest(unittest.TestCase):
                 if Path(path).suffix == ".json":
                     zip_file.writestr(path, json.dumps(document).encode())
                 elif Path(path).suffix == ".pdf":
-                    zip_file.write(
-                        f"{Path(__file__).parent}/../test_data/{Path(path).name}", path
-                    )
+                    zip_file.write(f"{Path(__file__).parent}/../test_data/{Path(path).name}", path)
                 elif path[-1] == "/":
                     zip_file.write(Path(__file__).parent, path)
 
@@ -260,32 +265,22 @@ class ImportPackageTest(unittest.TestCase):
 
         assert myTurbine2["type"] == "sys://test_data_source/MyRootPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
-        assert (
-            myTurbine2["Mooring"]["type"]
-            == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
-        )
+        assert myTurbine2["Mooring"]["type"] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
         assert myTurbine2["Mooring"]["_id"] == myTurbineMooring["_id"]
 
         windTurbine = root_package.search("WindTurbine")
         assert isinstance(UUID(windTurbine["_id"]), UUID)
-        assert (
-            windTurbine["attributes"][0]["attributeType"]
-            == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
-        )
-        assert (
-            windTurbine["attributes"][1]["attributeType"]
-        ) == "http://marine-modells.sintef.com/Signals/Default"
+        assert windTurbine["attributes"][0]["attributeType"] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert (windTurbine["attributes"][1]["attributeType"]) == "http://marine-modells.sintef.com/Signals/Default"
         assert windTurbine["extends"] == [
             "sys://system/SIMOS/DefaultUiRecipes",
             "sys://system/SIMOS/NamedEntity",
         ]
-        assert (
-            windTurbine["_meta_"]["version"] == "0.0.1"
-            and len(windTurbine["_meta_"]["dependencies"]) == 1
-        )
+        assert windTurbine["_meta_"]["version"] == "0.0.1" and len(windTurbine["_meta_"]["dependencies"]) == 1
 
         specialMooring = folder_Moorings.search("SpecialMooring")
         assert len(specialMooring["extends"]) == 2
+        assert specialMooring["attributes"][1]["type"] == "sys://test_data_source/AnotherPackage/MyType"
 
         myPDF = root_package.search("MyPdf")
         assert isinstance(myPDF["blob"]["_blob_data_"], bytes)
@@ -299,15 +294,11 @@ class ImportPackageTest(unittest.TestCase):
                 if Path(path).suffix == ".json":
                     zip_file.writestr(path, json.dumps(document).encode())
                 elif Path(path).suffix == ".pdf":
-                    zip_file.write(
-                        f"{Path(__file__).parent}/../test_data/{Path(path).name}", path
-                    )
+                    zip_file.write(f"{Path(__file__).parent}/../test_data/{Path(path).name}", path)
                 elif path[-1] == "/":
                     zip_file.write(Path(__file__).parent, path)
 
         memory_file.seek(0)
 
         with self.assertRaises(ApplicationException):
-            package_tree_from_zip(
-                data_source_id="test_data_source", zip_package=memory_file
-            )
+            package_tree_from_zip(data_source_id="test_data_source", zip_package=memory_file)

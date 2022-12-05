@@ -24,7 +24,7 @@
     {
       "name": "wheels",
       "type": "CORE:BlueprintAttribute",
-      "attributeType": "/CarPackage/Wheel",
+      "attributeType": "CarPackage/Wheel",
       "dimensions": "*"
     }
   ],

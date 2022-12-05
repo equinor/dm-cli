@@ -27,9 +27,7 @@ class Package:
         return self.__getattribute__(item)
 
     def search(self, filename: str) -> Union["Package", dict]:
-        return next(
-            (child for child in self.content if child["name"] == filename), None
-        )
+        return next((child for child in self.content if child["name"] == filename), None)
 
     def to_dict(self):
         return {
@@ -42,9 +40,7 @@ class Package:
             "content": self._content_to_ref_dict(),
         }
 
-    def traverse_documents(
-        self, func: Callable, update: bool = False, **kwargs
-    ) -> None:
+    def traverse_documents(self, func: Callable, update: bool = False, **kwargs) -> None:
         """
         Traverses the Package structure, calling the passed function on every non-Package node.
 
@@ -105,7 +101,5 @@ class Package:
                     )
 
                 else:
-                    result.append(
-                        {"_id": child["_id"], "type": child["type"], "contained": True}
-                    )
+                    result.append({"_id": child["_id"], "type": child["type"], "contained": True})
         return result

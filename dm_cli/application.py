@@ -19,9 +19,7 @@ def _parse_alias_file(file_path: str) -> Dict[str, str]:
                 if line.lstrip()[0] == "#":  # Skip commented lines
                     continue
                 if not re.search(pattern, line):
-                    raise ValueError(
-                        f"The alias file '{file_path}' is invalid. Invalid line '{line}'"
-                    )
+                    raise ValueError(f"The alias file '{file_path}' is invalid. Invalid line '{line}'")
                 key, value = line.split("=", 1)
                 result[key] = value
 
@@ -73,15 +71,11 @@ def _load_app_settings(home: str):
             with open(f"{home}/{app}/settings.json") as json_file:
                 app_settings: dict = json.load(json_file)
                 app_settings["fileLocation"] = json_file.name
-                app_settings["dataSourceAliases"] = _parse_alias_file(
-                    f"{home}/{app}/data/_aliases_"
-                )
+                app_settings["dataSourceAliases"] = _parse_alias_file(f"{home}/{app}/data/_aliases_")
                 code_gen_folder = Path(f"{home}/{app}/code_generators")
                 if code_gen_folder.is_dir():
                     app_settings["codeGenerators"] = os.listdir(str(code_gen_folder))
-                application_settings[
-                    app_settings["name"]
-                ] = _replace_aliases_in_settings(app_settings)
+                application_settings[app_settings["name"]] = _replace_aliases_in_settings(app_settings)
         except FileNotFoundError:
             raise FileNotFoundError(
                 f"No settings file found for the app '{app}'."
@@ -89,9 +83,7 @@ def _load_app_settings(home: str):
                 f"'{home}/{{name-of-app}}/'"
             )
         except KeyError as e:
-            raise KeyError(
-                f"The settings file for the '{app}' application is invalid: {e}"
-            )
+            raise KeyError(f"The settings file for the '{app}' application is invalid: {e}")
         print(f"Successfully loaded app '{app}'")
 
     return application_settings
@@ -122,11 +114,7 @@ def get_app_dir_structure(path: Path) -> [Path, Path]:
 
 def get_data_source_definition_files(path: Path) -> List[str]:
     """Get all JSON files found in <path>."""
-    return [
-        filename
-        for filename in os.listdir(path)
-        if filename.endswith(f".{DATA_SOURCE_DEF_FILE_EXT}")
-    ]
+    return [filename for filename in os.listdir(path) if filename.endswith(f".{DATA_SOURCE_DEF_FILE_EXT}")]
 
 
 def get_subdirectories(path: Path) -> List[str]:
