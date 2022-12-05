@@ -63,8 +63,8 @@ All values with one of these keys; `("type", "attributeType", "extends", "_bluep
 
 ```bash
 # DMSS
-dmss://datasource/package/entity
-dmss://datasource/package/subfolder/entity
+sys://datasource/package/entity
+sys://datasource/package/subfolder/entity
 
 # Alias - Require dependencies to be defined somewhere in the source tree
 ALIAS:packge/entity
