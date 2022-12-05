@@ -1,7 +1,7 @@
 {
   "name": "ExtendedApplication",
   "type": "CORE:Blueprint",
-  "extends": ["/DemoApplication"],
+  "extends": ["DemoApplication"],
   "description": "",
   "attributes": [
     {
@@ -13,7 +13,7 @@
     {
       "name": "wheels",
       "type": "CORE:BlueprintAttribute",
-      "attributeType": "/CarPackage/Wheel",
+      "attributeType": "CarPackage/Wheel",
       "dimensions": "*",
       "optional": false
     }
