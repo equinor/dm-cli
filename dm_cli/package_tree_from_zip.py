@@ -67,14 +67,9 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
 
         # Now that we have the entire package as a Package tree, traverse it, and replace relative references
         root_package.traverse_documents(
-            lambda document: {
+            lambda document, file_path: {
                 key: replace_relative_references(
-                    key,
-                    value,
-                    dependencies,
-                    zip_file=zip_file,
-                    data_source=data_source_id,
-                    root_package=root_package.name,
+                    key, value, dependencies, zip_file=zip_file, data_source=data_source_id, file_path=file_path
                 )
                 for key, value in document.items()
             },
