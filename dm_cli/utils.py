@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from os.path import normpath
+from pathlib import Path, PurePath, PurePosixPath
 from typing import Dict, List, Literal, NewType
 
 
@@ -87,7 +89,8 @@ def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> st
     raise ApplicationException(f"Protocol '{dependency.protocol}' is not a valid protocol for resolving dependencies")
 
 
-def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, root_package: str) -> str:
+def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
+    root_package = file_path.split("/", 1)[0]
     ref_schema = find_reference_schema(reference)
     if ref_schema == "alias":
         return resolve_dependency(reference, dependencies)
@@ -96,7 +99,8 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     if ref_schema == "package":
         return f"sys://{data_source}/{root_package}/{reference}"
     if ref_schema in "dotted":
-        raise NotImplementedError(f"Dotted relative references is not yet supported. Got: '{reference}'")
+        normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
+        return f"sys://{data_source}/{normalized_dotted_ref}"
 
 
 def concat_dependencies(

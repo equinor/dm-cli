@@ -57,7 +57,7 @@ test_documents = {
             "dependencies": [
                 {
                     "alias": "SINTEF",
-                    "address": "marine-modells.sintef.com/Signals",
+                    "address": "marine-models.sintef.com/Signals",
                     "version": "1.2.3",
                     "protocol": "http",
                 }
@@ -98,7 +98,7 @@ test_documents = {
     "MyRootPackage/Moorings/SpecialMooring.json": {
         "name": "SpecialMooring",
         "type": "CORE:Blueprint",
-        "extends": ["CORE:DefaultUiRecipes", "Moorings/Mooring"],
+        "extends": ["CORE:DefaultUiRecipes", "Moorings/Mooring", "./Mooring"],
         "description": "",
         "attributes": [
             {
@@ -112,6 +112,12 @@ test_documents = {
                 "type": "/AnotherPackage/MyType",
                 "description": "How big? Very",
                 "attributeType": "integer",
+            },
+            {
+                "name": "ComplexTypeFromAnotherPacakge",
+                "type": "CORE:BlueprintAttribute",
+                "description": "Type from parent folder",
+                "attributeType": "../WindTurbine",
             },
         ],
     },
@@ -161,7 +167,7 @@ test_documents = {
         "description": "This is a wind turbine demoing uncontained relationships",
         "Mooring": {
             "_id": "fefff0e8-1581-4fa5-a9ed-9ab693e029ca",
-            "type": "Moorings/Mooring",
+            "type": "../../Moorings/Mooring",
             "name": "myTurbineMooring",
         },
     },
@@ -195,7 +201,7 @@ test_documents_with_dependency_conflict = {
                 },
                 {
                     "alias": "SINTEF",
-                    "address": "marine-modells.sintef.com/Signals",
+                    "address": "marine-models.sintef.com/Signals",
                     "version": "1.2.3",
                     "protocol": "http",
                 },
@@ -212,7 +218,7 @@ test_documents_with_dependency_conflict = {
             "dependencies": [
                 {
                     "alias": "SINTEF",
-                    "address": "marine-modells.sintef.com/Signals/SpecialSignals",
+                    "address": "marine-models.sintef.com/Signals/SpecialSignals",
                     "version": "3.2.1",
                     "protocol": "http",
                 }
@@ -271,7 +277,7 @@ class ImportPackageTest(unittest.TestCase):
         windTurbine = root_package.search("WindTurbine")
         assert isinstance(UUID(windTurbine["_id"]), UUID)
         assert windTurbine["attributes"][0]["attributeType"] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
-        assert (windTurbine["attributes"][1]["attributeType"]) == "http://marine-modells.sintef.com/Signals/Default"
+        assert (windTurbine["attributes"][1]["attributeType"]) == "http://marine-models.sintef.com/Signals/Default"
         assert windTurbine["extends"] == [
             "sys://system/SIMOS/DefaultUiRecipes",
             "sys://system/SIMOS/NamedEntity",
@@ -279,7 +285,8 @@ class ImportPackageTest(unittest.TestCase):
         assert windTurbine["_meta_"]["version"] == "0.0.1" and len(windTurbine["_meta_"]["dependencies"]) == 1
 
         specialMooring = folder_Moorings.search("SpecialMooring")
-        assert len(specialMooring["extends"]) == 2
+        assert len(specialMooring["extends"]) == 3
+        assert specialMooring["extends"][2] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
         assert specialMooring["attributes"][1]["type"] == "sys://test_data_source/AnotherPackage/MyType"
 
         myPDF = root_package.search("MyPdf")

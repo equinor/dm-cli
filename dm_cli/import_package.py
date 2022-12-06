@@ -19,32 +19,35 @@ def replace_relative_references(
     value,
     dependencies: Dict[str, Dependency],
     data_source: str,
-    root_package: str,
     zip_file: ZipFile = None,
+    file_path: str = None,
 ) -> Union[str, List[str], dict]:
     """
-    Takes a key-value pair and returns the passed value, with relative references updated with absolute ones.
+    Takes a key-value pair, along with some context, and returns the passed value, with
+    relative references updated with absolute ones.
 
     For Blob-entities. Insert the binary data from the file into the entity.
     It digs down on complex types.
-
-    @param key: Name of the attribute being checked in the document
-    @param value: Value of the attribute being checked in the document
-    @return: The passed value, with relative references updated with absolute ones
     """
+
     if key in keys_to_check:
         if key == "extends":  # 'extends' is a list
             extends_list = []
             for i, blueprint in enumerate(value):
-                extends_list.append(resolve_reference(blueprint, dependencies, data_source, root_package))
+                extends_list.append(resolve_reference(blueprint, dependencies, data_source, file_path))
             return extends_list
-        return resolve_reference(value, dependencies, data_source, root_package)
+        return resolve_reference(
+            value,
+            dependencies,
+            data_source,
+            file_path,
+        )
 
     # If the value is a complex type, dig down recursively. Ignore the _meta_ key.
     if key != "_meta_" and isinstance(value, dict) and value != {}:
         # First check if the type is a blob type
         if (
-            replace_relative_references("type", value["type"], dependencies, data_source, root_package, zip_file)
+            replace_relative_references("type", value["type"], dependencies, data_source, zip_file, file_path)
             == SIMOS.BLOB.value
         ):
             # Add blob data to the blob-entity
@@ -60,11 +63,11 @@ def replace_relative_references(
             return {"_blob_data_": zip_file.read(value["name"]), **value}
 
         return {
-            k: replace_relative_references(k, v, dependencies, data_source, root_package, zip_file)
+            k: replace_relative_references(k, v, dependencies, data_source, zip_file, file_path)
             for k, v in value.items()
         }
     if isinstance(value, list):
-        return [replace_relative_references(key, v, dependencies, data_source, root_package, zip_file) for v in value]
+        return [replace_relative_references(key, v, dependencies, data_source, zip_file, file_path) for v in value]
 
     # This means it's a primitive type or an absolute path, return it as is
     return value
@@ -77,7 +80,7 @@ def add_file_to_package(path: Path, package: Package, document: dict) -> None:
         return
     sub_folder = next((p for p in package.content if p["name"] == path.parts[0]), None)
     if not sub_folder:  # If the sub folder has not already been created on parent, create it
-        sub_folder = Package(name=path.parts[0])
+        sub_folder = Package(name=path.parts[0], parent=package)
         package.content.append(sub_folder)
 
     new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
@@ -86,12 +89,12 @@ def add_file_to_package(path: Path, package: Package, document: dict) -> None:
 
 def add_package_to_package(path: Path, package: Package) -> None:
     if len(path.parts) == 1:
-        package.content.append(Package(name=path.parts[0]))
+        package.content.append(Package(name=path.parts[0], parent=package))
         return
 
     sub_folder = next((p for p in package.content if p["name"] == path.parts[0]), None)
     if not sub_folder:  # If the sub folder has not already been created on parent, create it
-        sub_folder = Package(name=path.parts[0])
+        sub_folder = Package(name=path.parts[0], parent=package)
         package.content.append(sub_folder)
 
     new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
