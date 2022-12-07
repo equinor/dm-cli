@@ -17,6 +17,7 @@ from dm_cli.application import (
     DATA_SOURCE_DEF_FILE_EXT,
 )
 from dm_cli.dmss import dmss_api
+from dmss_api.exceptions import ApiException
 from dm_cli.import_package import import_package_tree
 from dm_cli.utils import ApplicationException
 from dm_cli.package_tree_from_zip import package_tree_from_zip
