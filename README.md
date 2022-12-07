@@ -66,7 +66,7 @@ The CLI tool will understand and resolve these kind of type reference schemas du
 All values with one of these keys; `("type", "attributeType", "extends", "_blueprintPath_")` will be evaluated for resolution.
 
 ```bash
-# DMSS
+# URI - Full absolute path prefixed with protocol
 sys://datasource/package/entity
 sys://datasource/package/subfolder/entity
 
@@ -82,8 +82,8 @@ ALIAS:entity
 entity
 subfolder/entity
 
-# TODO: Dotted - Relative from the file (UNIX directory traversal)
-./..entity
+# Dotted - Relative from the file (UNIX directory traversal)
+./../entity
 ../subfolder/entity
 ../../subfolder/entity
 ```
