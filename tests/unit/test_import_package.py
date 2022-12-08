@@ -42,7 +42,7 @@ test_documents = {
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
-                    "protocol": "sys",
+                    "protocol": "dmss",
                 }
             ],
         },
@@ -197,7 +197,7 @@ test_documents_with_dependency_conflict = {
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
-                    "protocol": "sys",
+                    "protocol": "dmss",
                 },
                 {
                     "alias": "SINTEF",
@@ -269,25 +269,27 @@ class ImportPackageTest(unittest.TestCase):
         folder_SubFolder = folder_A.search("SubFolder")
         myTurbine2 = folder_SubFolder.search("myTurbine2")
 
-        assert myTurbine2["type"] == "sys://test_data_source/MyRootPackage/WindTurbine"
+        assert myTurbine2["type"] == "dmss://test_data_source/MyRootPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
-        assert myTurbine2["Mooring"]["type"] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert myTurbine2["Mooring"]["type"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
         assert myTurbine2["Mooring"]["_id"] == myTurbineMooring["_id"]
 
         windTurbine = root_package.search("WindTurbine")
         assert isinstance(UUID(windTurbine["_id"]), UUID)
-        assert windTurbine["attributes"][0]["attributeType"] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert (
+            windTurbine["attributes"][0]["attributeType"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+        )
         assert (windTurbine["attributes"][1]["attributeType"]) == "http://marine-models.sintef.com/Signals/Default"
         assert windTurbine["extends"] == [
-            "sys://system/SIMOS/DefaultUiRecipes",
-            "sys://system/SIMOS/NamedEntity",
+            "dmss://system/SIMOS/DefaultUiRecipes",
+            "dmss://system/SIMOS/NamedEntity",
         ]
         assert windTurbine["_meta_"]["version"] == "0.0.1" and len(windTurbine["_meta_"]["dependencies"]) == 1
 
         specialMooring = folder_Moorings.search("SpecialMooring")
         assert len(specialMooring["extends"]) == 3
-        assert specialMooring["extends"][2] == "sys://test_data_source/MyRootPackage/Moorings/Mooring"
-        assert specialMooring["attributes"][1]["type"] == "sys://test_data_source/AnotherPackage/MyType"
+        assert specialMooring["extends"][2] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert specialMooring["attributes"][1]["type"] == "dmss://test_data_source/AnotherPackage/MyType"
 
         myPDF = root_package.search("MyPdf")
         assert isinstance(myPDF["blob"]["_blob_data_"], bytes)

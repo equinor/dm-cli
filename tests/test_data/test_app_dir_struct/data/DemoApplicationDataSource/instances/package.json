@@ -9,13 +9,13 @@
         "alias": "CORE",
         "address": "system/SIMOS",
         "version": "0.0.1",
-        "protocol": "sys"
+        "protocol": "dmss"
       },
       {
         "alias": "TEST-MODELS",
         "address": "DemoApplicationDataSource/models",
         "version": "0.0.1",
-        "protocol": "sys"
+        "protocol": "dmss"
       }
     ]
   }

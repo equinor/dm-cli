@@ -9,7 +9,7 @@
         "alias": "TEST",
         "address": "system/SIMOS",
         "version": "0.0.1",
-        "protocol": "sys"
+        "protocol": "dmss"
       }
     ]
   }
