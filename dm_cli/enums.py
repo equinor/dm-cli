@@ -32,5 +32,5 @@ class BuiltinDataTypes(Enum):
 
 
 class SIMOS(Enum):
-    BLOB = "sys://system/SIMOS/Blob"
-    PACKAGE = "sys://system/SIMOS/Package"
+    BLOB = "dmss://system/SIMOS/Blob"
+    PACKAGE = "dmss://system/SIMOS/Package"

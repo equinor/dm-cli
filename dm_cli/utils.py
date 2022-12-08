@@ -34,7 +34,7 @@ class ApplicationException(Exception):
         }
 
 
-TDependencyProtocol = NewType("TDependencyProtocol", Literal["sys", "http"])
+TDependencyProtocol = NewType("TDependencyProtocol", Literal["dmss", "http"])
 
 
 @dataclass(frozen=True)
@@ -43,7 +43,7 @@ class Dependency:
 
     alias: str
     # Different ways we support to fetch dependencies.
-    # sys: Internally within the DMSS instance
+    # dmss: Internally within the DMSS instance
     # http: A public HTTP GET call
     protocol: TDependencyProtocol
     address: str
@@ -81,8 +81,8 @@ def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> st
         raise ApplicationException(f"No dependency with alias '{tag}' was found in the entities dependencies list")
     address = dependency.address.strip(" /")
 
-    if dependency.protocol == "sys":
-        return f"sys://{address}/{path}"
+    if dependency.protocol == "dmss":
+        return f"dmss://{address}/{path}"
     if dependency.protocol == "http":
         return f"http://{address}/{path}"
 
@@ -95,12 +95,12 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     if ref_schema == "alias":
         return resolve_dependency(reference, dependencies)
     if ref_schema == "data_source":
-        return f"sys://{data_source}{reference}"
+        return f"dmss://{data_source}{reference}"
     if ref_schema == "package":
-        return f"sys://{data_source}/{root_package}/{reference}"
+        return f"dmss://{data_source}/{root_package}/{reference}"
     if ref_schema in "dotted":
         normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
-        return f"sys://{data_source}/{normalized_dotted_ref}"
+        return f"dmss://{data_source}/{normalized_dotted_ref}"
 
 
 def concat_dependencies(
