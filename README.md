@@ -163,6 +163,15 @@ $ dm pkg import-all <path> <data_source>
 $ dm pkg import-all app/data/DemoApplicationDataSource DemoApplicationDataSource
 ```
 
+
+Exporting document(s) in a package as a zip file
+```sh
+# export document(s) in a package in the directory given by <path>
+$ dm pkg export <path> <data_source>
+# Export all documents in 'app/data/DemoApplicationDataSource'
+$ dm pkg export app/data/DemoApplicationDataSource DemoApplicationDataSource
+```
+
 Delete a package
 
 ```sh
