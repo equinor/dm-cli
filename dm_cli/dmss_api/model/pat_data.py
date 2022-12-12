@@ -156,7 +156,7 @@ class PATData(ModelNormal):
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
             pat_hash (str): [optional]  # noqa: E501
-            uuid (str): [optional] if omitted the server will use the default value of "6bf0bd94-f0ad-4c31-a596-11b980ec667c"  # noqa: E501
+            uuid (str): [optional] if omitted the server will use the default value of "4873f1eb-9688-45a2-9458-bb305e729ed2"  # noqa: E501
             roles ([str]): [optional] if omitted the server will use the default value of []  # noqa: E501
         """
 
@@ -248,7 +248,7 @@ class PATData(ModelNormal):
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
             pat_hash (str): [optional]  # noqa: E501
-            uuid (str): [optional] if omitted the server will use the default value of "6bf0bd94-f0ad-4c31-a596-11b980ec667c"  # noqa: E501
+            uuid (str): [optional] if omitted the server will use the default value of "4873f1eb-9688-45a2-9458-bb305e729ed2"  # noqa: E501
             roles ([str]): [optional] if omitted the server will use the default value of []  # noqa: E501
         """
 

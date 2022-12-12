@@ -146,7 +146,7 @@ class ErrorResponse(ModelNormal):
             type (str): [optional] if omitted the server will use the default value of "ApplicationException"  # noqa: E501
             message (str): [optional] if omitted the server will use the default value of "The requested operation failed"  # noqa: E501
             debug (str): [optional] if omitted the server will use the default value of "An unknown and unhandled exception occurred in the API"  # noqa: E501
-            data ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}): [optional]  # noqa: E501
+            data ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}): [optional] if omitted the server will use the default value of {}  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -232,7 +232,7 @@ class ErrorResponse(ModelNormal):
             type (str): [optional] if omitted the server will use the default value of "ApplicationException"  # noqa: E501
             message (str): [optional] if omitted the server will use the default value of "The requested operation failed"  # noqa: E501
             debug (str): [optional] if omitted the server will use the default value of "An unknown and unhandled exception occurred in the API"  # noqa: E501
-            data ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}): [optional]  # noqa: E501
+            data ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}): [optional] if omitted the server will use the default value of {}  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
