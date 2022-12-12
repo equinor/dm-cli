@@ -3299,7 +3299,7 @@ class DefaultApi(object):
 
             Keyword Args:
                 scope (dict): [optional]
-                time_to_live (int): [optional]
+                time_to_live (int): [optional] if omitted the server will use the default value of 2592000
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
                 _preload_content (bool): if False, the urllib3.HTTPResponse object
