@@ -6,10 +6,10 @@ import json
 import traceback
 from pathlib import Path
 from zipfile import ZipFile
-
 import click
 import emoji
 
+from dm_cli.dmss import settings, export
 from dm_cli.application import (
     get_app_dir_structure,
     get_data_source_definition_files,
@@ -41,8 +41,10 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 def cli(context, token: str, url: str):
     # Set the auth header
     dmss_api.api_client.default_headers["Authorization"] = f"Bearer {token}"
+    settings.DMSS_TOKEN = token
     # Set the DMSS host
     dmss_api.api_client.configuration.host = url
+    settings.PUBLIC_DMSS_API = url
 
 
 @cli.group("ds", help="Subcommand for working with data sources")
@@ -214,6 +216,28 @@ def import_packages(context, path: str, data_source: str):
         for r in results:
             if not r:
                 exit(1)  # If any of the parallel functions did not return True, they fail, and so we exit with 1
+
+
+@pkg_cli.command("export", help="Export document(s) in a package as a zip file in the directory given by <path> for a data source.")
+@click.argument("path", required=True)
+@click.argument("data_source", required=True)
+@click.pass_context
+def export_documents(context, path: str, data_source: str):
+    """
+    Export document(s) in a package. path is relative to the data_source.
+
+    Example: if you have the root package "models" with a sub package Windmill in the data_source DemoApplicationDataSource,
+    the entire Windmill package can be exported using:
+    path = "models/Windmill"
+    data_source = "DemoApplicationDataSource"
+
+    The zip file is downloaded to the directory the command is called from.
+    """
+    # path and data_source should not have a trailing or leading "/"
+    path = path.rstrip("/").lstrip("/")
+    data_source = data_source.rstrip("/").lstrip("/")
+
+    export(absolute_document_ref=f"{data_source}/{path}")
 
 
 @pkg_cli.command("delete", help="Delete the package <package> in the given data source.")
