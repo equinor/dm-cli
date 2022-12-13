@@ -16,10 +16,11 @@ from dm_cli.application import (
     get_subdirectories,
     DATA_SOURCE_DEF_FILE_EXT,
 )
-from dm_cli.dmss import dmss_api
+from dm_cli.dmss import dmss_api, ApplicationException
 from dm_cli.dmss_api.exceptions import ApiException
 from dm_cli.import_package import import_package_tree
-from dm_cli.utils import ApplicationException, unpack_and_save_zipfile, save_as_zip_file
+from dm_cli.import_entity import import_single_entity
+from dm_cli.utils import document_already_exists, unpack_and_save_zipfile, save_as_zip_file
 from dm_cli.package_tree_from_zip import package_tree_from_zip
 from dm_cli.zip_all import zip_all
 
@@ -73,7 +74,7 @@ def import_data_source(context, path: str):
             # Upload the data source definition to DMSS
             dmss_api.data_source_save(document["name"], data_source_request=document)
             click.echo(f"\tImported data source '{document['name']}'")
-        except (ApiException, KeyError) as error:
+        except (ApiException, ApplicationException, KeyError) as error:
             if error.status == 400:
                 click.echo(
                     emoji.emojize(
@@ -298,6 +299,42 @@ def delete_packages(context, data_source: str, path: str):
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(thread_function, packages)
+
+
+@cli.group("entity", help="Subcommand for working with entities")
+@click.pass_context
+def entity_cli(context):
+    pass
+
+
+@entity_cli.command("import", help="Import the entity <path> to the given <path_reference>.")
+@click.argument("path", required=True)
+@click.argument("path_reference", required=True)
+@click.pass_context
+def import_entity(context, path: str, path_reference: str) -> bool:
+    """
+    Import the entity <path> to the given <path_reference>
+    """
+    document_path = Path(path)
+    if not document_path.is_file():
+        raise FileNotFoundError(f"The path '{path}' is not a file.")
+
+    click.echo(f"IMPORTING ENTITY '{document_path.name}' TO '{path_reference}'")
+
+    try:
+        import_single_entity(document_path, path_reference)
+        click.echo(f"\tImported entity '{document_path.name}' to '{path_reference}'")
+    except ApiException as api_exception:
+        if not document_already_exists(api_exception):
+            raise
+    except ApplicationException as error:
+        click.echo(f"\nERROR: {error.message}")
+        return False
+    except Exception as error:
+        traceback.print_exc()
+        click.echo(f"\tSomething went wrong trying to upload the entity '{document_path.name}' to DMSS; {error}")
+        return False
+    return True
 
 
 @cli.command(help="Initialize the data sources and import all packages.")
