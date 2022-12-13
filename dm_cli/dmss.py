@@ -3,7 +3,6 @@ from typing import Union
 import requests
 
 from dm_cli.dmss_api.api.default_api import DefaultApi
-from dm_cli.utils import ApplicationException
 
 dmss_api = DefaultApi()
 
@@ -14,6 +13,36 @@ class Settings:
 
 
 settings = Settings()
+
+
+class ApplicationException(Exception):
+    status: int = 500
+    type: str = "ApplicationException"
+    message: str = "The requested operation failed"
+    debug: str = "An unknown and unhandled exception occurred in the API"
+    data: dict = None
+
+    def __init__(
+        self,
+        message: str = "The requested operation failed",
+        debug: str = "An unknown and unhandled exception occurred in the API",
+        data: dict = None,
+        status: int = 500,
+    ):
+        self.status = status
+        self.type = self.__class__.__name__
+        self.message = message
+        self.debug = debug
+        self.data = data
+
+    def dict(self):
+        return {
+            "status": self.status,
+            "type": self.type,
+            "message": self.message,
+            "debug": self.debug,
+            "data": self.data,
+        }
 
 
 def export(absolute_document_ref: str):

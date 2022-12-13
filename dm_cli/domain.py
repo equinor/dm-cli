@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, List, NewType, Union, Literal
+from typing import Callable, List, Literal, NewType, Union
 from uuid import UUID, uuid4
 
 from .enums import SIMOS

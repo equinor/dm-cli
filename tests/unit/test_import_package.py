@@ -5,8 +5,8 @@ from pathlib import Path
 from uuid import UUID
 from zipfile import ZipFile
 
+from dm_cli.dmss import ApplicationException
 from dm_cli.package_tree_from_zip import package_tree_from_zip
-from dm_cli.utils import ApplicationException
 
 """
 ROOT

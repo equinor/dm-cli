@@ -6,12 +6,8 @@ from typing import Dict
 from zipfile import ZipFile
 
 from .domain import Dependency, Package
-from .import_package import (
-    add_file_to_package,
-    add_package_to_package,
-    replace_relative_references,
-)
-from .utils import concat_dependencies
+from .import_package import add_file_to_package, add_package_to_package
+from .utils import concat_dependencies, replace_relative_references
 
 
 def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Package:
@@ -75,7 +71,12 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
         root_package.traverse_documents(
             lambda document, file_path: {
                 key: replace_relative_references(
-                    key, value, dependencies, zip_file=zip_file, data_source=data_source_id, file_path=file_path
+                    key,
+                    value,
+                    dependencies,
+                    data_source_id,
+                    file_path=file_path,
+                    zip_file=zip_file,
                 )
                 for key, value in document.items()
             },
