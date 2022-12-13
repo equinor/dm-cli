@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+import json
 from os.path import normpath
 from pathlib import Path
 from typing import Dict, List, Literal, NewType
@@ -7,6 +7,8 @@ from zipfile import ZipFile
 import click
 import emoji
 
+from .domain import Dependency
+from .dmss_api.exceptions import ApiException
 
 class ApplicationException(Exception):
     status: int = 500
@@ -36,30 +38,6 @@ class ApplicationException(Exception):
             "debug": self.debug,
             "data": self.data,
         }
-
-
-TDependencyProtocol = NewType("TDependencyProtocol", Literal["dmss", "http"])
-
-
-@dataclass(frozen=True)
-class Dependency:
-    """Class for any dependencies (external types) a entity references"""
-
-    alias: str
-    # Different ways we support to fetch dependencies.
-    # dmss: Internally within the DMSS instance
-    # http: A public HTTP GET call
-    protocol: TDependencyProtocol
-    address: str
-    version: str = ""
-
-    def __eq__(self, other):
-        return (
-            self.alias == other.alias
-            and self.protocol == other.protocol
-            and self.address == other.address
-            and self.version == other.version
-        )
 
 
 def find_reference_schema(reference: str) -> Literal["dmss", "alias", "dotted", "package", "data_source"]:
@@ -124,6 +102,14 @@ def concat_dependencies(
             raise ApplicationException(f"Conflicting dependency alias(es) in file '{filename}'. '{alias_intersect}'")
     old_dependencies.update(entity_dependencies)
     return old_dependencies
+
+
+def document_already_exists(api_exception: ApiException) -> bool:
+    error = json.loads(api_exception.body)
+    if error.get("type") == "BadRequestException" and "already exists" in error.get("message"):
+        print(f"ERROR: {error.get('message')}")
+        return True
+    return False
 
 
 def unpack_and_save_zipfile(export_location: str, zip_file: ZipFile):

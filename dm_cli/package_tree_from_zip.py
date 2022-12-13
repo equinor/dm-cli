@@ -5,13 +5,13 @@ from pathlib import Path
 from typing import Dict
 from zipfile import ZipFile
 
-from .domain import Package
+from .domain import Dependency, Package
 from .import_package import (
     add_file_to_package,
     add_package_to_package,
     replace_relative_references,
 )
-from .utils import Dependency, concat_dependencies
+from .utils import concat_dependencies
 
 
 def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Package:
