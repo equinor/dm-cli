@@ -7,9 +7,9 @@ from zipfile import ZipFile
 from progress.bar import IncrementalBar
 
 from .dmss import dmss_api
-from .domain import Package
+from .domain import Dependency, Package
 from .enums import PRIMITIVES, SIMOS
-from .utils import Dependency, resolve_reference
+from .utils import resolve_reference
 
 keys_to_check = ("type", "attributeType", "extends", "_blueprintPath_")  # These keys may contain a reference
 

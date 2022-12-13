@@ -1,4 +1,5 @@
-from typing import Callable, List, Union
+from dataclasses import dataclass
+from typing import Callable, List, NewType, Union, Literal
 from uuid import UUID, uuid4
 
 from .enums import SIMOS
@@ -111,3 +112,27 @@ class Package:
                 else:
                     result.append({"_id": child["_id"], "type": child["type"], "contained": True})
         return result
+
+
+TDependencyProtocol = NewType("TDependencyProtocol", Literal["dmss", "http"])
+
+
+@dataclass(frozen=True)
+class Dependency:
+    """Class for any dependencies (external types) a entity references"""
+
+    alias: str
+    # Different ways we support to fetch dependencies.
+    # dmss: Internally within the DMSS instance
+    # http: A public HTTP GET call
+    protocol: TDependencyProtocol
+    address: str
+    version: str = ""
+
+    def __eq__(self, other):
+        return (
+            self.alias == other.alias
+            and self.protocol == other.protocol
+            and self.address == other.address
+            and self.version == other.version
+        )
