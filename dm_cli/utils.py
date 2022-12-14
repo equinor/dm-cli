@@ -1,7 +1,10 @@
+import os
 from dataclasses import dataclass
 from os.path import normpath
 from pathlib import Path, PurePath, PurePosixPath
 from typing import Dict, List, Literal, NewType
+from uuid import uuid4
+from zipfile import ZipFile
 
 
 class ApplicationException(Exception):
@@ -115,3 +118,36 @@ def concat_dependencies(
             raise ApplicationException(f"Conflicting dependency alias(es) in file '{filename}'. '{alias_intersect}'")
     old_dependencies.update(entity_dependencies)
     return old_dependencies
+
+
+def unpack_and_save_zipfile(override: bool, export_location: str, zip_file: ZipFile):
+    """Unpack zipfile and save it to export_location.
+    If override is True, any existing file/folder with the name of filename will be overwritten.
+    """
+    if ".zip" not in zip_file.filename:
+        raise ApplicationException(message="file ending .zip must be included in filename!")
+    zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
+
+    if not override and Path(zip_file_unpacked_path).exists():
+        if Path(zip_file_unpacked_path).exists():
+            new_path = f"{zip_file_unpacked_path.rstrip('.zip')}-{str(uuid4())}"
+            os.mkdir(new_path)
+            zip_file.extractall(path=new_path)
+    else:
+        zip_file.extractall(path=export_location)
+
+
+def save_as_zip_file(override: bool, export_location: str, filename: str, data: str):
+    """Save binary data into a zip file on the local disk.
+    If override is True, any existing zip file with the name of filename will be overwritten.
+    """
+    if ".zip" not in filename:
+        raise ApplicationException(message="file ending .zip must be included in filename!")
+    saved_zip_file_path = f"{export_location}/{filename}"
+
+    if not override and Path(saved_zip_file_path).exists():
+        with open(f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip", "wb") as f:
+            f.write(data)
+    else:
+        with open(saved_zip_file_path, "wb") as f:
+            f.write(data)
