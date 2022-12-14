@@ -164,13 +164,22 @@ $ dm pkg import-all app/data/DemoApplicationDataSource DemoApplicationDataSource
 ```
 
 
-Exporting document(s) in a package as a zip file
+Exporting packages and single documents
 ```sh
-# export document(s) in a package in the directory given by <path>
-$ dm pkg export <path> <data_source>
-# Export all documents in 'app/data/DemoApplicationDataSource'
-$ dm pkg export app/data/DemoApplicationDataSource DemoApplicationDataSource
+# export document(s) by a given <data_source>/<path>
+$ dm pkg export <data_source>/<path>
+$ dm pkg export <data_source>/<path> <destination_path>
+$ dm pkg export <data_source>/<path> <destination_path> --unpack
+$ dm pkg export <data_source>/<path> <destination_path> --unpack -override
+
+# Export all documents in 'DemoApplicationDataSource/models/CarPackage'
+$ dm pkg export DemoApplicationDataSource/models/CarPackage
 ```
+
+Optional arguments and flags:
+<destination_path> : specifies where to save the downloaded file(s) on the local disk
+unpack: whether or not to unpack the zip file
+override: wheter or not to override folder/file on local disk if it exists
 
 Delete a package
 
