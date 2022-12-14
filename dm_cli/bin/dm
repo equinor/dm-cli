@@ -1,8 +1,8 @@
 #! /usr/bin/env python
-
-import concurrent.futures
 import io
+import concurrent.futures
 import json
+import os
 import traceback
 from pathlib import Path
 from zipfile import ZipFile
@@ -19,7 +19,7 @@ from dm_cli.application import (
 from dm_cli.dmss import dmss_api
 from dm_cli.dmss_api.exceptions import ApiException
 from dm_cli.import_package import import_package_tree
-from dm_cli.utils import ApplicationException
+from dm_cli.utils import ApplicationException, unpack_and_save_zipfile, save_as_zip_file
 from dm_cli.package_tree_from_zip import package_tree_from_zip
 from dm_cli.zip_all import zip_all
 
@@ -218,27 +218,33 @@ def import_packages(context, path: str, data_source: str):
                 exit(1)  # If any of the parallel functions did not return True, they fail, and so we exit with 1
 
 
-@pkg_cli.command("export", help="Export document(s) in a package as a zip file in the directory given by <path> for a data source.")
-@click.argument("path", required=True)
-@click.argument("data_source", required=True)
+@pkg_cli.command("export")
+@click.argument("absolute_document_reference", required=True)
+@click.argument("export_location", required=False, default="")
+@click.option("-u", "--unpack", is_flag=True, help="Flag to determine if the downloaded zip should be unpacked.")
+@click.option("-o", "--override", is_flag=True, help="If flag is set, existing folder/document with the same name as the downloaded folder/document will be overwritten.")
 @click.pass_context
-def export_documents(context, path: str, data_source: str):
+def export_documents(context, absolute_document_reference: str, export_location: str = "", unpack: bool = False, override: bool = False):
     """
-    Export document(s) in a package. path is relative to the data_source.
+    export document(s) by a given <data_source>/<path>
 
-    Example: if you have the root package "models" with a sub package Windmill in the data_source DemoApplicationDataSource,
-    the entire Windmill package can be exported using:
-    path = "models/Windmill"
-    data_source = "DemoApplicationDataSource"
+    Example: if you have a data_source "DemoApplicationDataSource" with the root package "models" and a sub package "Windmill",
+    the entire "Windmill" package can be exported using: absolute_document_reference = "DemoApplicationDataSource/models/Windmill"
 
-    The zip file is downloaded to the directory the command is called from.
+    Arguments:
+    absolute_document_reference: Path to document or package to export. Should be <dataSource>/<path>
+    export_location (Optional): Path to specify where to store the exported document(s). If not provided, will export to current folder.
     """
-    # path and data_source should not have a trailing or leading "/"
-    path = path.rstrip("/").lstrip("/")
-    data_source = data_source.rstrip("/").lstrip("/")
+    response = export(absolute_document_ref=absolute_document_reference)
 
-    export(absolute_document_ref=f"{data_source}/{path}")
-
+    if not export_location:
+        export_location = os.getcwd()
+    with ZipFile(io.BytesIO(response.content), "r") as zip_file:
+        zip_file.filename = f"{absolute_document_reference.split('/')[-1]}.zip"
+        if unpack:
+            unpack_and_save_zipfile(override=override, export_location=export_location, zip_file=zip_file)
+        else:
+            save_as_zip_file(override=override, export_location=export_location, filename=zip_file.filename, data=response.content)
 
 @pkg_cli.command("delete", help="Delete the package <package> in the given data source.")
 @click.argument("data_source", required=True)

@@ -1,7 +1,8 @@
-import io
-import zipfile
+from typing import Union
 
 import requests
+
+from dm_cli.utils import ApplicationException
 
 from .dmss_api.api.default_api import DefaultApi
 
@@ -10,7 +11,7 @@ dmss_api = DefaultApi()
 
 class Settings:
     PUBLIC_DMSS_API: str = "http://localhost:5000"
-    DMSS_TOKEN: str | None = None
+    DMSS_TOKEN: Union[str, None] = None
 
 
 settings = Settings()
@@ -25,5 +26,9 @@ def export(absolute_document_ref: str):
     headers = {"Access-Key": settings.DMSS_TOKEN}
 
     response = requests.get(f"{settings.PUBLIC_DMSS_API}/api/v1/export/{absolute_document_ref}", headers=headers)
-    zip_file = zipfile.ZipFile(io.BytesIO(response.content))
-    zip_file.extractall()
+    if response.status_code != 200:
+        raise ApplicationException(
+            message=f"Could not export document(s) from {absolute_document_ref} (status code {response.status_code})."
+        )
+
+    return response
