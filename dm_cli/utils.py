@@ -121,18 +121,18 @@ def concat_dependencies(
 
 
 def unpack_and_save_zipfile(override: bool, export_location: str, zip_file: ZipFile):
-    """Unpack zipfile and save it to export_location.
+    """Unpack zipfile and save it to export_location. It is assumed that zip file only contains json files and folders.
     If override is True, any existing file/folder with the name of filename will be overwritten.
     """
     if ".zip" not in zip_file.filename:
         raise ApplicationException(message="file ending .zip must be included in filename!")
     zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
 
-    if not override and Path(zip_file_unpacked_path).exists():
-        if Path(zip_file_unpacked_path).exists():
-            new_path = f"{zip_file_unpacked_path.rstrip('.zip')}-{str(uuid4())}"
-            os.mkdir(new_path)
-            zip_file.extractall(path=new_path)
+    if not override and (Path(zip_file_unpacked_path).exists() or Path(f"{zip_file_unpacked_path}.json").exists()):
+        new_path = f"{zip_file_unpacked_path}-{str(uuid4())}"
+        os.mkdir(new_path)
+        zip_file.extractall(path=new_path)
+        # TODO fix saving of single file when override is False. If zip_file contains single file, a new folder will be created instead of a single file.
     else:
         zip_file.extractall(path=export_location)
 

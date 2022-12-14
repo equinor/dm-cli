@@ -243,8 +243,10 @@ def export_documents(context, absolute_document_reference: str, export_location:
         zip_file.filename = f"{absolute_document_reference.split('/')[-1]}.zip"
         if unpack:
             unpack_and_save_zipfile(override=override, export_location=export_location, zip_file=zip_file)
+            click.echo("Unpacked and saved zip file!")
         else:
             save_as_zip_file(override=override, export_location=export_location, filename=zip_file.filename, data=response.content)
+            click.echo("Saved zip file!")
 
 @pkg_cli.command("delete", help="Delete the package <package> in the given data source.")
 @click.argument("data_source", required=True)
