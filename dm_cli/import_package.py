@@ -8,7 +8,7 @@ from progress.bar import IncrementalBar
 
 from .dmss import dmss_api
 from .domain import Package
-from .enums import SIMOS
+from .enums import PRIMITIVES, SIMOS
 from .utils import Dependency, resolve_reference
 
 keys_to_check = ("type", "attributeType", "extends", "_blueprintPath_")  # These keys may contain a reference
@@ -36,6 +36,8 @@ def replace_relative_references(
             for i, blueprint in enumerate(value):
                 extends_list.append(resolve_reference(blueprint, dependencies, data_source, file_path))
             return extends_list
+        if key == "attributeType" and value in PRIMITIVES:
+            return value
         return resolve_reference(
             value,
             dependencies,
