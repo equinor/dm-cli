@@ -222,9 +222,9 @@ def import_packages(context, path: str, data_source: str):
 @click.argument("absolute_document_reference", required=True)
 @click.argument("export_location", required=False, default="")
 @click.option("-u", "--unpack", is_flag=True, help="Flag to determine if the downloaded zip should be unpacked.")
-@click.option("-o", "--override", is_flag=True, help="If flag is set, existing folder/document with the same name as the downloaded folder/document will be overwritten.")
+@click.option("-o", "--overwrite", is_flag=True, help="If flag is set, existing folder/document with the same name as the downloaded folder/document will be overwritten.")
 @click.pass_context
-def export_documents(context, absolute_document_reference: str, export_location: str = "", unpack: bool = False, override: bool = False):
+def export_documents(context, absolute_document_reference: str, export_location: str = "", unpack: bool = False, overwrite: bool = False):
     """
     export document(s) by a given <data_source>/<path>
 
@@ -242,10 +242,10 @@ def export_documents(context, absolute_document_reference: str, export_location:
     with ZipFile(io.BytesIO(response.content), "r") as zip_file:
         zip_file.filename = f"{absolute_document_reference.split('/')[-1]}.zip"
         if unpack:
-            unpack_and_save_zipfile(override=override, export_location=export_location, zip_file=zip_file)
+            unpack_and_save_zipfile(overwrite=overwrite, export_location=export_location, zip_file=zip_file)
             click.echo("Unpacked and saved zip file!")
         else:
-            save_as_zip_file(override=override, export_location=export_location, filename=zip_file.filename, data=response.content)
+            save_as_zip_file(overwrite=overwrite, export_location=export_location, filename=zip_file.filename, data=response.content)
             click.echo("Saved zip file!")
 
 @pkg_cli.command("delete", help="Delete the package <package> in the given data source.")
