@@ -120,32 +120,32 @@ def concat_dependencies(
     return old_dependencies
 
 
-def unpack_and_save_zipfile(override: bool, export_location: str, zip_file: ZipFile):
+def unpack_and_save_zipfile(overwrite: bool, export_location: str, zip_file: ZipFile):
     """Unpack zipfile and save it to export_location. It is assumed that zip file only contains json files and folders.
-    If override is True, any existing file/folder with the name of filename will be overwritten.
+    If overwrite is True, any existing file/folder with the name of filename will be overwritten.
     """
     if ".zip" not in zip_file.filename:
         raise ApplicationException(message="file ending .zip must be included in filename!")
     zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
 
-    if not override and (Path(zip_file_unpacked_path).exists() or Path(f"{zip_file_unpacked_path}.json").exists()):
+    if not overwrite and (Path(zip_file_unpacked_path).exists() or Path(f"{zip_file_unpacked_path}.json").exists()):
         new_path = f"{zip_file_unpacked_path}-{str(uuid4())}"
         os.mkdir(new_path)
         zip_file.extractall(path=new_path)
-        # TODO fix saving of single file when override is False. If zip_file contains single file, a new folder will be created instead of a single file.
+        # TODO fix saving of single file when overwrite is False. If zip_file contains single file, a new folder will be created instead of a single file.
     else:
         zip_file.extractall(path=export_location)
 
 
-def save_as_zip_file(override: bool, export_location: str, filename: str, data: str):
+def save_as_zip_file(overwrite: bool, export_location: str, filename: str, data: str):
     """Save binary data into a zip file on the local disk.
-    If override is True, any existing zip file with the name of filename will be overwritten.
+    If overwrite is True, any existing zip file with the name of filename will be overwritten.
     """
     if ".zip" not in filename:
         raise ApplicationException(message="file ending .zip must be included in filename!")
     saved_zip_file_path = f"{export_location}/{filename}"
 
-    if not override and Path(saved_zip_file_path).exists():
+    if not overwrite and Path(saved_zip_file_path).exists():
         with open(f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip", "wb") as f:
             f.write(data)
     else:
