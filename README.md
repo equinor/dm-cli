@@ -170,7 +170,7 @@ Exporting packages and single documents
 $ dm pkg export <data_source>/<path>
 $ dm pkg export <data_source>/<path> <destination_path>
 $ dm pkg export <data_source>/<path> <destination_path> --unpack
-$ dm pkg export <data_source>/<path> <destination_path> --unpack -override
+$ dm pkg export <data_source>/<path> <destination_path> --unpack -overwrite
 
 # Export all documents in 'DemoApplicationDataSource/models/CarPackage'
 $ dm pkg export DemoApplicationDataSource/models/CarPackage
@@ -179,7 +179,7 @@ $ dm pkg export DemoApplicationDataSource/models/CarPackage
 Optional arguments and flags:
 <destination_path> : specifies where to save the downloaded file(s) on the local disk
 unpack: whether or not to unpack the zip file
-override: wheter or not to override folder/file on local disk if it exists
+overwrite: wheter or not to overwrite folder/file on local disk if it exists
 
 Delete a package
 
