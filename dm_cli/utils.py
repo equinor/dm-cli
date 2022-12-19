@@ -6,6 +6,8 @@ from typing import Dict, List, Literal, NewType
 from uuid import uuid4
 from zipfile import ZipFile
 
+import click
+
 
 class ApplicationException(Exception):
     status: int = 500
@@ -124,7 +126,7 @@ def unpack_and_save_zipfile(overwrite: bool, export_location: str, zip_file: Zip
     """Unpack zipfile and save it to export_location. It is assumed that zip file only contains json files and folders.
     If overwrite is True, any existing file/folder with the name of filename will be overwritten.
     """
-    if ".zip" not in zip_file.filename:
+    if not zip_file.filename.endswith(".zip"):
         raise ApplicationException(message="file ending .zip must be included in filename!")
     zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
 
@@ -141,13 +143,16 @@ def save_as_zip_file(overwrite: bool, export_location: str, filename: str, data:
     """Save binary data into a zip file on the local disk.
     If overwrite is True, any existing zip file with the name of filename will be overwritten.
     """
-    if ".zip" not in filename:
+    if not filename.endswith(".zip"):
         raise ApplicationException(message="file ending .zip must be included in filename!")
     saved_zip_file_path = f"{export_location}/{filename}"
 
     if not overwrite and Path(saved_zip_file_path).exists():
-        with open(f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip", "wb") as f:
-            f.write(data)
+        new_zip_filename = f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip"
+        with open(new_zip_filename, "wb") as file:
+            file.write(data)
+            click.echo(f"Wrote zip file to '{new_zip_filename}'")
     else:
-        with open(saved_zip_file_path, "wb") as f:
-            f.write(data)
+        with open(saved_zip_file_path, "wb") as file:
+            file.write(data)
+            click.echo(f"Wrote zip file to '{saved_zip_file_path}'")
