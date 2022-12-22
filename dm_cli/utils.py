@@ -126,15 +126,20 @@ def unpack_and_save_zipfile(overwrite: bool, export_location: str, zip_file: Zip
     """Unpack zipfile and save it to export_location. It is assumed that zip file only contains json files and folders.
     If overwrite is True, any existing file/folder with the name of filename will be overwritten.
     """
-    if not zip_file.filename.endswith(".zip"):
-        raise ApplicationException(message="file ending .zip must be included in filename!")
     zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
+    if len(zip_file.filelist) == 1:
+        # If single file in the zip file, the unpacked path has .json ending (we assume the zip file always contains json files)
+        zip_file_unpacked_path += ".json"
 
-    if not overwrite and (Path(zip_file_unpacked_path).exists() or Path(f"{zip_file_unpacked_path}.json").exists()):
-        new_path = f"{zip_file_unpacked_path}-{str(uuid4())}"
-        os.mkdir(new_path)
-        zip_file.extractall(path=new_path)
-        # TODO fix saving of single file when overwrite is False. If zip_file contains single file, a new folder will be created instead of a single file.
+    if not overwrite and (Path(zip_file_unpacked_path).exists()):
+        if len(zip_file.filelist) == 1:
+            file = zip_file.filelist[0]
+            file.filename = file.filename.replace(".json", f"-{str(uuid4())}.json")
+            zip_file.extract(file)
+        else:
+            new_path = f"{zip_file_unpacked_path}-{str(uuid4())}"
+            os.mkdir(new_path)
+            zip_file.extractall(path=new_path)
     else:
         zip_file.extractall(path=export_location)
 
