@@ -153,11 +153,8 @@ def save_as_zip_file(overwrite: bool, export_location: str, filename: str, data:
     saved_zip_file_path = f"{export_location}/{filename}"
 
     if not overwrite and Path(saved_zip_file_path).exists():
-        new_zip_filename = f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip"
-        with open(new_zip_filename, "wb") as file:
-            file.write(data)
-            click.echo(f"Wrote zip file to '{new_zip_filename}'")
-    else:
-        with open(saved_zip_file_path, "wb") as file:
-            file.write(data)
-            click.echo(f"Wrote zip file to '{saved_zip_file_path}'")
+        saved_zip_file_path = f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip"
+
+    with open(saved_zip_file_path, "wb") as file:
+        file.write(data)
+        click.echo(f"Wrote zip file to '{saved_zip_file_path}'")
