@@ -127,21 +127,31 @@ def unpack_and_save_zipfile(overwrite: bool, export_location: str, zip_file: Zip
     If overwrite is True, any existing file/folder with the name of filename will be overwritten.
     """
     zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
-    if len(zip_file.filelist) == 1:
-        # If single file in the zip file, the unpacked path has .json ending (we assume the zip file always contains json files)
+
+    zip_has_single_file_and_no_folders = (
+        len(zip_file.filelist) == 1 and zip_file.filelist[0].filename.split("/")[0] == ""
+    )
+    if zip_has_single_file_and_no_folders:
+        # If single file in the zip file (and the file is not inside a folder), the unpacked path has .json ending
+        # (we assume the zip file always contains json files)
         zip_file_unpacked_path += ".json"
 
-    if not overwrite and (Path(zip_file_unpacked_path).exists()):
-        if len(zip_file.filelist) == 1:
+    if not overwrite and Path(zip_file_unpacked_path).exists():
+        if zip_has_single_file_and_no_folders:
             file = zip_file.filelist[0]
             file.filename = file.filename.replace(".json", f"-{str(uuid4())}.json")
             zip_file.extract(file)
+            click.echo(
+                f"Saved unpacked zip file to '{zip_file_unpacked_path.replace(file.orig_filename, file.filename)}'"
+            )
         else:
             new_path = f"{zip_file_unpacked_path}-{str(uuid4())}"
             os.mkdir(new_path)
             zip_file.extractall(path=new_path)
+            click.echo(f"Saved unpacked zip file to '{new_path}'")
     else:
         zip_file.extractall(path=export_location)
+        click.echo(f"Saved unpacked zip file to '{zip_file_unpacked_path}'")
 
 
 def save_as_zip_file(overwrite: bool, export_location: str, filename: str, data: str):
