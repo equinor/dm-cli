@@ -1,12 +1,11 @@
-import os
 from dataclasses import dataclass
 from os.path import normpath
-from pathlib import Path, PurePath, PurePosixPath
+from pathlib import Path
 from typing import Dict, List, Literal, NewType
-from uuid import uuid4
 from zipfile import ZipFile
 
 import click
+import emoji
 
 
 class ApplicationException(Exception):
@@ -122,9 +121,9 @@ def concat_dependencies(
     return old_dependencies
 
 
-def unpack_and_save_zipfile(overwrite: bool, export_location: str, zip_file: ZipFile):
+def unpack_and_save_zipfile(export_location: str, zip_file: ZipFile):
     """Unpack zipfile and save it to export_location. It is assumed that zip file only contains json files and folders.
-    If overwrite is True, any existing file/folder with the name of filename will be overwritten.
+    If file or folder to export already exists, an exception is raised.
     """
     zip_file_unpacked_path = f"{export_location}/{zip_file.filename.rstrip('.zip')}"
 
@@ -136,34 +135,25 @@ def unpack_and_save_zipfile(overwrite: bool, export_location: str, zip_file: Zip
         # (we assume the zip file always contains json files)
         zip_file_unpacked_path += ".json"
 
-    if not overwrite and Path(zip_file_unpacked_path).exists():
-        if zip_has_single_file_and_no_folders:
-            file = zip_file.filelist[0]
-            file.filename = file.filename.replace(".json", f"-{str(uuid4())}.json")
-            zip_file.extract(file)
-            click.echo(
-                f"Saved unpacked zip file to '{zip_file_unpacked_path.replace(file.orig_filename, file.filename)}'"
-            )
-        else:
-            new_path = f"{zip_file_unpacked_path}-{str(uuid4())}"
-            os.mkdir(new_path)
-            zip_file.extractall(path=new_path)
-            click.echo(f"Saved unpacked zip file to '{new_path}'")
-    else:
-        zip_file.extractall(path=export_location)
-        click.echo(f"Saved unpacked zip file to '{zip_file_unpacked_path}'")
+    if Path(zip_file_unpacked_path).exists():
+        click.echo(emoji.emojize(f"\t:warning: File or folder '{zip_file_unpacked_path}' already exists. Exiting."))
+        raise ApplicationException("Path already exists")
+
+    zip_file.extractall(path=export_location)
+    click.echo(f"Saved unpacked zip file to '{zip_file_unpacked_path}'.")
 
 
-def save_as_zip_file(overwrite: bool, export_location: str, filename: str, data: str):
+def save_as_zip_file(export_location: str, filename: str, data: str):
     """Save binary data into a zip file on the local disk.
-    If overwrite is True, any existing zip file with the name of filename will be overwritten.
+    If file or folder to export already exists, an exception is raised.
     """
     if not filename.endswith(".zip"):
         raise ApplicationException(message="file ending .zip must be included in filename!")
     saved_zip_file_path = f"{export_location}/{filename}"
 
-    if not overwrite and Path(saved_zip_file_path).exists():
-        saved_zip_file_path = f"{export_location}/{filename.rstrip('.zip')}-{str(uuid4())}.zip"
+    if Path(saved_zip_file_path).exists():
+        click.echo(emoji.emojize(f"\t:warning: File or folder '{saved_zip_file_path}' already exists. Exiting."))
+        raise ApplicationException("Path already exists")
 
     with open(saved_zip_file_path, "wb") as file:
         file.write(data)

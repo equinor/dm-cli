@@ -222,14 +222,15 @@ def import_packages(context, path: str, data_source: str):
 @click.argument("absolute_document_reference", required=True)
 @click.argument("export_location", required=False, default="")
 @click.option("-u", "--unpack", is_flag=True, help="Flag to determine if the downloaded zip should be unpacked.")
-@click.option("-o", "--overwrite", is_flag=True, help="If flag is set, existing folder/document with the same name as the downloaded folder/document will be overwritten.")
 @click.pass_context
-def export_documents(context, absolute_document_reference: str, export_location: str = "", unpack: bool = False, overwrite: bool = False):
+def export_documents(context, absolute_document_reference: str, export_location: str = "", unpack: bool = False):
     """
     export document(s) by a given <data_source>/<path>
 
     Example: if you have a data_source "DemoApplicationDataSource" with the root package "models" and a sub package "Windmill",
     the entire "Windmill" package can be exported using: absolute_document_reference = "DemoApplicationDataSource/models/Windmill"
+
+    If the file or folder to export already exists on local disk, an exception is raised.
 
     Arguments:
     absolute_document_reference: Path to document or package to export. Should be <dataSource>/<path>
@@ -242,9 +243,9 @@ def export_documents(context, absolute_document_reference: str, export_location:
     with ZipFile(io.BytesIO(response.content), "r") as zip_file:
         zip_file.filename = f"{absolute_document_reference.split('/')[-1]}.zip"
         if unpack:
-            unpack_and_save_zipfile(overwrite=overwrite, export_location=export_location, zip_file=zip_file)
+            unpack_and_save_zipfile(export_location=export_location, zip_file=zip_file)
         else:
-            save_as_zip_file(overwrite=overwrite, export_location=export_location, filename=zip_file.filename, data=response.content)
+            save_as_zip_file(export_location=export_location, filename=zip_file.filename, data=response.content)
 
 @pkg_cli.command("delete", help="Delete the package <package> in the given data source.")
 @click.argument("data_source", required=True)
