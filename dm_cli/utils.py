@@ -96,6 +96,9 @@ def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> st
 def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
     root_package = file_path.split("/", 1)[0]
     ref_schema = find_reference_schema(reference)
+
+    if ref_schema == "dmss":
+        return reference
     if ref_schema == "alias":
         return resolve_dependency(reference, dependencies)
     if ref_schema == "data_source":
@@ -105,6 +108,8 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     if ref_schema in "dotted":
         normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
         return f"dmss://{data_source}/{normalized_dotted_ref}"
+
+    raise ApplicationException(f"'{reference}' is not a valid reference for resolving dependencies")
 
 
 def concat_dependencies(

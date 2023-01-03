@@ -83,7 +83,7 @@ test_documents = {
     },
     "MyRootPackage/Moorings/Mooring.json": {
         "name": "Mooring",
-        "type": "CORE:Blueprint",
+        "type": "dmss://system/SIMOS/Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
         "description": "",
         "attributes": [
@@ -266,8 +266,11 @@ class ImportPackageTest(unittest.TestCase):
         folder_A = root_package.search("A")
         folder_Moorings = root_package.search("Moorings")
         myTurbineMooring = folder_Moorings.search("myTurbineMooring")
+        mooringBlueprint = folder_Moorings.search("Mooring")
         folder_SubFolder = folder_A.search("SubFolder")
         myTurbine2 = folder_SubFolder.search("myTurbine2")
+
+        assert mooringBlueprint["type"] == "dmss://system/SIMOS/Blueprint"
 
         assert myTurbine2["type"] == "dmss://test_data_source/MyRootPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
