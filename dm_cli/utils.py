@@ -136,7 +136,7 @@ def unpack_and_save_zipfile(export_location: str, zip_file: ZipFile):
         zip_file_unpacked_path += ".json"
 
     if Path(zip_file_unpacked_path).exists():
-        click.echo(emoji.emojize(f"\t:warning: File or folder '{zip_file_unpacked_path}' already exists. Exiting."))
+        click.echo(emoji.emojize(f"\t:error: File or folder '{zip_file_unpacked_path}' already exists. Exiting."))
         raise ApplicationException("Path already exists")
 
     zip_file.extractall(path=export_location)
@@ -152,7 +152,7 @@ def save_as_zip_file(export_location: str, filename: str, data: str):
     saved_zip_file_path = f"{export_location}/{filename}"
 
     if Path(saved_zip_file_path).exists():
-        click.echo(emoji.emojize(f"\t:warning: File or folder '{saved_zip_file_path}' already exists. Exiting."))
+        click.echo(emoji.emojize(f"\t:error: File or folder '{saved_zip_file_path}' already exists. Exiting."))
         raise ApplicationException("Path already exists")
 
     with open(saved_zip_file_path, "wb") as file:
