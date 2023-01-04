@@ -1,4 +1,4 @@
-from dmss_api.paths.api_entity.post import ApiForpost
+from dm_cli.dmss_api.paths.api_entity.post import ApiForpost
 
 
 class ApiEntity(

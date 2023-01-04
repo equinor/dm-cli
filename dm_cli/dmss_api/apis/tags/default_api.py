@@ -23,21 +23,21 @@ from dm_cli.dmss_api.paths.api_documents_path_reference_add_to_path.post import 
 from dm_cli.dmss_api.paths.api_documents_id_reference.get import DocumentGetById
 from dm_cli.dmss_api.paths.api_documents_by_path_absolute_path.get import DocumentGetByPath
 from dm_cli.dmss_api.paths.api_documents_data_source_id_dotted_id.delete import DocumentRemove
-from dmss_api.paths.api_documents_data_source_id_remove_by_path_directory.delete import DocumentRemoveByPath
-from dmss_api.paths.api_documents_data_source_id_document_id.put import DocumentUpdate
-from dmss_api.paths.api_export_absolute_document_ref.get import Export
-from dmss_api.paths.api_export_meta_absolute_document_ref.get import ExportMeta
-from dmss_api.paths.api_acl_data_source_id_document_id.get import GetAcl
-from dmss_api.paths.api_healthcheck.get import GetApiHealthcheckGet
-from dmss_api.paths.api_entity.post import InstantiateEntity
-from dmss_api.paths.api_reference_data_source_id_document_dotted_id.delete import ReferenceDelete
-from dmss_api.paths.api_reference_data_source_id_document_dotted_id.put import ReferenceInsert
-from dmss_api.paths.api_search.post import Search
-from dmss_api.paths.api_acl_data_source_id_document_id.put import SetAcl
-from dmss_api.paths.api_token.post import TokenCreate
-from dmss_api.paths.api_token_token_id.delete import TokenDelete
-from dmss_api.paths.api_token.get import TokenListAll
-from dmss_api.paths.api_whoami.get import Whoami
+from dm_cli.dmss_api.paths.api_documents_data_source_id_remove_by_path_directory.delete import DocumentRemoveByPath
+from dm_cli.dmss_api.paths.api_documents_data_source_id_document_id.put import DocumentUpdate
+from dm_cli.dmss_api.paths.api_export_absolute_document_ref.get import Export
+from dm_cli.dmss_api.paths.api_export_meta_absolute_document_ref.get import ExportMeta
+from dm_cli.dmss_api.paths.api_acl_data_source_id_document_id.get import GetAcl
+from dm_cli.dmss_api.paths.api_healthcheck.get import GetApiHealthcheckGet
+from dm_cli.dmss_api.paths.api_entity.post import InstantiateEntity
+from dm_cli.dmss_api.paths.api_reference_data_source_id_document_dotted_id.delete import ReferenceDelete
+from dm_cli.dmss_api.paths.api_reference_data_source_id_document_dotted_id.put import ReferenceInsert
+from dm_cli.dmss_api.paths.api_search.post import Search
+from dm_cli.dmss_api.paths.api_acl_data_source_id_document_id.put import SetAcl
+from dm_cli.dmss_api.paths.api_token.post import TokenCreate
+from dm_cli.dmss_api.paths.api_token_token_id.delete import TokenDelete
+from dm_cli.dmss_api.paths.api_token.get import TokenListAll
+from dm_cli.dmss_api.paths.api_whoami.get import Whoami
 
 
 class DefaultApi(

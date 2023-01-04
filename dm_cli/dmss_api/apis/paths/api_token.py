@@ -1,5 +1,5 @@
-from dmss_api.paths.api_token.get import ApiForget
-from dmss_api.paths.api_token.post import ApiForpost
+from dm_cli.dmss_api.paths.api_token.get import ApiForget
+from dm_cli.dmss_api.paths.api_token.post import ApiForpost
 
 
 class ApiToken(

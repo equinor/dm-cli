@@ -11,7 +11,7 @@ import typing_extensions
 import urllib3
 from urllib3._collections import HTTPHeaderDict
 
-from dmss_api import api_client, exceptions
+from dm_cli.dmss_api import api_client, exceptions
 from datetime import date, datetime  # noqa: F401
 import decimal  # noqa: F401
 import functools  # noqa: F401
@@ -23,10 +23,10 @@ import uuid  # noqa: F401
 
 import frozendict  # noqa: F401
 
-from dmss_api import schemas  # noqa: F401
+from dm_cli.dmss_api import schemas  # noqa: F401
 
-from dmss_api.model.get_blueprint_response import GetBlueprintResponse
-from dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
+from dm_cli.dmss_api.model.error_response import ErrorResponse
 
 # Query params
 ContextSchema = schemas.StrSchema

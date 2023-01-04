@@ -3,8 +3,8 @@ from typing import Union
 import requests
 
 from dm_cli.utils import ApplicationException
+from .dmss_api.apis.tags.default_api import DefaultApi
 
-from .dmss_api.api.default_api import DefaultApi
 
 dmss_api = DefaultApi()
 

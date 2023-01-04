@@ -1,5 +1,5 @@
-from dmss_api.paths.api_data_sources_data_source_id.get import ApiForget
-from dmss_api.paths.api_data_sources_data_source_id.post import ApiForpost
+from dm_cli.dmss_api.paths.api_data_sources_data_source_id.get import ApiForget
+from dm_cli.dmss_api.paths.api_data_sources_data_source_id.post import ApiForpost
 
 
 class ApiDataSourcesDataSourceId(

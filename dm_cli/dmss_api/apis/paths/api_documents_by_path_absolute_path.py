@@ -1,4 +1,4 @@
-from dmss_api.paths.api_documents_by_path_absolute_path.get import ApiForget
+from dm_cli.dmss_api.paths.api_documents_by_path_absolute_path.get import ApiForget
 
 
 class ApiDocumentsByPathAbsolutePath(

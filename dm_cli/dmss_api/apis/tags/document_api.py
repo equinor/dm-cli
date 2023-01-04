@@ -11,12 +11,12 @@
 
 from dm_cli.dmss_api.paths.api_documents_absolute_ref.post import DocumentAdd
 from dm_cli.dmss_api.paths.api_documents_data_source_id_add_raw.post import DocumentAddSimple
-from dmss_api.paths.api_documents_path_reference_add_to_path.post import DocumentAddToPath
-from dmss_api.paths.api_documents_id_reference.get import DocumentGetById
-from dmss_api.paths.api_documents_by_path_absolute_path.get import DocumentGetByPath
-from dmss_api.paths.api_documents_data_source_id_dotted_id.delete import DocumentRemove
-from dmss_api.paths.api_documents_data_source_id_remove_by_path_directory.delete import DocumentRemoveByPath
-from dmss_api.paths.api_documents_data_source_id_document_id.put import DocumentUpdate
+from dm_cli.dmss_api.paths.api_documents_path_reference_add_to_path.post import DocumentAddToPath
+from dm_cli.dmss_api.paths.api_documents_id_reference.get import DocumentGetById
+from dm_cli.dmss_api.paths.api_documents_by_path_absolute_path.get import DocumentGetByPath
+from dm_cli.dmss_api.paths.api_documents_data_source_id_dotted_id.delete import DocumentRemove
+from dm_cli.dmss_api.paths.api_documents_data_source_id_remove_by_path_directory.delete import DocumentRemoveByPath
+from dm_cli.dmss_api.paths.api_documents_data_source_id_document_id.put import DocumentUpdate
 
 
 class DocumentApi(
