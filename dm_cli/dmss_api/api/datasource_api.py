@@ -110,7 +110,7 @@ class DatasourceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/data-sources/{data_source_id}',
+                'endpoint_path': '/api/data-sources/{data_source_id}',
                 'operation_id': 'data_source_get',
                 'http_method': 'GET',
                 'servers': None,
@@ -225,7 +225,7 @@ class DatasourceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/data-sources',
+                'endpoint_path': '/api/data-sources',
                 'operation_id': 'data_source_get_all',
                 'http_method': 'GET',
                 'servers': None,
@@ -343,7 +343,7 @@ class DatasourceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/data-sources/{data_source_id}',
+                'endpoint_path': '/api/data-sources/{data_source_id}',
                 'operation_id': 'data_source_save',
                 'http_method': 'POST',
                 'servers': None,

@@ -2,9 +2,8 @@ from typing import Union
 
 import requests
 
+from dm_cli.dmss_api.api.default_api import DefaultApi
 from dm_cli.utils import ApplicationException
-
-from .dmss_api.api.default_api import DefaultApi
 
 dmss_api = DefaultApi()
 
@@ -25,7 +24,7 @@ def export(absolute_document_ref: str):
     """
     headers = {"Access-Key": settings.DMSS_TOKEN}
 
-    response = requests.get(f"{settings.PUBLIC_DMSS_API}/api/v1/export/{absolute_document_ref}", headers=headers)
+    response = requests.get(f"{settings.PUBLIC_DMSS_API}/api/export/{absolute_document_ref}", headers=headers)
     if response.status_code != 200:
         raise ApplicationException(
             message=f"Could not export document(s) from {absolute_document_ref} (status code {response.status_code})."

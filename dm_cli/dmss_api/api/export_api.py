@@ -109,7 +109,7 @@ class ExportApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/export/{absolute_document_ref}',
+                'endpoint_path': '/api/export/{absolute_document_ref}',
                 'operation_id': 'export',
                 'http_method': 'GET',
                 'servers': None,
@@ -231,7 +231,7 @@ class ExportApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/export/meta/{absolute_document_ref}',
+                'endpoint_path': '/api/export/meta/{absolute_document_ref}',
                 'operation_id': 'export_meta',
                 'http_method': 'GET',
                 'servers': None,

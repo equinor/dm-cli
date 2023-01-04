@@ -105,7 +105,7 @@ class PersonalAccessTokenApi(object):
                 'auth': [
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/token',
+                'endpoint_path': '/api/token',
                 'operation_id': 'token_create',
                 'http_method': 'POST',
                 'servers': None,
@@ -227,7 +227,7 @@ class PersonalAccessTokenApi(object):
                 'auth': [
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/token/{token_id}',
+                'endpoint_path': '/api/token/{token_id}',
                 'operation_id': 'token_delete',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -341,7 +341,7 @@ class PersonalAccessTokenApi(object):
                 'auth': [
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/token',
+                'endpoint_path': '/api/token',
                 'operation_id': 'token_list_all',
                 'http_method': 'GET',
                 'servers': None,

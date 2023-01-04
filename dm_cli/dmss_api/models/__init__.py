@@ -15,6 +15,7 @@ from dm_cli.dmss_api.model.basic_entity import BasicEntity
 from dm_cli.dmss_api.model.data_source_information import DataSourceInformation
 from dm_cli.dmss_api.model.data_source_request import DataSourceRequest
 from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 from dm_cli.dmss_api.model.pat_data import PATData
 from dm_cli.dmss_api.model.reference import Reference
 from dm_cli.dmss_api.model.repository import Repository

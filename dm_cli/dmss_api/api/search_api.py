@@ -111,7 +111,7 @@ class SearchApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/search',
+                'endpoint_path': '/api/search',
                 'operation_id': 'search',
                 'http_method': 'POST',
                 'servers': None,

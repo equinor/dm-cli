@@ -26,6 +26,7 @@ from dm_cli.dmss_api.model.basic_entity import BasicEntity
 from dm_cli.dmss_api.model.data_source_information import DataSourceInformation
 from dm_cli.dmss_api.model.data_source_request import DataSourceRequest
 from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 from dm_cli.dmss_api.model.pat_data import PATData
 from dm_cli.dmss_api.model.reference import Reference
 
@@ -118,7 +119,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/blobs/{data_source_id}/{blob_id}',
+                'endpoint_path': '/api/blobs/{data_source_id}/{blob_id}',
                 'operation_id': 'blob_get_by_id',
                 'http_method': 'GET',
                 'servers': None,
@@ -253,7 +254,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/blobs/{data_source_id}/{blob_id}',
+                'endpoint_path': '/api/blobs/{data_source_id}/{blob_id}',
                 'operation_id': 'blob_upload',
                 'http_method': 'PUT',
                 'servers': None,
@@ -322,7 +323,7 @@ class DefaultApi(object):
         ):
             """Get Blueprint  # noqa: E501
 
-            Fetch the Blueprint of a type (including inherited attributes)  # noqa: E501
+            Fetch the Blueprint and Recipes of a type (including inherited attributes)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -333,6 +334,7 @@ class DefaultApi(object):
                 type_ref (str):
 
             Keyword Args:
+                context (str): [optional]
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
                 _preload_content (bool): if False, the urllib3.HTTPResponse object
@@ -354,7 +356,7 @@ class DefaultApi(object):
                 async_req (bool): execute request asynchronously
 
             Returns:
-                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
+                GetBlueprintResponse
                     If the method is called asynchronously, returns the request
                     thread.
             """
@@ -383,12 +385,12 @@ class DefaultApi(object):
 
         self.blueprint_get = _Endpoint(
             settings={
-                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
+                'response_type': (GetBlueprintResponse,),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/blueprint/{type_ref}',
+                'endpoint_path': '/api/blueprint/{type_ref}',
                 'operation_id': 'blueprint_get',
                 'http_method': 'GET',
                 'servers': None,
@@ -396,6 +398,7 @@ class DefaultApi(object):
             params_map={
                 'all': [
                     'type_ref',
+                    'context',
                 ],
                 'required': [
                     'type_ref',
@@ -405,22 +408,34 @@ class DefaultApi(object):
                 'enum': [
                 ],
                 'validation': [
+                    'type_ref',
                 ]
             },
             root_map={
                 'validations': {
+                    ('type_ref',): {
+                        'max_length': 128,
+                        'min_length': 3,
+                        'regex': {
+                            'pattern': r'^[A-Z:a-z0-9_\/-]*$',  # noqa: E501
+                        },
+                    },
                 },
                 'allowed_values': {
                 },
                 'openapi_types': {
                     'type_ref':
                         (str,),
+                    'context':
+                        (str,),
                 },
                 'attribute_map': {
                     'type_ref': 'type_ref',
+                    'context': 'context',
                 },
                 'location_map': {
                     'type_ref': 'path',
+                    'context': 'query',
                 },
                 'collection_format_map': {
                 }
@@ -509,7 +524,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/resolve-path/{absolute_id}',
+                'endpoint_path': '/api/resolve-path/{absolute_id}',
                 'operation_id': 'blueprint_resolve',
                 'http_method': 'GET',
                 'servers': None,
@@ -634,7 +649,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/application/{application}',
+                'endpoint_path': '/api/application/{application}',
                 'operation_id': 'create_lookup',
                 'http_method': 'POST',
                 'servers': None,
@@ -760,7 +775,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/data-sources/{data_source_id}',
+                'endpoint_path': '/api/data-sources/{data_source_id}',
                 'operation_id': 'data_source_get',
                 'http_method': 'GET',
                 'servers': None,
@@ -875,7 +890,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/data-sources',
+                'endpoint_path': '/api/data-sources',
                 'operation_id': 'data_source_get_all',
                 'http_method': 'GET',
                 'servers': None,
@@ -993,7 +1008,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/data-sources/{data_source_id}',
+                'endpoint_path': '/api/data-sources/{data_source_id}',
                 'operation_id': 'data_source_save',
                 'http_method': 'POST',
                 'servers': None,
@@ -1126,7 +1141,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{absolute_ref}',
+                'endpoint_path': '/api/documents/{absolute_ref}',
                 'operation_id': 'document_add',
                 'http_method': 'POST',
                 'servers': None,
@@ -1263,7 +1278,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/add-raw',
+                'endpoint_path': '/api/documents/{data_source_id}/add-raw',
                 'operation_id': 'document_add_simple',
                 'http_method': 'POST',
                 'servers': None,
@@ -1397,7 +1412,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{path_reference}/add-to-path',
+                'endpoint_path': '/api/documents/{path_reference}/add-to-path',
                 'operation_id': 'document_add_to_path',
                 'http_method': 'POST',
                 'servers': None,
@@ -1537,7 +1552,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{id_reference}',
+                'endpoint_path': '/api/documents/{id_reference}',
                 'operation_id': 'document_get_by_id',
                 'http_method': 'GET',
                 'servers': None,
@@ -1663,7 +1678,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents-by-path/{absolute_path}',
+                'endpoint_path': '/api/documents-by-path/{absolute_path}',
                 'operation_id': 'document_get_by_path',
                 'http_method': 'GET',
                 'servers': None,
@@ -1787,7 +1802,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/{dotted_id}',
+                'endpoint_path': '/api/documents/{data_source_id}/{dotted_id}',
                 'operation_id': 'document_remove',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -1917,7 +1932,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/remove-by-path/{directory}',
+                'endpoint_path': '/api/documents/{data_source_id}/remove-by-path/{directory}',
                 'operation_id': 'document_remove_by_path',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -2054,7 +2069,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/documents/{data_source_id}/{document_id}',
                 'operation_id': 'document_update',
                 'http_method': 'PUT',
                 'servers': None,
@@ -2205,7 +2220,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/export/{absolute_document_ref}',
+                'endpoint_path': '/api/export/{absolute_document_ref}',
                 'operation_id': 'export',
                 'http_method': 'GET',
                 'servers': None,
@@ -2327,7 +2342,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/export/meta/{absolute_document_ref}',
+                'endpoint_path': '/api/export/meta/{absolute_document_ref}',
                 'operation_id': 'export_meta',
                 'http_method': 'GET',
                 'servers': None,
@@ -2451,7 +2466,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/acl/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/acl/{data_source_id}/{document_id}',
                 'operation_id': 'get_acl',
                 'http_method': 'GET',
                 'servers': None,
@@ -2505,7 +2520,7 @@ class DefaultApi(object):
             callable=__get_acl
         )
 
-        def __get_api_v1_healthcheck_get(
+        def __get_api_healthcheck_get(
             self,
             **kwargs
         ):
@@ -2514,7 +2529,7 @@ class DefaultApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.get_api_v1_healthcheck_get(async_req=True)
+            >>> thread = api.get_api_healthcheck_get(async_req=True)
             >>> result = thread.get()
 
 
@@ -2565,12 +2580,12 @@ class DefaultApi(object):
             kwargs['_host_index'] = kwargs.get('_host_index')
             return self.call_with_http_info(**kwargs)
 
-        self.get_api_v1_healthcheck_get = _Endpoint(
+        self.get_api_healthcheck_get = _Endpoint(
             settings={
                 'response_type': (str,),
                 'auth': [],
-                'endpoint_path': '/api/v1/healthcheck',
-                'operation_id': 'get_api_v1_healthcheck_get',
+                'endpoint_path': '/api/healthcheck',
+                'operation_id': 'get_api_healthcheck_get',
                 'http_method': 'GET',
                 'servers': None,
             },
@@ -2607,7 +2622,7 @@ class DefaultApi(object):
                 'content_type': [],
             },
             api_client=api_client,
-            callable=__get_api_v1_healthcheck_get
+            callable=__get_api_healthcheck_get
         )
 
         def __instantiate_entity(
@@ -2682,7 +2697,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/entity',
+                'endpoint_path': '/api/entity',
                 'operation_id': 'instantiate_entity',
                 'http_method': 'POST',
                 'servers': None,
@@ -2807,7 +2822,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
                 'operation_id': 'reference_delete',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -2941,7 +2956,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
                 'operation_id': 'reference_insert',
                 'http_method': 'PUT',
                 'servers': None,
@@ -3077,7 +3092,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/search',
+                'endpoint_path': '/api/search',
                 'operation_id': 'search',
                 'http_method': 'POST',
                 'servers': None,
@@ -3218,7 +3233,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/acl/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/acl/{data_source_id}/{document_id}',
                 'operation_id': 'set_acl',
                 'http_method': 'PUT',
                 'servers': None,
@@ -3352,7 +3367,7 @@ class DefaultApi(object):
                 'auth': [
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/token',
+                'endpoint_path': '/api/token',
                 'operation_id': 'token_create',
                 'http_method': 'POST',
                 'servers': None,
@@ -3474,7 +3489,7 @@ class DefaultApi(object):
                 'auth': [
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/token/{token_id}',
+                'endpoint_path': '/api/token/{token_id}',
                 'operation_id': 'token_delete',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -3588,7 +3603,7 @@ class DefaultApi(object):
                 'auth': [
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/token',
+                'endpoint_path': '/api/token',
                 'operation_id': 'token_list_all',
                 'http_method': 'GET',
                 'servers': None,
@@ -3696,7 +3711,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/whoami',
+                'endpoint_path': '/api/whoami',
                 'operation_id': 'whoami',
                 'http_method': 'GET',
                 'servers': None,

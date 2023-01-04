@@ -113,7 +113,7 @@ class AccessControlApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/acl/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/acl/{data_source_id}/{document_id}',
                 'operation_id': 'get_acl',
                 'http_method': 'GET',
                 'servers': None,
@@ -248,7 +248,7 @@ class AccessControlApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/acl/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/acl/{data_source_id}/{document_id}',
                 'operation_id': 'set_acl',
                 'http_method': 'PUT',
                 'servers': None,

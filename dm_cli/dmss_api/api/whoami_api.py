@@ -103,7 +103,7 @@ class WhoamiApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/whoami',
+                'endpoint_path': '/api/whoami',
                 'operation_id': 'whoami',
                 'http_method': 'GET',
                 'servers': None,

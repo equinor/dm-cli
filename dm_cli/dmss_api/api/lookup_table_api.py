@@ -113,7 +113,7 @@ class LookupTableApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/application/{application}',
+                'endpoint_path': '/api/application/{application}',
                 'operation_id': 'create_lookup',
                 'http_method': 'POST',
                 'servers': None,

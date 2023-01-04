@@ -36,7 +36,7 @@ class HealthCheckApi(object):
             api_client = ApiClient()
         self.api_client = api_client
 
-        def __get_api_v1_healthcheck_get(
+        def __get_api_healthcheck_get(
             self,
             **kwargs
         ):
@@ -45,7 +45,7 @@ class HealthCheckApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.get_api_v1_healthcheck_get(async_req=True)
+            >>> thread = api.get_api_healthcheck_get(async_req=True)
             >>> result = thread.get()
 
 
@@ -96,12 +96,12 @@ class HealthCheckApi(object):
             kwargs['_host_index'] = kwargs.get('_host_index')
             return self.call_with_http_info(**kwargs)
 
-        self.get_api_v1_healthcheck_get = _Endpoint(
+        self.get_api_healthcheck_get = _Endpoint(
             settings={
                 'response_type': (str,),
                 'auth': [],
-                'endpoint_path': '/api/v1/healthcheck',
-                'operation_id': 'get_api_v1_healthcheck_get',
+                'endpoint_path': '/api/healthcheck',
+                'operation_id': 'get_api_healthcheck_get',
                 'http_method': 'GET',
                 'servers': None,
             },
@@ -138,5 +138,5 @@ class HealthCheckApi(object):
                 'content_type': [],
             },
             api_client=api_client,
-            callable=__get_api_v1_healthcheck_get
+            callable=__get_api_healthcheck_get
         )
