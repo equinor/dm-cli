@@ -10,7 +10,7 @@ echo "Creating DMSS Python package version $PACKAGE_VERSION"
 docker run --rm \
 --network="host" \
 -v ${PWD}/dm_cli/dmss_api:/local/dm_cli/dmss_api/ \
-openapitools/openapi-generator-cli:v5.2.1 generate \
+openapitools/openapi-generator-cli:v6.2.1 generate \
 -i http://localhost:5000/openapi.json  \
 -g python \
 -o /local/dm_cli \

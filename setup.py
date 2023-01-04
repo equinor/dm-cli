@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="dm-cli",
-    version="0.1.23",
+    version="0.1.24",
     author="",
     author_email="",
     license="MIT",
@@ -19,7 +19,7 @@ setup(
     packages=[
         "dm_cli",
         "dm_cli/dmss_api",
-        "dm_cli/dmss_api/api",
+        "dm_cli/dmss_api/apis",
         "dm_cli/dmss_api/models",
         "dm_cli/dmss_api/model",
     ],
