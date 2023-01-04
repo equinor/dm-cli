@@ -113,7 +113,7 @@ class ReferenceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
                 'operation_id': 'reference_delete',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -247,7 +247,7 @@ class ReferenceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
                 'operation_id': 'reference_insert',
                 'http_method': 'PUT',
                 'servers': None,

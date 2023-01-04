@@ -114,7 +114,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{absolute_ref}',
+                'endpoint_path': '/api/documents/{absolute_ref}',
                 'operation_id': 'document_add',
                 'http_method': 'POST',
                 'servers': None,
@@ -251,7 +251,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/add-raw',
+                'endpoint_path': '/api/documents/{data_source_id}/add-raw',
                 'operation_id': 'document_add_simple',
                 'http_method': 'POST',
                 'servers': None,
@@ -385,7 +385,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{path_reference}/add-to-path',
+                'endpoint_path': '/api/documents/{path_reference}/add-to-path',
                 'operation_id': 'document_add_to_path',
                 'http_method': 'POST',
                 'servers': None,
@@ -525,7 +525,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{id_reference}',
+                'endpoint_path': '/api/documents/{id_reference}',
                 'operation_id': 'document_get_by_id',
                 'http_method': 'GET',
                 'servers': None,
@@ -651,7 +651,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents-by-path/{absolute_path}',
+                'endpoint_path': '/api/documents-by-path/{absolute_path}',
                 'operation_id': 'document_get_by_path',
                 'http_method': 'GET',
                 'servers': None,
@@ -775,7 +775,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/{dotted_id}',
+                'endpoint_path': '/api/documents/{data_source_id}/{dotted_id}',
                 'operation_id': 'document_remove',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -905,7 +905,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/remove-by-path/{directory}',
+                'endpoint_path': '/api/documents/{data_source_id}/remove-by-path/{directory}',
                 'operation_id': 'document_remove_by_path',
                 'http_method': 'DELETE',
                 'servers': None,
@@ -1042,7 +1042,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/documents/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/documents/{data_source_id}/{document_id}',
                 'operation_id': 'document_update',
                 'http_method': 'PUT',
                 'servers': None,

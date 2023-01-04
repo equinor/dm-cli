@@ -109,7 +109,7 @@ class EntityApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/entity',
+                'endpoint_path': '/api/entity',
                 'operation_id': 'instantiate_entity',
                 'http_method': 'POST',
                 'servers': None,

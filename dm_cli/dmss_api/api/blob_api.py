@@ -112,7 +112,7 @@ class BlobApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/blobs/{data_source_id}/{blob_id}',
+                'endpoint_path': '/api/blobs/{data_source_id}/{blob_id}',
                 'operation_id': 'blob_get_by_id',
                 'http_method': 'GET',
                 'servers': None,
@@ -247,7 +247,7 @@ class BlobApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/blobs/{data_source_id}/{blob_id}',
+                'endpoint_path': '/api/blobs/{data_source_id}/{blob_id}',
                 'operation_id': 'blob_upload',
                 'http_method': 'PUT',
                 'servers': None,

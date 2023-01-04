@@ -22,6 +22,7 @@ from dm_cli.dmss_api.model_utils import (  # noqa: F401
     validate_and_convert_types
 )
 from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 
 
 class BlueprintApi(object):
@@ -43,7 +44,7 @@ class BlueprintApi(object):
         ):
             """Get Blueprint  # noqa: E501
 
-            Fetch the Blueprint of a type (including inherited attributes)  # noqa: E501
+            Fetch the Blueprint and Recipes of a type (including inherited attributes)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -54,6 +55,7 @@ class BlueprintApi(object):
                 type_ref (str):
 
             Keyword Args:
+                context (str): [optional]
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
                 _preload_content (bool): if False, the urllib3.HTTPResponse object
@@ -75,7 +77,7 @@ class BlueprintApi(object):
                 async_req (bool): execute request asynchronously
 
             Returns:
-                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
+                GetBlueprintResponse
                     If the method is called asynchronously, returns the request
                     thread.
             """
@@ -104,12 +106,12 @@ class BlueprintApi(object):
 
         self.blueprint_get = _Endpoint(
             settings={
-                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
+                'response_type': (GetBlueprintResponse,),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/blueprint/{type_ref}',
+                'endpoint_path': '/api/blueprint/{type_ref}',
                 'operation_id': 'blueprint_get',
                 'http_method': 'GET',
                 'servers': None,
@@ -117,6 +119,7 @@ class BlueprintApi(object):
             params_map={
                 'all': [
                     'type_ref',
+                    'context',
                 ],
                 'required': [
                     'type_ref',
@@ -126,22 +129,34 @@ class BlueprintApi(object):
                 'enum': [
                 ],
                 'validation': [
+                    'type_ref',
                 ]
             },
             root_map={
                 'validations': {
+                    ('type_ref',): {
+                        'max_length': 128,
+                        'min_length': 3,
+                        'regex': {
+                            'pattern': r'^[A-Z:a-z0-9_\/-]*$',  # noqa: E501
+                        },
+                    },
                 },
                 'allowed_values': {
                 },
                 'openapi_types': {
                     'type_ref':
                         (str,),
+                    'context':
+                        (str,),
                 },
                 'attribute_map': {
                     'type_ref': 'type_ref',
+                    'context': 'context',
                 },
                 'location_map': {
                     'type_ref': 'path',
+                    'context': 'query',
                 },
                 'collection_format_map': {
                 }
@@ -230,7 +245,7 @@ class BlueprintApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/v1/resolve-path/{absolute_id}',
+                'endpoint_path': '/api/resolve-path/{absolute_id}',
                 'operation_id': 'blueprint_resolve',
                 'http_method': 'GET',
                 'servers': None,
