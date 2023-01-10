@@ -27,6 +27,7 @@ from dm_cli.dmss_api.model.data_source_information import DataSourceInformation
 from dm_cli.dmss_api.model.data_source_request import DataSourceRequest
 from dm_cli.dmss_api.model.error_response import ErrorResponse
 from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
+from dm_cli.dmss_api.model.lookup import Lookup
 from dm_cli.dmss_api.model.pat_data import PATData
 from dm_cli.dmss_api.model.reference import Reference
 
@@ -2623,6 +2624,127 @@ class DefaultApi(object):
             },
             api_client=api_client,
             callable=__get_api_healthcheck_get
+        )
+
+        def __get_lookup(
+            self,
+            application,
+            **kwargs
+        ):
+            """Get Lookup  # noqa: E501
+
+            Fetch a single lookup  # noqa: E501
+            This method makes a synchronous HTTP request by default. To make an
+            asynchronous HTTP request, please pass async_req=True
+
+            >>> thread = api.get_lookup(application, async_req=True)
+            >>> result = thread.get()
+
+            Args:
+                application (str):
+
+            Keyword Args:
+                _return_http_data_only (bool): response data without head status
+                    code and headers. Default is True.
+                _preload_content (bool): if False, the urllib3.HTTPResponse object
+                    will be returned without reading/decoding response data.
+                    Default is True.
+                _request_timeout (int/float/tuple): timeout setting for this request. If
+                    one number provided, it will be total request timeout. It can also
+                    be a pair (tuple) of (connection, read) timeouts.
+                    Default is None.
+                _check_input_type (bool): specifies if type checking
+                    should be done one the data sent to the server.
+                    Default is True.
+                _check_return_type (bool): specifies if type checking
+                    should be done one the data received from the server.
+                    Default is True.
+                _host_index (int/None): specifies the index of the server
+                    that we want to use.
+                    Default is read from the configuration.
+                async_req (bool): execute request asynchronously
+
+            Returns:
+                Lookup
+                    If the method is called asynchronously, returns the request
+                    thread.
+            """
+            kwargs['async_req'] = kwargs.get(
+                'async_req', False
+            )
+            kwargs['_return_http_data_only'] = kwargs.get(
+                '_return_http_data_only', True
+            )
+            kwargs['_preload_content'] = kwargs.get(
+                '_preload_content', True
+            )
+            kwargs['_request_timeout'] = kwargs.get(
+                '_request_timeout', None
+            )
+            kwargs['_check_input_type'] = kwargs.get(
+                '_check_input_type', True
+            )
+            kwargs['_check_return_type'] = kwargs.get(
+                '_check_return_type', True
+            )
+            kwargs['_host_index'] = kwargs.get('_host_index')
+            kwargs['application'] = \
+                application
+            return self.call_with_http_info(**kwargs)
+
+        self.get_lookup = _Endpoint(
+            settings={
+                'response_type': (Lookup,),
+                'auth': [
+                    'APIKeyHeader',
+                    'OAuth2AuthorizationCodeBearer'
+                ],
+                'endpoint_path': '/api/application/{application}',
+                'operation_id': 'get_lookup',
+                'http_method': 'GET',
+                'servers': None,
+            },
+            params_map={
+                'all': [
+                    'application',
+                ],
+                'required': [
+                    'application',
+                ],
+                'nullable': [
+                ],
+                'enum': [
+                ],
+                'validation': [
+                ]
+            },
+            root_map={
+                'validations': {
+                },
+                'allowed_values': {
+                },
+                'openapi_types': {
+                    'application':
+                        (str,),
+                },
+                'attribute_map': {
+                    'application': 'application',
+                },
+                'location_map': {
+                    'application': 'path',
+                },
+                'collection_format_map': {
+                }
+            },
+            headers_map={
+                'accept': [
+                    'application/json',
+                    'text/plain'
+                ],
+                'content_type': [],
+            },
+            api_client=api_client,
+            callable=__get_lookup
         )
 
         def __instantiate_entity(
