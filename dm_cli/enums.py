@@ -1,7 +1,6 @@
 from enum import Enum
 
 
-
 class StorageDataTypes(Enum):
     DEFAULT = "default"
     LARGE = "large"
