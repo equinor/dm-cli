@@ -12,7 +12,7 @@ import emoji
 from .dmss import ApplicationException, dmss_api
 from .dmss_api.exceptions import ApiException
 from .domain import Dependency
-from .enums import PRIMITIVES, SIMOS, BuiltinDataTypes
+from .enums import SIMOS, BuiltinDataTypes
 
 
 def find_reference_schema(reference: str) -> Literal["dmss", "alias", "dotted", "package", "data_source"]:
@@ -172,7 +172,7 @@ def replace_relative_references(
                     )
                 )
             return extends_list
-        if key == "attributeType" and (value in PRIMITIVES or value == BuiltinDataTypes.OBJECT.value):
+        if key == "attributeType" and value in [data_type.value for data_type in BuiltinDataTypes]:
             return value
         return resolve_reference(
             value,
