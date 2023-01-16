@@ -9,6 +9,7 @@ from zipfile import ZipFile
 import click
 import emoji
 
+from dm_cli import VERSION
 from dm_cli.dmss import settings, export
 from dm_cli.application import (
     get_app_dir_structure,
@@ -27,7 +28,9 @@ from dm_cli.zip_all import zip_all
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
+
 @click.group(context_settings=CONTEXT_SETTINGS)
+@click.version_option(VERSION)
 @click.option(
     "-t", "--token",
     default="no-token", type=str,
