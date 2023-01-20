@@ -33,10 +33,11 @@ Options:
 
 Commands:
   create-lookup  Create a named Ui-/StorageRecipe-lookup-table from all...
-  ds     Subcommand for working with data sources
-  init   Initialize the data sources and import all packages.
-  pkg    Subcommand for working with packages
-  reset  Reset all data sources (deletes and reuploads packages)
+  ds             Subcommand for working with data sources
+  entity         Subcommand for working with entities
+  init           Initialize the data sources and import all packages.
+  pkg            Subcommand for working with packages
+  reset          Reset all data sources (deletes and reuploads packages)
 ```
 
 For each of the `commands` listed above, you can run `dm <COMMAND> --help` to see subcommand-specific help messages, e.g. `dm ds import --help` or `dm pkg --help`
@@ -49,11 +50,11 @@ For these commands, the `path` argument must be the path to a directory with two
 $ tree app
 app
 ├── data
-│   └── DemoApplicationDataSource
-│       ├── instances
-│       │   └── demoApplication.json
-│       └── models
-│           └── DemoApplication.json
+  └── DemoApplicationDataSource
+    ├── instances
+│     └── demoApplication.json
+|     └── models
+|       └── DemoApplication.json
 └── data_sources
     └── DemoApplicationDataSource.json
 ```
@@ -195,6 +196,14 @@ Delete all packages
 # Delete all packages found in the directory given by <path>
 $ dm pkg delete-all <data_source> <path>
 $ dm pkg delete-all DemoApplicationDataSource app/data/DemoApplicationDataSource
+```
+
+### Entities
+
+Upload a single entity
+
+```sh
+$ dm entity import <local_path> <destination_path>
 ```
 
 ### Recipe Lookup
