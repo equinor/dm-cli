@@ -3,6 +3,7 @@ from json import JSONDecodeError
 from pathlib import Path
 
 from .dmss import dmss_api
+from .domain import Dependency
 from .utils import (
     concat_dependencies,
     replace_relative_references,
@@ -20,7 +21,14 @@ def import_single_entity(path: Path, path_reference: str):
     except JSONDecodeError:
         raise Exception(f"Failed to load the file '{path.name}' as a JSON document")
 
-    dependencies = concat_dependencies(document.get("_meta_", {}).get("dependencies", []), {}, path.name)
+    remote_dependencies = dmss_api.export_meta(f"{data_source_id}/{package}")
+    old_dependencies = {v["alias"]: Dependency(**v) for v in remote_dependencies.get("dependencies", [])}
+
+    dependencies = concat_dependencies(
+        new_dependencies=document.get("_meta_", {}).get("dependencies", []),
+        old_dependencies=old_dependencies,
+        filename=path.name,
+    )
 
     # Replace references
     prepared_document = {}
