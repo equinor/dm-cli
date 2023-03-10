@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import List
 from uuid import uuid4
@@ -6,7 +7,7 @@ from progress.bar import IncrementalBar
 
 from .dmss import dmss_api
 from .domain import Package
-from .utils import upload_blobs_in_document
+from .utils import ensure_package_structure, upload_blobs_in_document
 
 
 def add_file_to_package(path: Path, package: Package, document: dict) -> None:
@@ -41,17 +42,30 @@ def add_package_to_package(path: Path, package: Package) -> None:
     return add_package_to_package(Path(new_path), sub_folder)
 
 
-def import_package_tree(root_package: Package, data_source_id: str) -> None:
-    documents_to_upload: List[dict] = [root_package.to_dict()]
-    root_package.traverse_documents(lambda document, **kwargs: documents_to_upload.append(document))
-    root_package.traverse_package(lambda package: documents_to_upload.append(package.to_dict()))
+def import_package_tree(package: Package, destination: str) -> None:
+    destination_parts = destination.split("/")
+    data_source = destination_parts[0]
+
+    documents_to_upload: List[dict] = []
+    if len(destination_parts) == 1:  # We're importing a root package
+        documents_to_upload.append(package.to_dict())
+    else:  # We're importing a sub folder
+        dmss_api.document_add_to_path(
+            destination,
+            json.dumps(package.to_dict()),
+            update_uncontained=False,
+            files=[],
+        )
+
+    package.traverse_documents(lambda document, **kwargs: documents_to_upload.append(document))
+    package.traverse_package(lambda package: documents_to_upload.append(package.to_dict()))
 
     with IncrementalBar(
-        f"\tImporting {root_package.name}",
+        f"\tImporting {package.name}",
         max=len(documents_to_upload),
         suffix="%(percent).0f%% - [%(eta)ds/%(elapsed)ds]",
     ) as bar:
         for document in documents_to_upload:
-            document = upload_blobs_in_document(document, data_source_id)
-            dmss_api.document_add_simple(data_source_id, document)
+            document = upload_blobs_in_document(document, data_source)
+            dmss_api.document_add_simple(data_source, document)
         bar.next()

@@ -2,10 +2,10 @@ from os.path import normpath
 from pathlib import Path
 from typing import Dict, List, Literal, Union
 
-from dmss import ApplicationException
-from domain import Dependency
-from enums import SIMOS, BuiltinDataTypes
-from utils import resolve_dependency
+from .dmss import ApplicationException
+from .domain import Dependency
+from .enums import SIMOS, BuiltinDataTypes
+from .utils import resolve_dependency
 
 
 def find_reference_schema(reference: str) -> Literal["dmss", "alias", "dotted", "package", "data_source"]:

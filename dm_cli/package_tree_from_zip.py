@@ -2,15 +2,21 @@ import io
 import json
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Union
 from zipfile import ZipFile
 
 from .domain import Dependency, Package
 from .import_package import add_file_to_package, add_package_to_package
-from .utils import concat_dependencies, replace_relative_references
+from .reference_utils import replace_relative_references
+from .utils import concat_dependencies
 
 
-def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Package:
+def package_tree_from_zip(
+    data_source_id: str,
+    zip_package: io.BytesIO,
+    is_root: bool = True,
+    extra_dependencies: Union[Dict[str, Dependency], None] = None,
+) -> Package:
     """
     Converts a Zip-folder into a DMSS Package structure.
 
@@ -21,7 +27,6 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
     @param zip_package: A zip-folder represented as an in-memory io.BytesIO object
     @return: A Package object with sub folders(Package) and documents(dict)
     """
-    reference_table = {}
 
     with ZipFile(zip_package) as zip_file:
         folder_name = zip_file.filelist[0].filename.split("/", 1)[0]
@@ -35,14 +40,14 @@ def package_tree_from_zip(data_source_id: str, zip_package: io.BytesIO) -> Packa
         package_entity = json.loads(zip_file.read(package_file.filename)) if package_file else {}
         if package_file in zip_file.filelist:
             zip_file.filelist.remove(package_file)
-        dependencies: Dict[str, Dependency] = {}
-        package_dependencies = {
+        dependencies: Dict[str, Dependency] = {
             v["alias"]: Dependency(**v) for v in package_entity.get("_meta_", {}).get("dependencies", [])
         }
-        dependencies.update(package_dependencies)
+        if extra_dependencies:
+            dependencies.update(extra_dependencies)
         root_package = Package(
             name=package_entity.get("name", folder_name),
-            is_root=True,
+            is_root=is_root,
             meta=package_entity.get("_meta_"),
         )
         # Construct a nested Package object of the package to import
