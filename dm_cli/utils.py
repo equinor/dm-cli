@@ -123,3 +123,21 @@ def dmss_exception_wrapper(function: Callable, *args, **kwargs) -> Any:
         traceback.print_exc()
         click.echo(f"\nERROR: {error}")
         exit(1)
+
+
+def ensure_package_structure(path: Path):
+    """Create any missing packages in the provided path (mkdir -R)"""
+    try:
+        dmss_api.document_get_by_path(f"dmss://{path}")
+    except NotFoundException as e:
+        error = json.loads(e.body)
+        if str(f"'{path}'") not in error["message"]:
+            click.echo(f"Target package '{path}' is likely corrupt!")
+            click.echo(f"\n\t{pprint.pprint(error)}")
+            exit(1)
+
+        if len(path.parts) > 2:  # We're at root package level. Do not check for datasource.
+            ensure_package_structure(path.parent)
+
+        add_package_to_path(path.name, path)
+        click.echo(f"Target folder '{path.name}' was missing in '{path.parent}'. Created: ✓")

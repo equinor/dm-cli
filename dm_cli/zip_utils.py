@@ -4,7 +4,8 @@ from zipfile import ZipFile
 
 import click
 import emoji
-from dmss import ApplicationException
+
+from .dmss import ApplicationException
 
 
 def zip_all(zip_file: ZipFile, path: str, real_name="", write_folder: bool = True):
