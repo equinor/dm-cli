@@ -50,7 +50,7 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     root_package = file_path.split("/", 1)[0]
     ref_schema = find_reference_schema(reference)
 
-    if ref_schema == "dmss":
+    if ref_schema == "dmss" or reference == "_default_":
         return reference
     if ref_schema == "alias":
         return resolve_dependency(reference, dependencies)
