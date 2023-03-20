@@ -43,6 +43,7 @@ class PersonalAccessTokenApi(object):
         ):
             """New Personal Access Token  # noqa: E501
 
+            Create a personal access token (PAT).  - **scope**: WRITE, READ or NONE - **time_to_live**: Optional parameter to set time to life in seconds (default is 30 days)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -163,6 +164,7 @@ class PersonalAccessTokenApi(object):
         ):
             """Revoke Personal Access Token  # noqa: E501
 
+            Delete a personal access token (PAT).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -281,6 +283,7 @@ class PersonalAccessTokenApi(object):
         ):
             """List All Pats  # noqa: E501
 
+            Get a list of all personal access tokens (PATs).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

@@ -44,6 +44,7 @@ class BlobApi(object):
         ):
             """Get By Id  # noqa: E501
 
+            Get blob from id. A blob (binary large object) can be anything from video to text file.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -176,6 +177,7 @@ class BlobApi(object):
         ):
             """Upload  # noqa: E501
 
+            Upload a new blob. A blob (binary large object) can be anything from video to text file.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

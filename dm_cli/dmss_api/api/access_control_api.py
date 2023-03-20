@@ -45,6 +45,7 @@ class AccessControlApi(object):
         ):
             """Get Acl  # noqa: E501
 
+            get access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -176,6 +177,7 @@ class AccessControlApi(object):
         ):
             """Set Acl  # noqa: E501
 
+            Update access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

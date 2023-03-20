@@ -43,7 +43,7 @@ class ExportApi(object):
         ):
             """Export  # noqa: E501
 
-            Download a zip-folder with one or more documents as json file(s).  absolute_document_ref is on the format: 'DATASOURCE/PACKAGE/{ENTITY.name/ENTITY._id}  # noqa: E501
+            Download a zip-folder with one or more documents as json file(s).  - **absolute_document_ref**: <data_source>/<path>/<document_name>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -165,7 +165,7 @@ class ExportApi(object):
         ):
             """Export Meta  # noqa: E501
 
-            Export only the metadata of an entity. Entities must be specified on the format 'DATASOURCE/PACKAGE/{ENTITY.name/ENTITY._id} An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  # noqa: E501
+            Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **absolute_document_ref**: <data_source>/<path_to_entity>/<entity_name>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
