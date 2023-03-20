@@ -45,6 +45,7 @@ class DatasourceApi(object):
         ):
             """Get  # noqa: E501
 
+            Get configuration of a single data source.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -164,6 +165,7 @@ class DatasourceApi(object):
         ):
             """Get All  # noqa: E501
 
+            Get list of all data sources found in DMSS (name and id for each data source).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -274,7 +276,7 @@ class DatasourceApi(object):
         ):
             """Save  # noqa: E501
 
-            Create or update a data source configuration  # noqa: E501
+            Create or update a data source configuration.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

@@ -43,7 +43,7 @@ class SearchApi(object):
         ):
             """Search  # noqa: E501
 
-            Takes a list of data source id's as a query parameter, and search all data sources for the posted dictionary. If data source list is empty, search all databases.  # noqa: E501
+            Takes a list of data source id's as a query parameter, and search those data sources for the posted dictionary. If data source list is empty, search all databases.  - **data**: a JSON document, must include a \"type\" attribute. Can also include other attributes like \"name\". - **data_sources**: List of data sources to search in. - **sort_by_attribute**: which attribute to sort the result by  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

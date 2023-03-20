@@ -22,9 +22,9 @@ from dm_cli.dmss_api.model_utils import (  # noqa: F401
     validate_and_convert_types
 )
 from dm_cli.dmss_api.model.acl import ACL
-from dm_cli.dmss_api.model.basic_entity import BasicEntity
 from dm_cli.dmss_api.model.data_source_information import DataSourceInformation
 from dm_cli.dmss_api.model.data_source_request import DataSourceRequest
+from dm_cli.dmss_api.model.entity import Entity
 from dm_cli.dmss_api.model.error_response import ErrorResponse
 from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 from dm_cli.dmss_api.model.lookup import Lookup
@@ -52,6 +52,7 @@ class DefaultApi(object):
         ):
             """Get By Id  # noqa: E501
 
+            Get blob from id. A blob (binary large object) can be anything from video to text file.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -184,6 +185,7 @@ class DefaultApi(object):
         ):
             """Upload  # noqa: E501
 
+            Upload a new blob. A blob (binary large object) can be anything from video to text file.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -324,7 +326,7 @@ class DefaultApi(object):
         ):
             """Get Blueprint  # noqa: E501
 
-            Fetch the Blueprint and Recipes of a type (including inherited attributes)  # noqa: E501
+            Fetch the Blueprint and Recipes from a type reference (including inherited attributes).  - **type_ref**: <protocol>://<data_source>/<path_to_blueprint> - **context**: name of application that has Ui-/StorageRecipe lookup table (optional attribute)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -459,7 +461,7 @@ class DefaultApi(object):
         ):
             """Resolve Blueprint Id  # noqa: E501
 
-            Resolve the data_source/uuid form of a blueprint to its type path  # noqa: E501
+            Resolve absolute_id of a blueprint to its type path.  - **absolute_id**: <data_source</<blueprint_uuid>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -581,7 +583,7 @@ class DefaultApi(object):
         ):
             """Create Lookup  # noqa: E501
 
-            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  # noqa: E501
+            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -711,6 +713,7 @@ class DefaultApi(object):
         ):
             """Get  # noqa: E501
 
+            Get configuration of a single data source.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -830,6 +833,7 @@ class DefaultApi(object):
         ):
             """Get All  # noqa: E501
 
+            Get list of all data sources found in DMSS (name and id for each data source).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -940,7 +944,7 @@ class DefaultApi(object):
         ):
             """Save  # noqa: E501
 
-            Create or update a data source configuration  # noqa: E501
+            Create or update a data source configuration.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -1342,7 +1346,7 @@ class DefaultApi(object):
         ):
             """Add To Path  # noqa: E501
 
-            Same as 'add_to_parent', but reference parent by path instead of ID. Also supports files. The path must be on format; DATA_SOURCE/PACKAGE/ENTITY.Attribute  # noqa: E501
+            Same as 'add_to_parent', but reference parent by path instead of ID. Also supports files.  - **path_reference**: <data_source>/<path_to_entity>/<entity_name>.<attribute>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -1413,7 +1417,7 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{path_reference}/add-to-path',
+                'endpoint_path': '/api/documents-by-path/{path_reference}',
                 'operation_id': 'document_add_to_path',
                 'http_method': 'POST',
                 'servers': None,
@@ -1487,6 +1491,7 @@ class DefaultApi(object):
         ):
             """Get By Id  # noqa: E501
 
+            Get document as JSON string.  - **id_reference**: <data_source>/<document_uuid> - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -1613,7 +1618,7 @@ class DefaultApi(object):
         ):
             """Get By Path  # noqa: E501
 
-            Get a document by its path in the form PROTOCOL://DATA_SOURCE/PACKAGE/FOLDER/NAME.Attribute  # noqa: E501
+            Get a document by its absolute path.  - **absolute_path**: <protocol>://<data_source>/<path>.<attribute>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -1729,21 +1734,20 @@ class DefaultApi(object):
 
         def __document_remove(
             self,
-            data_source_id,
-            dotted_id,
+            id_reference,
             **kwargs
         ):
             """Remove  # noqa: E501
 
+            Remove document - **id_reference**: <data_source>/<document_uuid>.<attribute_path>  Example: id_reference=SomeDataSource/3978d9ca-2d7a-4b47-8fed-57710f6cf50b.attributes.1 will remove the first element in the attribute list of a blueprint with the given id in data source 'SomeDataSource'.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_remove(data_source_id, dotted_id, async_req=True)
+            >>> thread = api.document_remove(id_reference, async_req=True)
             >>> result = thread.get()
 
             Args:
-                data_source_id (str):
-                dotted_id (str):
+                id_reference (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -1790,10 +1794,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['data_source_id'] = \
-                data_source_id
-            kwargs['dotted_id'] = \
-                dotted_id
+            kwargs['id_reference'] = \
+                id_reference
             return self.call_with_http_info(**kwargs)
 
         self.document_remove = _Endpoint(
@@ -1803,19 +1805,17 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{data_source_id}/{dotted_id}',
+                'endpoint_path': '/api/documents/{id_reference}',
                 'operation_id': 'document_remove',
                 'http_method': 'DELETE',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'data_source_id',
-                    'dotted_id',
+                    'id_reference',
                 ],
                 'required': [
-                    'data_source_id',
-                    'dotted_id',
+                    'id_reference',
                 ],
                 'nullable': [
                 ],
@@ -1830,18 +1830,14 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'data_source_id':
-                        (str,),
-                    'dotted_id':
+                    'id_reference':
                         (str,),
                 },
                 'attribute_map': {
-                    'data_source_id': 'data_source_id',
-                    'dotted_id': 'dotted_id',
+                    'id_reference': 'id_reference',
                 },
                 'location_map': {
-                    'data_source_id': 'path',
-                    'dotted_id': 'path',
+                    'id_reference': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -1859,21 +1855,20 @@ class DefaultApi(object):
 
         def __document_remove_by_path(
             self,
-            data_source_id,
-            directory,
+            path_reference,
             **kwargs
         ):
             """Remove By Path  # noqa: E501
 
+            Remove a document from DMSS.  - **path_reference**: <data_source>/<path>.<attribute>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_remove_by_path(data_source_id, directory, async_req=True)
+            >>> thread = api.document_remove_by_path(path_reference, async_req=True)
             >>> result = thread.get()
 
             Args:
-                data_source_id (str):
-                directory (str):
+                path_reference (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -1920,10 +1915,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['data_source_id'] = \
-                data_source_id
-            kwargs['directory'] = \
-                directory
+            kwargs['path_reference'] = \
+                path_reference
             return self.call_with_http_info(**kwargs)
 
         self.document_remove_by_path = _Endpoint(
@@ -1933,19 +1926,17 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{data_source_id}/remove-by-path/{directory}',
+                'endpoint_path': '/api/documents-by-path/{path_reference}',
                 'operation_id': 'document_remove_by_path',
                 'http_method': 'DELETE',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'data_source_id',
-                    'directory',
+                    'path_reference',
                 ],
                 'required': [
-                    'data_source_id',
-                    'directory',
+                    'path_reference',
                 ],
                 'nullable': [
                 ],
@@ -1960,18 +1951,14 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'data_source_id':
-                        (str,),
-                    'directory':
+                    'path_reference':
                         (str,),
                 },
                 'attribute_map': {
-                    'data_source_id': 'data_source_id',
-                    'directory': 'directory',
+                    'path_reference': 'path_reference',
                 },
                 'location_map': {
-                    'data_source_id': 'path',
-                    'directory': 'path',
+                    'path_reference': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -1989,27 +1976,25 @@ class DefaultApi(object):
 
         def __document_update(
             self,
-            data_source_id,
-            document_id,
+            id_reference,
             data,
             **kwargs
         ):
             """Update  # noqa: E501
 
+            Update document - **id_reference**: <data_source>/<document_uuid> (can also include an optional .<attribute> after <document_uuid>)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_update(data_source_id, document_id, data, async_req=True)
+            >>> thread = api.document_update(id_reference, data, async_req=True)
             >>> result = thread.get()
 
             Args:
-                data_source_id (str):
-                document_id (str):
+                id_reference (str):
                 data (str):
 
             Keyword Args:
                 update_uncontained (bool): [optional] if omitted the server will use the default value of False
-                attribute (str): [optional]
                 files ([file_type]): [optional]
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
@@ -2055,10 +2040,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['data_source_id'] = \
-                data_source_id
-            kwargs['document_id'] = \
-                document_id
+            kwargs['id_reference'] = \
+                id_reference
             kwargs['data'] = \
                 data
             return self.call_with_http_info(**kwargs)
@@ -2070,23 +2053,20 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{data_source_id}/{document_id}',
+                'endpoint_path': '/api/documents/{id_reference}',
                 'operation_id': 'document_update',
                 'http_method': 'PUT',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'data_source_id',
-                    'document_id',
+                    'id_reference',
                     'data',
                     'update_uncontained',
-                    'attribute',
                     'files',
                 ],
                 'required': [
-                    'data_source_id',
-                    'document_id',
+                    'id_reference',
                     'data',
                 ],
                 'nullable': [
@@ -2102,33 +2082,25 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'data_source_id':
-                        (str,),
-                    'document_id':
+                    'id_reference':
                         (str,),
                     'data':
                         (str,),
                     'update_uncontained':
                         (bool,),
-                    'attribute':
-                        (str,),
                     'files':
                         ([file_type],),
                 },
                 'attribute_map': {
-                    'data_source_id': 'data_source_id',
-                    'document_id': 'document_id',
+                    'id_reference': 'id_reference',
                     'data': 'data',
                     'update_uncontained': 'update_uncontained',
-                    'attribute': 'attribute',
                     'files': 'files',
                 },
                 'location_map': {
-                    'data_source_id': 'path',
-                    'document_id': 'path',
+                    'id_reference': 'path',
                     'data': 'form',
                     'update_uncontained': 'query',
-                    'attribute': 'form',
                     'files': 'form',
                 },
                 'collection_format_map': {
@@ -2155,7 +2127,7 @@ class DefaultApi(object):
         ):
             """Export  # noqa: E501
 
-            Download a zip-folder with one or more documents as json file(s).  absolute_document_ref is on the format: 'DATASOURCE/PACKAGE/{ENTITY.name/ENTITY._id}  # noqa: E501
+            Download a zip-folder with one or more documents as json file(s).  - **absolute_document_ref**: <data_source>/<path>/<document_name>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -2277,7 +2249,7 @@ class DefaultApi(object):
         ):
             """Export Meta  # noqa: E501
 
-            Export only the metadata of an entity. Entities must be specified on the format 'DATASOURCE/PACKAGE/{ENTITY.name/ENTITY._id} An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  # noqa: E501
+            Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **absolute_document_ref**: <data_source>/<path_to_entity>/<entity_name>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -2399,6 +2371,7 @@ class DefaultApi(object):
         ):
             """Get Acl  # noqa: E501
 
+            get access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -2527,6 +2500,7 @@ class DefaultApi(object):
         ):
             """Get  # noqa: E501
 
+            Healthcheck endpoint. Responds with \"OK\" - 200.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -2633,7 +2607,7 @@ class DefaultApi(object):
         ):
             """Get Lookup  # noqa: E501
 
-            Fetch a single lookup  # noqa: E501
+            Fetch a single lookup table.  - **application**: name of application  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -2749,19 +2723,20 @@ class DefaultApi(object):
 
         def __instantiate_entity(
             self,
-            basic_entity,
+            entity,
             **kwargs
         ):
             """Instantiate  # noqa: E501
 
+            Create a new entity and return it.  (entity is not saved in DMSS)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.instantiate_entity(basic_entity, async_req=True)
+            >>> thread = api.instantiate_entity(entity, async_req=True)
             >>> result = thread.get()
 
             Args:
-                basic_entity (BasicEntity):
+                entity (Entity):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -2808,8 +2783,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['basic_entity'] = \
-                basic_entity
+            kwargs['entity'] = \
+                entity
             return self.call_with_http_info(**kwargs)
 
         self.instantiate_entity = _Endpoint(
@@ -2826,10 +2801,10 @@ class DefaultApi(object):
             },
             params_map={
                 'all': [
-                    'basic_entity',
+                    'entity',
                 ],
                 'required': [
-                    'basic_entity',
+                    'entity',
                 ],
                 'nullable': [
                 ],
@@ -2844,13 +2819,13 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'basic_entity':
-                        (BasicEntity,),
+                    'entity':
+                        (Entity,),
                 },
                 'attribute_map': {
                 },
                 'location_map': {
-                    'basic_entity': 'body',
+                    'entity': 'body',
                 },
                 'collection_format_map': {
                 }
@@ -2876,6 +2851,7 @@ class DefaultApi(object):
         ):
             """Delete Reference  # noqa: E501
 
+            Delete a reference in an entity.  Used to delete uncontained attributes in an entity.  - **document_dotted_id**: <data_source>/<path_to_entity>/<entity_name>.<attribute>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3007,6 +2983,7 @@ class DefaultApi(object):
         ):
             """Insert Reference  # noqa: E501
 
+            Add reference to an entity.  Used to add uncontained attributes to an entity.  - **document_dotted_id**: <data_source>/<path_to_entity>/<entity_name>.<attribute> - **reference**: a reference object in JSON format  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3146,7 +3123,7 @@ class DefaultApi(object):
         ):
             """Search  # noqa: E501
 
-            Takes a list of data source id's as a query parameter, and search all data sources for the posted dictionary. If data source list is empty, search all databases.  # noqa: E501
+            Takes a list of data source id's as a query parameter, and search those data sources for the posted dictionary. If data source list is empty, search all databases.  - **data**: a JSON document, must include a \"type\" attribute. Can also include other attributes like \"name\". - **data_sources**: List of data sources to search in. - **sort_by_attribute**: which attribute to sort the result by  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3283,6 +3260,7 @@ class DefaultApi(object):
         ):
             """Set Acl  # noqa: E501
 
+            Update access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3427,6 +3405,7 @@ class DefaultApi(object):
         ):
             """New Personal Access Token  # noqa: E501
 
+            Create a personal access token (PAT).  - **scope**: WRITE, READ or NONE - **time_to_live**: Optional parameter to set time to life in seconds (default is 30 days)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3547,6 +3526,7 @@ class DefaultApi(object):
         ):
             """Revoke Personal Access Token  # noqa: E501
 
+            Delete a personal access token (PAT).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3665,6 +3645,7 @@ class DefaultApi(object):
         ):
             """List All Pats  # noqa: E501
 
+            Get a list of all personal access tokens (PATs).  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -3766,12 +3747,149 @@ class DefaultApi(object):
             callable=__token_list_all
         )
 
+        def __validate_entity(
+            self,
+            entity,
+            **kwargs
+        ):
+            """Validate  # noqa: E501
+
+            Validate an entity. Will return detailed error messages and status code 422 if the entity is invalid.  \"as_type\": Optional. Validate the root entity against this type instead of the one defined in the entity.  # noqa: E501
+            This method makes a synchronous HTTP request by default. To make an
+            asynchronous HTTP request, please pass async_req=True
+
+            >>> thread = api.validate_entity(entity, async_req=True)
+            >>> result = thread.get()
+
+            Args:
+                entity (Entity):
+
+            Keyword Args:
+                as_type (str): [optional]
+                _return_http_data_only (bool): response data without head status
+                    code and headers. Default is True.
+                _preload_content (bool): if False, the urllib3.HTTPResponse object
+                    will be returned without reading/decoding response data.
+                    Default is True.
+                _request_timeout (int/float/tuple): timeout setting for this request. If
+                    one number provided, it will be total request timeout. It can also
+                    be a pair (tuple) of (connection, read) timeouts.
+                    Default is None.
+                _check_input_type (bool): specifies if type checking
+                    should be done one the data sent to the server.
+                    Default is True.
+                _check_return_type (bool): specifies if type checking
+                    should be done one the data received from the server.
+                    Default is True.
+                _host_index (int/None): specifies the index of the server
+                    that we want to use.
+                    Default is read from the configuration.
+                async_req (bool): execute request asynchronously
+
+            Returns:
+                bool, date, datetime, dict, float, int, list, str, none_type
+                    If the method is called asynchronously, returns the request
+                    thread.
+            """
+            kwargs['async_req'] = kwargs.get(
+                'async_req', False
+            )
+            kwargs['_return_http_data_only'] = kwargs.get(
+                '_return_http_data_only', True
+            )
+            kwargs['_preload_content'] = kwargs.get(
+                '_preload_content', True
+            )
+            kwargs['_request_timeout'] = kwargs.get(
+                '_request_timeout', None
+            )
+            kwargs['_check_input_type'] = kwargs.get(
+                '_check_input_type', True
+            )
+            kwargs['_check_return_type'] = kwargs.get(
+                '_check_return_type', True
+            )
+            kwargs['_host_index'] = kwargs.get('_host_index')
+            kwargs['entity'] = \
+                entity
+            return self.call_with_http_info(**kwargs)
+
+        self.validate_entity = _Endpoint(
+            settings={
+                'response_type': (bool, date, datetime, dict, float, int, list, str, none_type,),
+                'auth': [
+                    'APIKeyHeader',
+                    'OAuth2AuthorizationCodeBearer'
+                ],
+                'endpoint_path': '/api/entity/validate',
+                'operation_id': 'validate_entity',
+                'http_method': 'POST',
+                'servers': None,
+            },
+            params_map={
+                'all': [
+                    'entity',
+                    'as_type',
+                ],
+                'required': [
+                    'entity',
+                ],
+                'nullable': [
+                ],
+                'enum': [
+                ],
+                'validation': [
+                    'as_type',
+                ]
+            },
+            root_map={
+                'validations': {
+                    ('as_type',): {
+                        'max_length': 128,
+                        'min_length': 3,
+                        'regex': {
+                            'pattern': r'^[A-Z:a-z0-9_\/-]*$',  # noqa: E501
+                        },
+                    },
+                },
+                'allowed_values': {
+                },
+                'openapi_types': {
+                    'entity':
+                        (Entity,),
+                    'as_type':
+                        (str,),
+                },
+                'attribute_map': {
+                    'as_type': 'as_type',
+                },
+                'location_map': {
+                    'entity': 'body',
+                    'as_type': 'query',
+                },
+                'collection_format_map': {
+                }
+            },
+            headers_map={
+                'accept': [
+                    'application/json',
+                    'text/plain'
+                ],
+                'content_type': [
+                    'application/json'
+                ]
+            },
+            api_client=api_client,
+            callable=__validate_entity
+        )
+
         def __whoami(
             self,
             **kwargs
         ):
             """Get Information On Authenticated User  # noqa: E501
 
+            Get information about the user sending the request.  If no user is authenticated, a default \"nologin\" user is returned.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

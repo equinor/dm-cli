@@ -45,7 +45,7 @@ class LookupTableApi(object):
         ):
             """Create Lookup  # noqa: E501
 
-            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  # noqa: E501
+            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -175,7 +175,7 @@ class LookupTableApi(object):
         ):
             """Get Lookup  # noqa: E501
 
-            Fetch a single lookup  # noqa: E501
+            Fetch a single lookup table.  - **application**: name of application  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

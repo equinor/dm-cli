@@ -42,6 +42,7 @@ class HealthCheckApi(object):
         ):
             """Get  # noqa: E501
 
+            Healthcheck endpoint. Responds with \"OK\" - 200.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 

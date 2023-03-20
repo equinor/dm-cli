@@ -44,7 +44,7 @@ class BlueprintApi(object):
         ):
             """Get Blueprint  # noqa: E501
 
-            Fetch the Blueprint and Recipes of a type (including inherited attributes)  # noqa: E501
+            Fetch the Blueprint and Recipes from a type reference (including inherited attributes).  - **type_ref**: <protocol>://<data_source>/<path_to_blueprint> - **context**: name of application that has Ui-/StorageRecipe lookup table (optional attribute)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -179,7 +179,7 @@ class BlueprintApi(object):
         ):
             """Resolve Blueprint Id  # noqa: E501
 
-            Resolve the data_source/uuid form of a blueprint to its type path  # noqa: E501
+            Resolve absolute_id of a blueprint to its type path.  - **absolute_id**: <data_source</<blueprint_uuid>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
