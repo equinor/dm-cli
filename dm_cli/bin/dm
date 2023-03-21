@@ -431,6 +431,14 @@ def reset(context, path: str):
 def create_lookup(context, name: str, path: str):
     dmss_api.create_lookup(recipe_package=path, application=name)
 
+@cli.command()
+@click.argument("path", required=True)
+@click.pass_context
+def import_plugin_blueprints(context, path: str):
+    """Import blueprints from a plugin into the standard location 'system/Plugins/<plugin-name>'
+
+    PATH: Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself"""
+    context.invoke(import_entity, source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", force=True)
 
 if __name__ == "__main__":
     cli()
