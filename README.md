@@ -22,22 +22,24 @@ Both the above commands would install the package globally and `dm` will be avai
 
 ## Usage
 
-```sh
+```txt
 $ dm --help
-Usage: python -m dm [OPTIONS] COMMAND [ARGS]...
+Usage: dm [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  -t, --token TEXT  Token for authentication against DMSS.
-  -u, --url TEXT    URL to the Data Modelling Storage Service (DMSS).
-  -h, --help        Show this message and exit.
+--version         Show the version and exit.
+-t, --token TEXT  Token for authentication against DMSS.
+-u, --url TEXT    URL to the Data Modelling Storage Service (DMSS).
+-h, --help        Show this message and exit.
 
 Commands:
-  create-lookup  Create a named Ui-/StorageRecipe-lookup-table from all...
-  ds             Subcommand for working with data sources
-  entity         Subcommand for working with entities
-  init           Initialize the data sources and import all packages.
-  pkg            Subcommand for working with packages
-  reset          Reset all data sources (deletes and reuploads packages)
+create-lookup             Create a named Ui-/StorageRecipe-lookup-table...
+ds                        Subcommand for working with data sources
+entity                    Subcommand for working with entities
+import-plugin-blueprints  Import blueprints from a plugin into the...
+init                      Initialize the data sources and import all...
+pkg                       Subcommand for working with packages
+reset                     Reset all data sources (deletes and reuploads...
 ```
 
 For each of the `commands` listed above, you can run `dm <COMMAND> --help` to see subcommand-specific help messages, e.g. `dm ds import --help` or `dm pkg --help`
@@ -143,6 +145,16 @@ $ dm ds reset DemoApplicationDataSource
 # Optionally specify a path to the directory containing data sources and data
 $ dm ds reset DemoApplicationDataSource app/
 ```
+
+### Plugin blueprints
+Import blueprints from a plugin into the default plugin blueprint path (`system/Plugins/<plugin-name>)
+
+```shell
+dm import-plugin-blueprints ./node_modules/@development-framework/dm-core-plugins
+```
+> Note that this is the same as;
+> `dm entity import ./node_modules/@development-framework/dm-core-plugins/blueprints/ system/Plugins/dm-core-plugins`
+
 
 ### Packages
 Import a package
