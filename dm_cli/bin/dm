@@ -264,7 +264,7 @@ def delete_package(context, data_source: str, package: str, silent: bool = False
 
     try:
         # Delete the document in DMSS
-        response = dmss_api.document_remove_by_path(data_source, directory=package)
+        response = dmss_api.document_remove_by_path(path_reference=f"{data_source}/{package}")
         if not silent:
             click.echo(f"\tDeleted package '{data_source}/{package}'")
     except Exception as error:
@@ -309,8 +309,8 @@ def entity_cli(context):
     pass
 
 
-@entity_cli.command("import", help="Import the entity (file or package) <source> to the given <destination>.")
-@click.argument("source", required=True, help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself")
+@entity_cli.command("import")
+@click.argument("source", required=True)
 @click.argument("destination", required=True)
 @click.option(
     "--force/--no-force", "-f/",
@@ -319,8 +319,10 @@ def entity_cli(context):
 )
 @click.pass_context
 def import_entity(context, source: str, destination: str, force: bool) -> bool:
-    """
-    Import the entity <path> to the given <path_reference>
+    """Import the entity (file or package) <source> to the given <destination>.
+
+    SOURCE is the path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself.
+    DESTINATION is the destination for the folder or file (consists of a data source and package name).
     """
     destination = destination.rstrip("/\\")
     source_path = Path(source)
