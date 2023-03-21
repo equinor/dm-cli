@@ -176,17 +176,9 @@ def import_package(context, path: str, data_source: str) -> bool:
         )
     memory_file.seek(0)
 
-    try:
-        root_package = package_tree_from_zip(data_source, memory_file)
-        import_package_tree(root_package, data_source)
-        click.echo(f"\tImported package '{data_source}/{root_package.name}'")
-    except ApplicationException as error:
-        click.echo(f"\nERROR: {error.message}")
-        return False
-    except Exception as error:
-        traceback.print_exc()
-        click.echo(f"\tSomething went wrong trying to upload the package '{data_source}/{root_package.name}' to DMSS; {error}")
-        return False
+    root_package = package_tree_from_zip(data_source, memory_file)
+    dmss_exception_wrapper(import_package_tree, root_package, data_source)
+    click.echo(f"\tImported package '{data_source}/{root_package.name}'")
     return True
 
 @pkg_cli.command("import-all", help="Import all packages found in the directory given by <path> to the given data source")
@@ -239,7 +231,7 @@ def export_documents(context, absolute_document_reference: str, export_location:
     absolute_document_reference: Path to document or package to export. Should be <dataSource>/<path>
     export_location (Optional): Path to specify where to store the exported document(s). If not provided, will export to current folder.
     """
-    response = export(absolute_document_ref=absolute_document_reference)
+    response = dmss_exception_wrapper(export, absolute_document_reference)
 
     if not export_location:
         export_location = os.getcwd()
@@ -429,7 +421,8 @@ def reset(context, path: str):
 @click.argument("path", required=True)
 @click.pass_context
 def create_lookup(context, name: str, path: str):
-    dmss_api.create_lookup(recipe_package=path, application=name)
+    create_lookup = lambda path, name: dmss_api.create_lookup(recipe_package=path, application=name)
+    dmss_exception_wrapper(create_lookup, path, name)
 
 @cli.command()
 @click.argument("path", required=True)

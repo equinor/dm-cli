@@ -107,7 +107,11 @@ def add_package_to_path(name: str, path: Path):
     )
 
 
-def dmss_exception_wrapper(function: Callable, *args, **kwargs) -> Any:
+def dmss_exception_wrapper(
+    function: Callable,
+    *args,
+    **kwargs,
+) -> Any:
     try:
         return function(*args, **kwargs)
     except ApiException as e:
