@@ -74,20 +74,10 @@ def import_data_source(context, path: str):
     # Read the data source definition
     with open(data_source_path) as file:
         document = json.load(file)
-        try:
-            # Upload the data source definition to DMSS
-            dmss_api.data_source_save(document["name"], data_source_request=document)
-            click.echo(f"\tImported data source '{document['name']}'")
-        except (ApiException, ApplicationException, KeyError) as error:
-            if error.status == 400:
-                click.echo(
-                    emoji.emojize(
-                        f"\t:warning: Could not import data source '{document['name']}'. "
-                        "A data source with that name already exists"
-                    )
-                )
-            else:
-                raise ImportError(f"\tFailed to import data source '{data_source_path.name}': {error}")
+        # Upload the data source definition to DMSS
+        dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
+        dmss_api.data_source_save(document["name"], data_source_request=document)
+        click.echo(f"\tImported data source '{document['name']}'")
 
 
 @ds_cli.command("import-all", help="Import all datasources found in the directory given by 'path'.")
@@ -254,17 +244,9 @@ def delete_package(context, data_source: str, package: str, silent: bool = False
     if not silent:
         click.echo(f"DELETING PACKAGE '{data_source}/{package}'")
 
-    try:
-        # Delete the document in DMSS
-        response = dmss_api.document_remove_by_path(path_reference=f"{data_source}/{package}")
-        if not silent:
-            click.echo(f"\tDeleted package '{data_source}/{package}'")
-    except Exception as error:
-        if error.status == 404:
-            if not silent:
-                click.echo(emoji.emojize(f"\t:warning: The package '{data_source}/{package}' does not exist in DMSS"))
-        else:
-            raise error
+    dmss_exception_wrapper(dmss_api.document_remove_by_path, f"{data_source}/{package}")
+    if not silent:
+        click.echo(f"\tDeleted package '{data_source}/{package}'")
 
 
 @pkg_cli.command("delete-all", help="Delete all packages found in the directory given by <path> from the given data source.")
