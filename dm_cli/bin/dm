@@ -3,7 +3,6 @@ import io
 import concurrent.futures
 import json
 import os
-import traceback
 from pathlib import Path
 from zipfile import ZipFile
 import click
@@ -17,11 +16,12 @@ from dm_cli.application import (
     get_subdirectories,
     DATA_SOURCE_DEF_FILE_EXT,
 )
-from dm_cli.dmss import dmss_api, ApplicationException
+from dm_cli.dmss import ApplicationException
 from dm_cli.dmss_api.exceptions import ApiException
+from dm_cli.dmss import dmss_api
 from dm_cli.import_package import import_package_tree
 from dm_cli.import_entity import import_single_entity, import_folder_entity
-from dm_cli.utils import dmss_exception_wrapper
+from dm_cli.utils import dmss_exception_wrapper, dmss_exception_wrapper_with_allowed_exceptions
 from dm_cli.zip_utils import unpack_and_save_zipfile, save_as_zip_file
 from dm_cli.package_tree_from_zip import package_tree_from_zip
 from dm_cli.zip_utils import zip_all
@@ -74,9 +74,14 @@ def import_data_source(context, path: str):
     # Read the data source definition
     with open(data_source_path) as file:
         document = json.load(file)
-        # Upload the data source definition to DMSS
-        dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
-        dmss_api.data_source_save(document["name"], data_source_request=document)
+
+        allowed_exceptions = (ApiException, ApplicationException, KeyError)
+        accepted_status_code = 400
+        error_message = f"Could not import data source {document['name']}. A data source with that name already exists."
+        dmss_exception_wrapper_with_allowed_exceptions(allowed_exceptions,
+                                                       accepted_status_code,
+                                                       error_message,
+                                                       dmss_api.data_source_save, document["name"], document)
         click.echo(f"\tImported data source '{document['name']}'")
 
 
@@ -241,12 +246,19 @@ def delete_package(context, data_source: str, package: str, silent: bool = False
     """
     Delete the package <package> in the given data source.
     """
+    path_reference = f"{data_source}/{package}"
     if not silent:
-        click.echo(f"DELETING PACKAGE '{data_source}/{package}'")
+        click.echo(f"DELETING PACKAGE '{path_reference}'")
 
-    dmss_exception_wrapper(dmss_api.document_remove_by_path, f"{data_source}/{package}")
+    allowed_exceptions = (Exception)
+    accepted_status_code = 404
+    error_message = f"The package '{path_reference}' does not exist in DMSS"
+    dmss_exception_wrapper_with_allowed_exceptions(allowed_exceptions,
+                                                   accepted_status_code,
+                                                   error_message,
+                                                   dmss_api.document_remove_by_path, path_reference)
     if not silent:
-        click.echo(f"\tDeleted package '{data_source}/{package}'")
+        click.echo(f"\tDeleted package '{path_reference}'")
 
 
 @pkg_cli.command("delete-all", help="Delete all packages found in the directory given by <path> from the given data source.")
