@@ -3,10 +3,11 @@ import json
 import pprint
 import traceback
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 from uuid import uuid4
 
 import click
+import emoji
 
 from .dmss import ApplicationException, dmss_api
 from .dmss_api.exceptions import ApiException, NotFoundException
@@ -105,6 +106,24 @@ def add_package_to_path(name: str, path: Path):
         update_uncontained=False,
         files=[],
     )
+
+
+def dmss_exception_wrapper_with_allowed_exceptions(
+    allowed_exceptions: Tuple, accepted_status_code: int, error_message: str, function: Callable, *args, **kwargs
+):
+    try:
+        function(*args, **kwargs)
+    except allowed_exceptions as error:
+        if error.status == accepted_status_code:
+            click.echo(emoji.emojize(f"\t:warning: {error_message}"))
+        else:
+            traceback.print_exc()
+            click.echo(f"\nERROR: {error}")
+            exit(1)
+    except Exception as error:
+        traceback.print_exc()
+        click.echo(f"\nERROR: {error}")
+        exit(1)
 
 
 def dmss_exception_wrapper(
