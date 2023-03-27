@@ -2,9 +2,9 @@ from os.path import normpath
 from pathlib import Path
 from typing import Dict, List, Literal, Union
 
-from .dmss import ApplicationException
-from .domain import Dependency
-from .enums import SIMOS, BuiltinDataTypes
+from ..dmss import ApplicationException
+from ..domain import Dependency
+from ..enums import SIMOS, BuiltinDataTypes
 from .utils import resolve_dependency
 
 

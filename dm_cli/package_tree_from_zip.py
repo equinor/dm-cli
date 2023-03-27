@@ -7,8 +7,8 @@ from zipfile import ZipFile
 
 from .domain import Dependency, Package
 from .import_package import add_file_to_package, add_package_to_package
-from .reference_utils import replace_relative_references
-from .utils import concat_dependencies
+from .utils.reference import replace_relative_references
+from .utils.utils import concat_dependencies
 
 
 def package_tree_from_zip(

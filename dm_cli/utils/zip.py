@@ -2,10 +2,9 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-import click
 import emoji
 
-from .dmss import ApplicationException
+from ..dmss import ApplicationException
 
 
 def zip_all(zip_file: ZipFile, path: str, real_name="", write_folder: bool = True):
@@ -47,11 +46,11 @@ def unpack_and_save_zipfile(export_location: str, zip_file: ZipFile):
         zip_file_unpacked_path += ".json"
 
     if Path(zip_file_unpacked_path).exists():
-        click.echo(emoji.emojize(f"\t:error: File or folder '{zip_file_unpacked_path}' already exists. Exiting."))
+        print(emoji.emojize(f"\t:error: File or folder '{zip_file_unpacked_path}' already exists. Exiting."))
         raise ApplicationException("Path already exists")
 
     zip_file.extractall(path=export_location)
-    click.echo(f"Saved unpacked zip file to '{zip_file_unpacked_path}'.")
+    print(f"Saved unpacked zip file to '{zip_file_unpacked_path}'.")
 
 
 def save_as_zip_file(export_location: str, filename: str, data: str):
@@ -63,9 +62,9 @@ def save_as_zip_file(export_location: str, filename: str, data: str):
     saved_zip_file_path = f"{export_location}/{filename}"
 
     if Path(saved_zip_file_path).exists():
-        click.echo(emoji.emojize(f"\t:error: File or folder '{saved_zip_file_path}' already exists. Exiting."))
+        print(emoji.emojize(f"\t:error: File or folder '{saved_zip_file_path}' already exists. Exiting."))
         raise ApplicationException("Path already exists")
 
     with open(saved_zip_file_path, "wb") as file:
         file.write(data)
-        click.echo(f"Wrote zip file to '{saved_zip_file_path}'")
+        print(f"Wrote zip file to '{saved_zip_file_path}'")

@@ -7,7 +7,7 @@ from progress.bar import IncrementalBar
 
 from .dmss import dmss_api
 from .domain import Package
-from .utils import ensure_package_structure, upload_blobs_in_document
+from .utils.utils import upload_blobs_in_document
 
 
 def add_file_to_package(path: Path, package: Package, document: dict) -> None:

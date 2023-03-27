@@ -1,18 +1,17 @@
-from typing import Union
+import json
+import traceback
+from typing import Any, Callable
 
 import requests
+import typer
+from rich import print
 
+from dm_cli.dmss_api import ApiException
 from dm_cli.dmss_api.api.default_api import DefaultApi
+from dm_cli.dmss_api.exceptions import NotFoundException
+from dm_cli.state import state
 
 dmss_api = DefaultApi()
-
-
-class Settings:
-    PUBLIC_DMSS_API: str = "http://localhost:5000"
-    DMSS_TOKEN: Union[str, None] = None
-
-
-settings = Settings()
 
 
 class ApplicationException(Exception):
@@ -51,12 +50,31 @@ def export(absolute_document_ref: str):
     The reason dmss_api cannot be used directly is that there were some issues with interpreting the JSON schema,
     which caused the export function in the generated DMSS api to not work properly.
     """
-    headers = {"Access-Key": settings.DMSS_TOKEN}
+    headers = {"Access-Key": state.token}
 
-    response = requests.get(f"{settings.PUBLIC_DMSS_API}/api/export/{absolute_document_ref}", headers=headers)  # nosec
+    response = requests.get(f"{state.dmss_url}/api/export/{absolute_document_ref}", headers=headers)  # nosec
     if response.status_code != 200:
         raise ApplicationException(
             message=f"Could not export document(s) from {absolute_document_ref} (status code {response.status_code})."
         )
 
     return response
+
+
+def dmss_exception_wrapper(
+    function: Callable,
+    *args,
+    **kwargs,
+) -> Any:
+    try:
+        return function(*args, **kwargs)
+    except (ApplicationException, NotFoundException, ApiException) as e:
+        if state.debug:
+            traceback.print_exc()
+        exception = json.loads(e.body)
+        print(exception)
+        raise typer.Exit(code=1)
+    except Exception as error:
+        traceback.print_exc()
+        print(error)
+        raise typer.Exit(code=1)

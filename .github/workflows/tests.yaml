@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@master
 
       - name: install requirements
-        run: pip install -r requirements.txt && pip install -r dev-requirements.txt && pip install .
+        run: pip install -r requirements.txt && pip install -r dev-requirements.txt && pip install -e .
 
       - name: run pytest
         run: pytest
