@@ -1,18 +1,19 @@
 import io
 import json
-import pprint
-import traceback
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Dict, List
 from uuid import uuid4
 
-import click
-import emoji
+from rich import print
+from rich.console import Console
 
-from .dmss import ApplicationException, dmss_api
-from .dmss_api.exceptions import ApiException, NotFoundException
-from .domain import Dependency, Package
-from .enums import SIMOS
+from dm_cli.dmss import ApplicationException, dmss_api
+from dm_cli.dmss_api.exceptions import ApiException, NotFoundException
+
+from ..domain import Dependency, Package
+from ..enums import SIMOS
+
+console = Console()
 
 
 def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> str:
@@ -108,44 +109,10 @@ def add_package_to_path(name: str, path: Path):
     )
 
 
-def dmss_exception_wrapper_with_allowed_exceptions(
-    allowed_exceptions: Tuple, accepted_status_code: int, error_message: str, function: Callable, *args, **kwargs
-):
-    try:
-        function(*args, **kwargs)
-    except allowed_exceptions as error:
-        if error.status == accepted_status_code:
-            click.echo(emoji.emojize(f"\t:warning: {error_message}"))
-        else:
-            traceback.print_exc()
-            click.echo(f"\nERROR: {error}")
-            exit(1)
-    except Exception as error:
-        traceback.print_exc()
-        click.echo(f"\nERROR: {error}")
-        exit(1)
-
-
-def dmss_exception_wrapper(
-    function: Callable,
-    *args,
-    **kwargs,
-) -> Any:
-    try:
-        return function(*args, **kwargs)
-    except ApiException as e:
-        exception = json.loads(e.body)
-        click.echo(f"\nERROR: {exception['type']}")
-        click.echo(f"\n\t{pprint.pprint(exception)}")
-        exit(1)
-    except (ApplicationException, NotFoundException) as error:
-        click.echo(f"\nERROR: {error.type}")
-        click.echo(f"\n\t{pprint.pprint(error)}")
-        exit(1)
-    except Exception as error:
-        traceback.print_exc()
-        click.echo(f"\nERROR: {error}")
-        exit(1)
+def destination_is_root(destination: Path) -> bool:
+    if len(destination.parts) > 1:
+        return False
+    return True
 
 
 def ensure_package_structure(path: Path):
@@ -153,14 +120,14 @@ def ensure_package_structure(path: Path):
     try:
         dmss_api.document_get_by_path(f"dmss://{path}")
     except NotFoundException as e:
-        error = json.loads(e.body)
-        if str(f"'{path}'") not in error["message"]:
-            click.echo(f"Target package '{path}' is likely corrupt!")
-            click.echo(f"\n\t{pprint.pprint(error)}")
-            exit(1)
+        # error = json.loads(e.body)
+        # if str(f"'{path}'") not in error["message"]:
+        #     print(f"Target package '{path}' is likely corrupt!")
+        #     print(f"\n\t{pprint.pprint(error)}")
+        #     raise typer.Exit(code=1)
 
         if len(path.parts) > 2:  # We're at root package level. Do not check for datasource.
             ensure_package_structure(path.parent)
 
         add_package_to_path(path.name, path)
-        click.echo(f"Target folder '{path.name}' was missing in '{path.parent}'. Created: ✓")
+        print(f"Target folder '{path.name}' was missing in '{path.parent}'. Created: ✓")

@@ -2,8 +2,8 @@ import unittest
 from pathlib import Path
 
 from dm_cli.dmss import ApplicationException
-from dm_cli.reference_utils import replace_relative_references
-from dm_cli.utils import concat_dependencies
+from dm_cli.utils.reference import replace_relative_references
+from dm_cli.utils.utils import concat_dependencies
 
 """
 ROOT
