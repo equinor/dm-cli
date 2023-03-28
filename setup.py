@@ -20,6 +20,8 @@ setup(
     url="https://github.com/equinor/dm-cli",
     packages=[
         "dm_cli",
+        "dm_cli/utils"
+        "dm_cli/command_group"
         "dm_cli/dmss_api",
         "dm_cli/dmss_api/api",
         "dm_cli/dmss_api/models",
