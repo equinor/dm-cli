@@ -26,3 +26,32 @@ jobs:
 
       - name: run pytest
         run: pytest
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tests/integration
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Start DMSS
+        run: docker-compose up -d && sleep 60 && docker-compose run --rm dmss reset-app
+
+      - name: Download test blueprints
+        run: |
+          npm pack @development-framework/dm-core-plugins
+          tar -xzf development-framework-dm-core-plugins-*.tgz
+
+      - name: Setup python
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -e ../..
+
+      - name: Tests
+        run: |
+          pip install -e ../..
+          dm reset ../test_data/test_app_dir_struct
+          dm import-plugin-blueprints package
+          dm create-lookup test DemoApplicationDataSource/instances
