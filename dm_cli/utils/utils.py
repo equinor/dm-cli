@@ -1,9 +1,11 @@
 import io
 import json
+import pprint
 from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
+import typer
 from rich import print
 from rich.console import Console
 
@@ -120,11 +122,11 @@ def ensure_package_structure(path: Path):
     try:
         dmss_api.document_get_by_path(f"dmss://{path}")
     except NotFoundException as e:
-        # error = json.loads(e.body)
-        # if str(f"'{path}'") not in error["message"]:
-        #     print(f"Target package '{path}' is likely corrupt!")
-        #     print(f"\n\t{pprint.pprint(error)}")
-        #     raise typer.Exit(code=1)
+        error = json.loads(e.body)
+        if str(f"{path}") not in error["message"]:
+            print(f"Target package '{path}' is likely corrupt!")
+            pprint.pformat(error)
+            raise typer.Exit(code=1)
 
         if len(path.parts) > 2:  # We're at root package level. Do not check for datasource.
             ensure_package_structure(path.parent)
