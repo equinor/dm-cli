@@ -92,25 +92,27 @@ class Package:
             if isinstance(child, Package):
                 result.append(
                     {
-                        "_id": str(child.uid),
-                        "name": child.name,
-                        "type": SIMOS.PACKAGE.value,
-                        "contained": True,
+                        "ref": str(child.uid),
+                        "targetName": child.name,
+                        "targetType": SIMOS.PACKAGE.value,
+                        "type": "dmss://system/SIMOS/Link",
                     }
                 )
             else:  # Assume the child is a dict
                 if "name" in child:
                     result.append(
                         {
-                            "_id": child["_id"],
-                            "name": child["name"],
-                            "type": child["type"],
-                            "contained": True,
+                            "ref": child["_id"],
+                            "targetName": child["name"],
+                            "targetType": child["type"],
+                            "type": "dmss://system/SIMOS/Link",
                         }
                     )
 
                 else:
-                    result.append({"_id": child["_id"], "type": child["type"], "contained": True})
+                    result.append(
+                        {"ref": child["_id"], "targetType": child["type"], "type": "dmss://system/SIMOS/Link"}
+                    )
         return result
 
 
