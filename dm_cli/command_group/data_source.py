@@ -27,6 +27,9 @@ def import_data_source(path: Path):
     # Read the data source definition
     with open(data_source_path) as file:
         document = json.load(file)
+        existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
+        if any(existing_document["name"] == document["name"] for existing_document in existing_data_sources):
+            print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
 
         dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
         print(f"\tImported data source '{document['name']}' ✓")

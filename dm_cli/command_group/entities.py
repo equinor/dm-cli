@@ -29,7 +29,7 @@ def import_entity(source: str, destination: str) -> bool:
                 dmss_exception_wrapper(import_folder_entity, file, destination)
             return True
         print(f"Importing PACKAGE '{source}' --> '{destination}'")
-        dmss_exception_wrapper(import_folder_entity, source, destination)
+        dmss_exception_wrapper(import_folder_entity, source_path, destination)
         return True
     else:
         dmss_exception_wrapper(import_single_entity, source_path, destination)
