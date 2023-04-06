@@ -57,4 +57,13 @@ jobs:
           source ../../.venv/bin/activate
           dm reset ../test_data/test_app_dir_struct
           dm import-plugin-blueprints package
-          dm create-lookup test DemoApplicationDataSource/instances
+          dm create-lookup test DemoApplicationDataSource/models/recipe_links
+          dm export DemoApplicationDataSource/models/CarPackage
+          dm export DemoApplicationDataSource/instances --unpack
+          dm ds import ../test_data/test_app_dir_struct/data_sources/DemoApplicationDataSource.json
+          dm ds import-all ../test_data/test_app_dir_struct/data_sources
+          dm entities import ../test_data/more_documents/bmw.json DemoApplicationDataSource/instances
+          dm entities import ../test_data/more_documents/engines DemoApplicationDataSource/instances
+          dm entities delete DemoApplicationDataSource/instances
+          dm ds reset DemoApplicationDataSource ../test_data/test_app_dir_struct
+          dm ds init ../test_data/test_app_dir_struct
