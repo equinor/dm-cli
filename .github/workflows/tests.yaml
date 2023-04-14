@@ -43,15 +43,18 @@ jobs:
           npm pack @development-framework/dm-core-plugins
           tar -xzf development-framework-dm-core-plugins-*.tgz
 
-      - name: Setup python
+      - name: Build and install dm-cli package
         run: |
+          cd ../..
           python -m venv .venv
           source .venv/bin/activate
-          pip install -e ../..
+          pip install wheel twine
+          python setup.py sdist bdist_wheel
+          pip install ./dist/dm-cli-*.tar.gz
 
       - name: Tests
         run: |
-          pip install -e ../..
+          source ../../.venv/bin/activate
           dm reset ../test_data/test_app_dir_struct
           dm import-plugin-blueprints package
           dm create-lookup test DemoApplicationDataSource/instances
