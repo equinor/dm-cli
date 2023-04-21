@@ -35,10 +35,11 @@ test_documents = {
         "name": "MyRootPackage",
         "type": "CORE:Package",
         "_meta_": {
-            "type": "CORE:Meta",
+            "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
@@ -52,10 +53,11 @@ test_documents = {
         "type": "CORE:Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
         "_meta_": {
-            "type": "CORE:Meta",
+            "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "SINTEF",
                     "address": "marine-models.sintef.com/Signals",
                     "version": "1.2.3",
@@ -190,16 +192,18 @@ test_documents_with_dependency_conflict = {
         "name": "MyRootPackage",
         "type": "CORE:Package",
         "_meta_": {
-            "type": "CORE:Meta",
+            "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
                     "protocol": "dmss",
                 },
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "SINTEF",
                     "address": "marine-models.sintef.com/Signals",
                     "version": "1.2.3",
@@ -213,10 +217,11 @@ test_documents_with_dependency_conflict = {
         "type": "CORE:Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
         "_meta_": {
-            "type": "CORE:Meta",
+            "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "SINTEF",
                     "address": "marine-models.sintef.com/Signals/SpecialSignals",
                     "version": "3.2.1",

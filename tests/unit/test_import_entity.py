@@ -32,10 +32,11 @@ test_documents = {
         "name": "MyRootPackage",
         "type": "CORE:Package",
         "_meta_": {
-            "type": "CORE:Meta",
+            "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
@@ -58,10 +59,11 @@ test_documents = {
             }
         ],
         "_meta_": {
-            "type": "CORE:Meta",
+            "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "dmss://system/SIMOS/Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
