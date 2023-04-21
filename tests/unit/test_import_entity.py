@@ -31,6 +31,7 @@ test_documents = {
     "MyRootPackage/package.json": {
         "name": "MyRootPackage",
         "type": "CORE:Package",
+        "isRoot": False,
         "_meta_": {
             "type": "dmss://system/SIMOS/Meta",
             "version": "0.0.1",
