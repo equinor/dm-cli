@@ -4,7 +4,7 @@
   "extends": ["CORE:NamedEntity"],
   "description": "",
   "_meta_": {
-    "type": "CORE:Meta",
+    "type": "dmss://system/SIMOS/Meta",
     "version": "0.0.1",
     "dependencies": [
       {

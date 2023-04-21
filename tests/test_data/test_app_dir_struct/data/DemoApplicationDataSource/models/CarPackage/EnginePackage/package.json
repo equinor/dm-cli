@@ -2,10 +2,11 @@
   "name": "EnginePackage",
   "type": "CORE:Package",
   "_meta_": {
-    "type": "CORE:Meta",
+    "type": "dmss://system/SIMOS/Meta",
     "version": "0.0.1",
     "dependencies": [
       {
+        "type": "dmss://system/SIMOS/Dependency",
         "alias": "TEST-ENGINE",
         "address": "system/SIMOS",
         "version": "0.0.1",
