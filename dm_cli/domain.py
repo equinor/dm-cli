@@ -124,6 +124,7 @@ class Dependency:
     """Class for any dependencies (external types) a entity references"""
 
     alias: str
+    type: str
     # Different ways we support to fetch dependencies.
     # dmss: Internally within the DMSS instance
     # http: A public HTTP GET call
