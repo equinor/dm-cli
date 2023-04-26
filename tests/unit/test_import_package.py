@@ -39,6 +39,7 @@ test_documents = {
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "CORE:Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
@@ -56,6 +57,7 @@ test_documents = {
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "CORE:Dependency",
                     "alias": "SINTEF",
                     "address": "marine-models.sintef.com/Signals",
                     "version": "1.2.3",
@@ -194,12 +196,14 @@ test_documents_with_dependency_conflict = {
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "CORE:Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
                     "protocol": "dmss",
                 },
                 {
+                    "type": "CORE:Dependency",
                     "alias": "SINTEF",
                     "address": "marine-models.sintef.com/Signals",
                     "version": "1.2.3",
@@ -217,6 +221,7 @@ test_documents_with_dependency_conflict = {
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "CORE:Dependency",
                     "alias": "SINTEF",
                     "address": "marine-models.sintef.com/Signals/SpecialSignals",
                     "version": "3.2.1",
