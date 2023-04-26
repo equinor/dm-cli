@@ -70,6 +70,7 @@ def replace_relative_references(
     When importing packages, the following additional parameter is required:
     @param zip_file:
     """
+
     KEYS_TO_CHECK = ("type", "attributeType", "extends", "_blueprintPath_")  # These keys may contain a reference
 
     if key in KEYS_TO_CHECK:
@@ -94,8 +95,8 @@ def replace_relative_references(
             file_path,
         )
 
-    # If the value is a complex type, dig down recursively. Ignore the _meta_ key
-    if key != "_meta_" and isinstance(value, dict) and value != {}:
+    # If the value is a complex type, dig down recursively.
+    if isinstance(value, dict) and value != {}:
         # First check if the type is a blob type
         if (
             replace_relative_references(

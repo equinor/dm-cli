@@ -88,4 +88,9 @@ def package_tree_from_zip(
             update=True,
         )
 
+        # Make sure to replace relative references in _meta_
+        root_package.meta = replace_relative_references(
+            "_meta_", root_package.meta, dependencies, data_source_id, file_path=root_package.path()
+        )
+
     return root_package

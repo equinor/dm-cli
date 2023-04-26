@@ -36,6 +36,7 @@ test_documents = {
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "CORE:Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
@@ -62,6 +63,7 @@ test_documents = {
             "version": "0.0.1",
             "dependencies": [
                 {
+                    "type": "CORE:Dependency",
                     "alias": "CORE",
                     "address": "system/SIMOS",
                     "version": "0.0.1",
@@ -123,9 +125,7 @@ class ImportEntityTest(unittest.TestCase):
         assert prepared_document["attributes"][0]["type"] == f"{REFERENCE_PREFIX}/BlueprintAttribute"
         # Ensure the attribute's attributeType is not replaced, as it's a primitive
         assert prepared_document["attributes"][0]["attributeType"] == "integer"
-
-        # _meta_ references should not be replaced
-        assert prepared_document["_meta_"]["type"] == document["_meta_"]["type"]
+        assert prepared_document["_meta_"]["type"] == "dmss://system/SIMOS/Meta"
 
     def test_replace_relative_references_no_meta(self):
         src_path = Path("MyRootPackage/Moorings/Mooring_no_meta.json")

@@ -92,26 +92,28 @@ class Package:
             if isinstance(child, Package):
                 result.append(
                     {
-                        "ref": str(child.uid),
-                        "targetName": child.name,
-                        "targetType": SIMOS.PACKAGE.value,
-                        "type": "dmss://system/SIMOS/Link",
+                        "address": str(child.uid),
+                        "type": "dmss://system/SIMOS/Reference",
+                        "referenceType": "link",
                     }
                 )
             else:  # Assume the child is a dict
                 if "name" in child:
                     result.append(
                         {
-                            "ref": child["_id"],
-                            "targetName": child["name"],
-                            "targetType": child["type"],
-                            "type": "dmss://system/SIMOS/Link",
+                            "address": child["_id"],
+                            "type": "dmss://system/SIMOS/Reference",
+                            "referenceType": "link",
                         }
                     )
 
                 else:
                     result.append(
-                        {"ref": child["_id"], "targetType": child["type"], "type": "dmss://system/SIMOS/Link"}
+                        {
+                            "address": child["_id"],
+                            "type": "dmss://system/SIMOS/Reference",
+                            "referenceType": "link",
+                        }
                     )
         return result
 
@@ -130,6 +132,7 @@ class Dependency:
     protocol: TDependencyProtocol
     address: str
     version: str = ""
+    type: str = ""
 
     def __eq__(self, other):
         return (
