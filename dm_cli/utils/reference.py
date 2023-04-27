@@ -97,6 +97,8 @@ def replace_relative_references(
 
     # If the value is a complex type, dig down recursively.
     if isinstance(value, dict) and value != {}:
+        if not value.get("type"):
+            raise KeyError(f"Object with key '{key}' is missing the required 'type' attribute. File: '{file_path}'")
         # First check if the type is a blob type
         if (
             replace_relative_references(
@@ -109,6 +111,10 @@ def replace_relative_references(
             )
             == SIMOS.BLOB.value
         ):
+            if not value.get("name"):
+                raise KeyError(
+                    f"Blob object with key '{key}' is missing the required 'name' attribute. File: '{file_path}'"
+                )
             # Add blob data to the blob-entity
             if parent_directory:  # entity
                 _blob_data = None

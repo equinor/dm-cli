@@ -1,15 +1,17 @@
 import json
-import traceback
 from typing import Any, Callable
 
 import requests
 import typer
-from rich import print
+from rich.console import Console
+from rich.text import Text
 
 from dm_cli.dmss_api import ApiException
 from dm_cli.dmss_api.api.default_api import DefaultApi
 from dm_cli.dmss_api.exceptions import NotFoundException
 from dm_cli.state import state
+
+console = Console()
 
 dmss_api = DefaultApi()
 
@@ -70,11 +72,13 @@ def dmss_exception_wrapper(
         return function(*args, **kwargs)
     except (ApplicationException, NotFoundException, ApiException) as e:
         if state.debug:
-            traceback.print_exc()
+            console.print_exception()
         exception = json.loads(e.body)
-        print(exception)
+        console.print(exception, style="red1")
         raise typer.Exit(code=1)
     except Exception as error:
-        traceback.print_exc()
-        print(error)
+        if state.debug:
+            console.print_exception()
+        text = Text(str(error))
+        console.print(text, style="red1")
         raise typer.Exit(code=1)
