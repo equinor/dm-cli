@@ -104,7 +104,7 @@ def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
 def add_package_to_path(name: str, path: Path):
     package = Package(name, is_root=len(path.parts) == 2)
     dmss_api.document_add_to_path(
-        str(path.parent),
+        f"/{str(path.parent)}/",
         json.dumps(package.to_dict()),
         update_uncontained=False,
         files=[],
@@ -120,10 +120,10 @@ def destination_is_root(destination: Path) -> bool:
 def ensure_package_structure(path: Path):
     """Create any missing packages in the provided path (mkdir -R)"""
     try:
-        dmss_api.document_get_by_path(f"dmss://{path}")
+        dmss_api.document_get_by_path(f"dmss://{path}/")
     except NotFoundException as e:
         error = json.loads(e.body)
-        if str(f"{path}") not in error["message"]:
+        if error["status"] != 404:
             print(f"Target package '{path}' is likely corrupt!")
             pprint.pformat(error)
             raise typer.Exit(code=1)

@@ -92,7 +92,7 @@ class Package:
             if isinstance(child, Package):
                 result.append(
                     {
-                        "address": str(child.uid),
+                        "address": f"${str(child.uid)}",
                         "type": "dmss://system/SIMOS/Reference",
                         "referenceType": "link",
                     }
@@ -101,7 +101,7 @@ class Package:
                 if "name" in child:
                     result.append(
                         {
-                            "address": child["_id"],
+                            "address": f"${child['_id']}",
                             "type": "dmss://system/SIMOS/Reference",
                             "referenceType": "link",
                         }
@@ -110,7 +110,7 @@ class Package:
                 else:
                     result.append(
                         {
-                            "address": child["_id"],
+                            "address": f"${child['_id']}",
                             "type": "dmss://system/SIMOS/Reference",
                             "referenceType": "link",
                         }
