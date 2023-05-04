@@ -29,7 +29,7 @@ from dm_cli.dmss_api.model.error_response import ErrorResponse
 from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 from dm_cli.dmss_api.model.lookup import Lookup
 from dm_cli.dmss_api.model.pat_data import PATData
-from dm_cli.dmss_api.model.reference import Reference
+from dm_cli.dmss_api.model.reference_entity import ReferenceEntity
 
 
 class DefaultApi(object):
@@ -43,6 +43,127 @@ class DefaultApi(object):
         if api_client is None:
             api_client = ApiClient()
         self.api_client = api_client
+
+        def __attribute_get(
+            self,
+            address,
+            **kwargs
+        ):
+            """Get Attribute  # noqa: E501
+
+            Fetch the attribute from a address.  # noqa: E501
+            This method makes a synchronous HTTP request by default. To make an
+            asynchronous HTTP request, please pass async_req=True
+
+            >>> thread = api.attribute_get(address, async_req=True)
+            >>> result = thread.get()
+
+            Args:
+                address (str):
+
+            Keyword Args:
+                _return_http_data_only (bool): response data without head status
+                    code and headers. Default is True.
+                _preload_content (bool): if False, the urllib3.HTTPResponse object
+                    will be returned without reading/decoding response data.
+                    Default is True.
+                _request_timeout (int/float/tuple): timeout setting for this request. If
+                    one number provided, it will be total request timeout. It can also
+                    be a pair (tuple) of (connection, read) timeouts.
+                    Default is None.
+                _check_input_type (bool): specifies if type checking
+                    should be done one the data sent to the server.
+                    Default is True.
+                _check_return_type (bool): specifies if type checking
+                    should be done one the data received from the server.
+                    Default is True.
+                _host_index (int/None): specifies the index of the server
+                    that we want to use.
+                    Default is read from the configuration.
+                async_req (bool): execute request asynchronously
+
+            Returns:
+                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
+                    If the method is called asynchronously, returns the request
+                    thread.
+            """
+            kwargs['async_req'] = kwargs.get(
+                'async_req', False
+            )
+            kwargs['_return_http_data_only'] = kwargs.get(
+                '_return_http_data_only', True
+            )
+            kwargs['_preload_content'] = kwargs.get(
+                '_preload_content', True
+            )
+            kwargs['_request_timeout'] = kwargs.get(
+                '_request_timeout', None
+            )
+            kwargs['_check_input_type'] = kwargs.get(
+                '_check_input_type', True
+            )
+            kwargs['_check_return_type'] = kwargs.get(
+                '_check_return_type', True
+            )
+            kwargs['_host_index'] = kwargs.get('_host_index')
+            kwargs['address'] = \
+                address
+            return self.call_with_http_info(**kwargs)
+
+        self.attribute_get = _Endpoint(
+            settings={
+                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
+                'auth': [
+                    'APIKeyHeader',
+                    'OAuth2AuthorizationCodeBearer'
+                ],
+                'endpoint_path': '/api/attribute/{address}',
+                'operation_id': 'attribute_get',
+                'http_method': 'GET',
+                'servers': None,
+            },
+            params_map={
+                'all': [
+                    'address',
+                ],
+                'required': [
+                    'address',
+                ],
+                'nullable': [
+                ],
+                'enum': [
+                ],
+                'validation': [
+                ]
+            },
+            root_map={
+                'validations': {
+                },
+                'allowed_values': {
+                },
+                'openapi_types': {
+                    'address':
+                        (str,),
+                },
+                'attribute_map': {
+                    'address': 'address',
+                },
+                'location_map': {
+                    'address': 'path',
+                },
+                'collection_format_map': {
+                }
+            },
+            headers_map={
+                'accept': [
+                    'application/json',
+                    'text/plain'
+                ],
+                'content_type': [],
+            },
+            api_client=api_client,
+            callable=__attribute_get
+        )
 
         def __blob_get_by_id(
             self,
@@ -456,20 +577,20 @@ class DefaultApi(object):
 
         def __blueprint_resolve(
             self,
-            absolute_id,
+            address,
             **kwargs
         ):
             """Resolve Blueprint Id  # noqa: E501
 
-            Resolve absolute_id of a blueprint to its type path.  - **absolute_id**: <data_source</<blueprint_uuid>  # noqa: E501
+            Resolve address of a blueprint to its type path.  - **address**: <protocol>://<data_source</$<blueprint_uuid>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.blueprint_resolve(absolute_id, async_req=True)
+            >>> thread = api.blueprint_resolve(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_id (str):
+                address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -516,8 +637,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_id'] = \
-                absolute_id
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.blueprint_resolve = _Endpoint(
@@ -527,17 +648,17 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/resolve-path/{absolute_id}',
+                'endpoint_path': '/api/resolve-path/{address}',
                 'operation_id': 'blueprint_resolve',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_id',
+                    'address',
                 ],
                 'required': [
-                    'absolute_id',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -552,14 +673,14 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_id':
+                    'address':
                         (str,),
                 },
                 'attribute_map': {
-                    'absolute_id': 'absolute_id',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'absolute_id': 'path',
+                    'address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -1071,21 +1192,21 @@ class DefaultApi(object):
 
         def __document_add(
             self,
-            reference,
+            address,
             document,
             **kwargs
         ):
             """Add Document  # noqa: E501
 
-            Add a document to a package (or a data source) using a reference.  - **reference**:   - Reference to data source: PROTOCOL://DATA SOURCE   - Reference to package by id: PROTOCOL://DATA SOURCE/$ID   - Reference to package by path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE   The PROTOCOL is optional, and the default is dmss.  # noqa: E501
+            Add a document to a package (or a data source) using an address.  - **address**:   - Reference to data source: PROTOCOL://DATA SOURCE   - Reference to package by id: PROTOCOL://DATA SOURCE/$ID   - Reference to package by path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE   The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_add(reference, document, async_req=True)
+            >>> thread = api.document_add(address, document, async_req=True)
             >>> result = thread.get()
 
             Args:
-                reference (str):
+                address (str):
                 document (str):
 
             Keyword Args:
@@ -1135,8 +1256,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
             kwargs['document'] = \
                 document
             return self.call_with_http_info(**kwargs)
@@ -1148,20 +1269,20 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{reference}',
+                'endpoint_path': '/api/documents/{address}',
                 'operation_id': 'document_add',
                 'http_method': 'POST',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'reference',
+                    'address',
                     'document',
                     'update_uncontained',
                     'files',
                 ],
                 'required': [
-                    'reference',
+                    'address',
                     'document',
                 ],
                 'nullable': [
@@ -1177,7 +1298,7 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'reference':
+                    'address':
                         (str,),
                     'document':
                         (str,),
@@ -1187,13 +1308,13 @@ class DefaultApi(object):
                         ([file_type],),
                 },
                 'attribute_map': {
-                    'reference': 'reference',
+                    'address': 'address',
                     'document': 'document',
                     'update_uncontained': 'update_uncontained',
                     'files': 'files',
                 },
                 'location_map': {
-                    'reference': 'path',
+                    'address': 'path',
                     'document': 'form',
                     'update_uncontained': 'query',
                     'files': 'form',
@@ -1349,20 +1470,20 @@ class DefaultApi(object):
 
         def __document_get(
             self,
-            reference,
+            address,
             **kwargs
         ):
             """Get  # noqa: E501
 
-            Get document as JSON string.  - **reference**: A reference to a package or a data source   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)  The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
+            Get document as JSON string.  - **address**: An address to a package or a data source   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)  The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_get(reference, async_req=True)
+            >>> thread = api.document_get(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                reference (str):
+                address (str):
 
             Keyword Args:
                 depth (int): [optional] if omitted the server will use the default value of 0
@@ -1411,8 +1532,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.document_get = _Endpoint(
@@ -1422,19 +1543,19 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{reference}',
+                'endpoint_path': '/api/documents/{address}',
                 'operation_id': 'document_get',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'reference',
+                    'address',
                     'depth',
                     'resolve_links',
                 ],
                 'required': [
-                    'reference',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -1449,7 +1570,7 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'reference':
+                    'address':
                         (str,),
                     'depth':
                         (int,),
@@ -1457,12 +1578,12 @@ class DefaultApi(object):
                         (bool,),
                 },
                 'attribute_map': {
-                    'reference': 'reference',
+                    'address': 'address',
                     'depth': 'depth',
                     'resolve_links': 'resolve_links',
                 },
                 'location_map': {
-                    'reference': 'path',
+                    'address': 'path',
                     'depth': 'query',
                     'resolve_links': 'query',
                 },
@@ -1482,7 +1603,7 @@ class DefaultApi(object):
 
         def __document_remove(
             self,
-            reference,
+            address,
             **kwargs
         ):
             """Remove  # noqa: E501
@@ -1491,11 +1612,11 @@ class DefaultApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_remove(reference, async_req=True)
+            >>> thread = api.document_remove(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                reference (str):
+                address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -1542,8 +1663,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.document_remove = _Endpoint(
@@ -1553,17 +1674,17 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{reference}',
+                'endpoint_path': '/api/documents/{address}',
                 'operation_id': 'document_remove',
                 'http_method': 'DELETE',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'reference',
+                    'address',
                 ],
                 'required': [
-                    'reference',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -1578,14 +1699,14 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'reference':
+                    'address':
                         (str,),
                 },
                 'attribute_map': {
-                    'reference': 'reference',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'reference': 'path',
+                    'address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -1603,21 +1724,21 @@ class DefaultApi(object):
 
         def __document_update(
             self,
-            id_reference,
+            id_address,
             data,
             **kwargs
         ):
             """Update  # noqa: E501
 
-            Update document - **id_reference**: <data_source>/<document_uuid> (can also include an optional .<attribute> after <document_uuid>)  # noqa: E501
+            Update document - **id_address**: <protocol>://<data_source>/$<document_uuid> (can also include an optional .<attribute> after <document_uuid>)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_update(id_reference, data, async_req=True)
+            >>> thread = api.document_update(id_address, data, async_req=True)
             >>> result = thread.get()
 
             Args:
-                id_reference (str):
+                id_address (str):
                 data (str):
 
             Keyword Args:
@@ -1667,8 +1788,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['id_reference'] = \
-                id_reference
+            kwargs['id_address'] = \
+                id_address
             kwargs['data'] = \
                 data
             return self.call_with_http_info(**kwargs)
@@ -1680,20 +1801,20 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{id_reference}',
+                'endpoint_path': '/api/documents/{id_address}',
                 'operation_id': 'document_update',
                 'http_method': 'PUT',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'id_reference',
+                    'id_address',
                     'data',
                     'update_uncontained',
                     'files',
                 ],
                 'required': [
-                    'id_reference',
+                    'id_address',
                     'data',
                 ],
                 'nullable': [
@@ -1709,7 +1830,7 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'id_reference':
+                    'id_address':
                         (str,),
                     'data':
                         (str,),
@@ -1719,13 +1840,13 @@ class DefaultApi(object):
                         ([file_type],),
                 },
                 'attribute_map': {
-                    'id_reference': 'id_reference',
+                    'id_address': 'id_address',
                     'data': 'data',
                     'update_uncontained': 'update_uncontained',
                     'files': 'files',
                 },
                 'location_map': {
-                    'id_reference': 'path',
+                    'id_address': 'path',
                     'data': 'form',
                     'update_uncontained': 'query',
                     'files': 'form',
@@ -1749,20 +1870,20 @@ class DefaultApi(object):
 
         def __export(
             self,
-            absolute_document_ref,
+            path_address,
             **kwargs
         ):
             """Export  # noqa: E501
 
-            Download a zip-folder with one or more documents as json file(s).  - **absolute_document_ref**: <data_source>/<path>/<document_name>  # noqa: E501
+            Download a zip-folder with one or more documents as json file(s).  - **address**:   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY    The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.export(absolute_document_ref, async_req=True)
+            >>> thread = api.export(path_address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_document_ref (str):
+                path_address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -1809,8 +1930,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_document_ref'] = \
-                absolute_document_ref
+            kwargs['path_address'] = \
+                path_address
             return self.call_with_http_info(**kwargs)
 
         self.export = _Endpoint(
@@ -1820,17 +1941,17 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/export/{absolute_document_ref}',
+                'endpoint_path': '/api/export/{path_address}',
                 'operation_id': 'export',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'required': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'nullable': [
                 ],
@@ -1845,14 +1966,14 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_document_ref':
+                    'path_address':
                         (str,),
                 },
                 'attribute_map': {
-                    'absolute_document_ref': 'absolute_document_ref',
+                    'path_address': 'path_address',
                 },
                 'location_map': {
-                    'absolute_document_ref': 'path',
+                    'path_address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -1871,20 +1992,20 @@ class DefaultApi(object):
 
         def __export_meta(
             self,
-            absolute_document_ref,
+            path_address,
             **kwargs
         ):
             """Export Meta  # noqa: E501
 
-            Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **absolute_document_ref**: <data_source>/<path_to_entity>/<entity_name>  # noqa: E501
+            Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **address**:   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY    The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.export_meta(absolute_document_ref, async_req=True)
+            >>> thread = api.export_meta(path_address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_document_ref (str):
+                path_address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -1931,8 +2052,8 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_document_ref'] = \
-                absolute_document_ref
+            kwargs['path_address'] = \
+                path_address
             return self.call_with_http_info(**kwargs)
 
         self.export_meta = _Endpoint(
@@ -1942,17 +2063,17 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/export/meta/{absolute_document_ref}',
+                'endpoint_path': '/api/export/meta/{path_address}',
                 'operation_id': 'export_meta',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'required': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'nullable': [
                 ],
@@ -1967,14 +2088,14 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_document_ref':
+                    'path_address':
                         (str,),
                 },
                 'attribute_map': {
-                    'absolute_document_ref': 'absolute_document_ref',
+                    'path_address': 'path_address',
                 },
                 'location_map': {
-                    'absolute_document_ref': 'path',
+                    'path_address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -1988,6 +2109,149 @@ class DefaultApi(object):
             },
             api_client=api_client,
             callable=__export_meta
+        )
+
+        def __file_upload(
+            self,
+            data_source_id,
+            data,
+            file,
+            **kwargs
+        ):
+            """Upload File  # noqa: E501
+
+            Upload a new binary file and create a file entity with the binary data as content.  **file_id** The data source ID to be used for the file entity that will be created.  # noqa: E501
+            This method makes a synchronous HTTP request by default. To make an
+            asynchronous HTTP request, please pass async_req=True
+
+            >>> thread = api.file_upload(data_source_id, data, file, async_req=True)
+            >>> result = thread.get()
+
+            Args:
+                data_source_id (str):
+                data (str):
+                file (file_type):
+
+            Keyword Args:
+                _return_http_data_only (bool): response data without head status
+                    code and headers. Default is True.
+                _preload_content (bool): if False, the urllib3.HTTPResponse object
+                    will be returned without reading/decoding response data.
+                    Default is True.
+                _request_timeout (int/float/tuple): timeout setting for this request. If
+                    one number provided, it will be total request timeout. It can also
+                    be a pair (tuple) of (connection, read) timeouts.
+                    Default is None.
+                _check_input_type (bool): specifies if type checking
+                    should be done one the data sent to the server.
+                    Default is True.
+                _check_return_type (bool): specifies if type checking
+                    should be done one the data received from the server.
+                    Default is True.
+                _host_index (int/None): specifies the index of the server
+                    that we want to use.
+                    Default is read from the configuration.
+                async_req (bool): execute request asynchronously
+
+            Returns:
+                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
+                    If the method is called asynchronously, returns the request
+                    thread.
+            """
+            kwargs['async_req'] = kwargs.get(
+                'async_req', False
+            )
+            kwargs['_return_http_data_only'] = kwargs.get(
+                '_return_http_data_only', True
+            )
+            kwargs['_preload_content'] = kwargs.get(
+                '_preload_content', True
+            )
+            kwargs['_request_timeout'] = kwargs.get(
+                '_request_timeout', None
+            )
+            kwargs['_check_input_type'] = kwargs.get(
+                '_check_input_type', True
+            )
+            kwargs['_check_return_type'] = kwargs.get(
+                '_check_return_type', True
+            )
+            kwargs['_host_index'] = kwargs.get('_host_index')
+            kwargs['data_source_id'] = \
+                data_source_id
+            kwargs['data'] = \
+                data
+            kwargs['file'] = \
+                file
+            return self.call_with_http_info(**kwargs)
+
+        self.file_upload = _Endpoint(
+            settings={
+                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
+                'auth': [
+                    'APIKeyHeader',
+                    'OAuth2AuthorizationCodeBearer'
+                ],
+                'endpoint_path': '/api/files/{data_source_id}',
+                'operation_id': 'file_upload',
+                'http_method': 'POST',
+                'servers': None,
+            },
+            params_map={
+                'all': [
+                    'data_source_id',
+                    'data',
+                    'file',
+                ],
+                'required': [
+                    'data_source_id',
+                    'data',
+                    'file',
+                ],
+                'nullable': [
+                ],
+                'enum': [
+                ],
+                'validation': [
+                ]
+            },
+            root_map={
+                'validations': {
+                },
+                'allowed_values': {
+                },
+                'openapi_types': {
+                    'data_source_id':
+                        (str,),
+                    'data':
+                        (str,),
+                    'file':
+                        (file_type,),
+                },
+                'attribute_map': {
+                    'data_source_id': 'data_source_id',
+                    'data': 'data',
+                    'file': 'file',
+                },
+                'location_map': {
+                    'data_source_id': 'path',
+                    'data': 'form',
+                    'file': 'form',
+                },
+                'collection_format_map': {
+                }
+            },
+            headers_map={
+                'accept': [
+                    'application/json',
+                    'text/plain'
+                ],
+                'content_type': [
+                    'multipart/form-data'
+                ]
+            },
+            api_client=api_client,
+            callable=__file_upload
         )
 
         def __get_acl(
@@ -2470,24 +2734,24 @@ class DefaultApi(object):
             callable=__instantiate_entity
         )
 
-        def __reference_delete(
+        def __meta_by_id(
             self,
             data_source_id,
-            document_dotted_id,
+            document_id,
             **kwargs
         ):
-            """Delete Reference  # noqa: E501
+            """Get Meta By Id  # noqa: E501
 
-            Delete a reference in an entity.  Used to delete uncontained attributes in an entity.  - **document_dotted_id**: <data_source>/<path_to_entity>/<entity_name>.<attribute>  # noqa: E501
+            Get meta information from data source id.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.reference_delete(data_source_id, document_dotted_id, async_req=True)
+            >>> thread = api.meta_by_id(data_source_id, document_id, async_req=True)
             >>> result = thread.get()
 
             Args:
                 data_source_id (str):
-                document_dotted_id (str):
+                document_id (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -2536,30 +2800,30 @@ class DefaultApi(object):
             kwargs['_host_index'] = kwargs.get('_host_index')
             kwargs['data_source_id'] = \
                 data_source_id
-            kwargs['document_dotted_id'] = \
-                document_dotted_id
+            kwargs['document_id'] = \
+                document_id
             return self.call_with_http_info(**kwargs)
 
-        self.reference_delete = _Endpoint(
+        self.meta_by_id = _Endpoint(
             settings={
                 'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
-                'operation_id': 'reference_delete',
-                'http_method': 'DELETE',
+                'endpoint_path': '/api/meta/{data_source_id}/{document_id}',
+                'operation_id': 'meta_by_id',
+                'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
                     'data_source_id',
-                    'document_dotted_id',
+                    'document_id',
                 ],
                 'required': [
                     'data_source_id',
-                    'document_dotted_id',
+                    'document_id',
                 ],
                 'nullable': [
                 ],
@@ -2576,16 +2840,137 @@ class DefaultApi(object):
                 'openapi_types': {
                     'data_source_id':
                         (str,),
-                    'document_dotted_id':
+                    'document_id':
                         (str,),
                 },
                 'attribute_map': {
                     'data_source_id': 'data_source_id',
-                    'document_dotted_id': 'document_dotted_id',
+                    'document_id': 'document_id',
                 },
                 'location_map': {
                     'data_source_id': 'path',
-                    'document_dotted_id': 'path',
+                    'document_id': 'path',
+                },
+                'collection_format_map': {
+                }
+            },
+            headers_map={
+                'accept': [
+                    'application/json',
+                    'text/plain'
+                ],
+                'content_type': [],
+            },
+            api_client=api_client,
+            callable=__meta_by_id
+        )
+
+        def __reference_delete(
+            self,
+            address,
+            **kwargs
+        ):
+            """Delete Reference  # noqa: E501
+
+            Delete a reference in an entity.  Used to delete uncontained attributes in an entity.  - **document_dotted_id**: <data_source>/<path_to_entity>/<entity_name>.<attribute>  # noqa: E501
+            This method makes a synchronous HTTP request by default. To make an
+            asynchronous HTTP request, please pass async_req=True
+
+            >>> thread = api.reference_delete(address, async_req=True)
+            >>> result = thread.get()
+
+            Args:
+                address (str):
+
+            Keyword Args:
+                _return_http_data_only (bool): response data without head status
+                    code and headers. Default is True.
+                _preload_content (bool): if False, the urllib3.HTTPResponse object
+                    will be returned without reading/decoding response data.
+                    Default is True.
+                _request_timeout (int/float/tuple): timeout setting for this request. If
+                    one number provided, it will be total request timeout. It can also
+                    be a pair (tuple) of (connection, read) timeouts.
+                    Default is None.
+                _check_input_type (bool): specifies if type checking
+                    should be done one the data sent to the server.
+                    Default is True.
+                _check_return_type (bool): specifies if type checking
+                    should be done one the data received from the server.
+                    Default is True.
+                _host_index (int/None): specifies the index of the server
+                    that we want to use.
+                    Default is read from the configuration.
+                async_req (bool): execute request asynchronously
+
+            Returns:
+                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
+                    If the method is called asynchronously, returns the request
+                    thread.
+            """
+            kwargs['async_req'] = kwargs.get(
+                'async_req', False
+            )
+            kwargs['_return_http_data_only'] = kwargs.get(
+                '_return_http_data_only', True
+            )
+            kwargs['_preload_content'] = kwargs.get(
+                '_preload_content', True
+            )
+            kwargs['_request_timeout'] = kwargs.get(
+                '_request_timeout', None
+            )
+            kwargs['_check_input_type'] = kwargs.get(
+                '_check_input_type', True
+            )
+            kwargs['_check_return_type'] = kwargs.get(
+                '_check_return_type', True
+            )
+            kwargs['_host_index'] = kwargs.get('_host_index')
+            kwargs['address'] = \
+                address
+            return self.call_with_http_info(**kwargs)
+
+        self.reference_delete = _Endpoint(
+            settings={
+                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
+                'auth': [
+                    'APIKeyHeader',
+                    'OAuth2AuthorizationCodeBearer'
+                ],
+                'endpoint_path': '/api/reference/{address}',
+                'operation_id': 'reference_delete',
+                'http_method': 'DELETE',
+                'servers': None,
+            },
+            params_map={
+                'all': [
+                    'address',
+                ],
+                'required': [
+                    'address',
+                ],
+                'nullable': [
+                ],
+                'enum': [
+                ],
+                'validation': [
+                ]
+            },
+            root_map={
+                'validations': {
+                },
+                'allowed_values': {
+                },
+                'openapi_types': {
+                    'address':
+                        (str,),
+                },
+                'attribute_map': {
+                    'address': 'address',
+                },
+                'location_map': {
+                    'address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -2603,9 +2988,8 @@ class DefaultApi(object):
 
         def __reference_insert(
             self,
-            data_source_id,
-            document_dotted_id,
-            reference,
+            address,
+            reference_entity,
             **kwargs
         ):
             """Insert Reference  # noqa: E501
@@ -2614,13 +2998,12 @@ class DefaultApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.reference_insert(data_source_id, document_dotted_id, reference, async_req=True)
+            >>> thread = api.reference_insert(address, reference_entity, async_req=True)
             >>> result = thread.get()
 
             Args:
-                data_source_id (str):
-                document_dotted_id (str):
-                reference (Reference):
+                address (str):
+                reference_entity (ReferenceEntity):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -2667,12 +3050,10 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['data_source_id'] = \
-                data_source_id
-            kwargs['document_dotted_id'] = \
-                document_dotted_id
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
+            kwargs['reference_entity'] = \
+                reference_entity
             return self.call_with_http_info(**kwargs)
 
         self.reference_insert = _Endpoint(
@@ -2682,21 +3063,19 @@ class DefaultApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{address}',
                 'operation_id': 'reference_insert',
                 'http_method': 'PUT',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'data_source_id',
-                    'document_dotted_id',
-                    'reference',
+                    'address',
+                    'reference_entity',
                 ],
                 'required': [
-                    'data_source_id',
-                    'document_dotted_id',
-                    'reference',
+                    'address',
+                    'reference_entity',
                 ],
                 'nullable': [
                 ],
@@ -2711,21 +3090,17 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'data_source_id':
+                    'address':
                         (str,),
-                    'document_dotted_id':
-                        (str,),
-                    'reference':
-                        (Reference,),
+                    'reference_entity':
+                        (ReferenceEntity,),
                 },
                 'attribute_map': {
-                    'data_source_id': 'data_source_id',
-                    'document_dotted_id': 'document_dotted_id',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'data_source_id': 'path',
-                    'document_dotted_id': 'path',
-                    'reference': 'body',
+                    'address': 'path',
+                    'reference_entity': 'body',
                 },
                 'collection_format_map': {
                 }

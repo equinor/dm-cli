@@ -2,14 +2,14 @@
   "name": "ExternalFile",
   "type": "CORE:Blueprint",
   "extends": ["CORE:NamedEntity"],
-  "description": "Blueprint with blob",
+  "description": "Blueprint with a file",
   "attributes": [
     {
       "type": "CORE:BlueprintAttribute",
-      "name": "blob",
-      "description": "external file as blob",
-      "attributeType": "CORE:Blob",
-      "contained": true
+      "name": "file",
+      "description": "External file with binary data",
+      "attributeType": "CORE:File",
+      "contained": false
     },
     {
       "type": "CORE:BlueprintAttribute",

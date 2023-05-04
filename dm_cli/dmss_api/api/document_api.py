@@ -38,21 +38,21 @@ class DocumentApi(object):
 
         def __document_add(
             self,
-            reference,
+            address,
             document,
             **kwargs
         ):
             """Add Document  # noqa: E501
 
-            Add a document to a package (or a data source) using a reference.  - **reference**:   - Reference to data source: PROTOCOL://DATA SOURCE   - Reference to package by id: PROTOCOL://DATA SOURCE/$ID   - Reference to package by path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE   The PROTOCOL is optional, and the default is dmss.  # noqa: E501
+            Add a document to a package (or a data source) using an address.  - **address**:   - Reference to data source: PROTOCOL://DATA SOURCE   - Reference to package by id: PROTOCOL://DATA SOURCE/$ID   - Reference to package by path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE   The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_add(reference, document, async_req=True)
+            >>> thread = api.document_add(address, document, async_req=True)
             >>> result = thread.get()
 
             Args:
-                reference (str):
+                address (str):
                 document (str):
 
             Keyword Args:
@@ -102,8 +102,8 @@ class DocumentApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
             kwargs['document'] = \
                 document
             return self.call_with_http_info(**kwargs)
@@ -115,20 +115,20 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{reference}',
+                'endpoint_path': '/api/documents/{address}',
                 'operation_id': 'document_add',
                 'http_method': 'POST',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'reference',
+                    'address',
                     'document',
                     'update_uncontained',
                     'files',
                 ],
                 'required': [
-                    'reference',
+                    'address',
                     'document',
                 ],
                 'nullable': [
@@ -144,7 +144,7 @@ class DocumentApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'reference':
+                    'address':
                         (str,),
                     'document':
                         (str,),
@@ -154,13 +154,13 @@ class DocumentApi(object):
                         ([file_type],),
                 },
                 'attribute_map': {
-                    'reference': 'reference',
+                    'address': 'address',
                     'document': 'document',
                     'update_uncontained': 'update_uncontained',
                     'files': 'files',
                 },
                 'location_map': {
-                    'reference': 'path',
+                    'address': 'path',
                     'document': 'form',
                     'update_uncontained': 'query',
                     'files': 'form',
@@ -316,20 +316,20 @@ class DocumentApi(object):
 
         def __document_get(
             self,
-            reference,
+            address,
             **kwargs
         ):
             """Get  # noqa: E501
 
-            Get document as JSON string.  - **reference**: A reference to a package or a data source   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)  The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
+            Get document as JSON string.  - **address**: An address to a package or a data source   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)  The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_get(reference, async_req=True)
+            >>> thread = api.document_get(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                reference (str):
+                address (str):
 
             Keyword Args:
                 depth (int): [optional] if omitted the server will use the default value of 0
@@ -378,8 +378,8 @@ class DocumentApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.document_get = _Endpoint(
@@ -389,19 +389,19 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{reference}',
+                'endpoint_path': '/api/documents/{address}',
                 'operation_id': 'document_get',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'reference',
+                    'address',
                     'depth',
                     'resolve_links',
                 ],
                 'required': [
-                    'reference',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -416,7 +416,7 @@ class DocumentApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'reference':
+                    'address':
                         (str,),
                     'depth':
                         (int,),
@@ -424,12 +424,12 @@ class DocumentApi(object):
                         (bool,),
                 },
                 'attribute_map': {
-                    'reference': 'reference',
+                    'address': 'address',
                     'depth': 'depth',
                     'resolve_links': 'resolve_links',
                 },
                 'location_map': {
-                    'reference': 'path',
+                    'address': 'path',
                     'depth': 'query',
                     'resolve_links': 'query',
                 },
@@ -449,7 +449,7 @@ class DocumentApi(object):
 
         def __document_remove(
             self,
-            reference,
+            address,
             **kwargs
         ):
             """Remove  # noqa: E501
@@ -458,11 +458,11 @@ class DocumentApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_remove(reference, async_req=True)
+            >>> thread = api.document_remove(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                reference (str):
+                address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -509,8 +509,8 @@ class DocumentApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.document_remove = _Endpoint(
@@ -520,17 +520,17 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{reference}',
+                'endpoint_path': '/api/documents/{address}',
                 'operation_id': 'document_remove',
                 'http_method': 'DELETE',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'reference',
+                    'address',
                 ],
                 'required': [
-                    'reference',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -545,14 +545,14 @@ class DocumentApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'reference':
+                    'address':
                         (str,),
                 },
                 'attribute_map': {
-                    'reference': 'reference',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'reference': 'path',
+                    'address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -570,21 +570,21 @@ class DocumentApi(object):
 
         def __document_update(
             self,
-            id_reference,
+            id_address,
             data,
             **kwargs
         ):
             """Update  # noqa: E501
 
-            Update document - **id_reference**: <data_source>/<document_uuid> (can also include an optional .<attribute> after <document_uuid>)  # noqa: E501
+            Update document - **id_address**: <protocol>://<data_source>/$<document_uuid> (can also include an optional .<attribute> after <document_uuid>)  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_update(id_reference, data, async_req=True)
+            >>> thread = api.document_update(id_address, data, async_req=True)
             >>> result = thread.get()
 
             Args:
-                id_reference (str):
+                id_address (str):
                 data (str):
 
             Keyword Args:
@@ -634,8 +634,8 @@ class DocumentApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['id_reference'] = \
-                id_reference
+            kwargs['id_address'] = \
+                id_address
             kwargs['data'] = \
                 data
             return self.call_with_http_info(**kwargs)
@@ -647,20 +647,20 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{id_reference}',
+                'endpoint_path': '/api/documents/{id_address}',
                 'operation_id': 'document_update',
                 'http_method': 'PUT',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'id_reference',
+                    'id_address',
                     'data',
                     'update_uncontained',
                     'files',
                 ],
                 'required': [
-                    'id_reference',
+                    'id_address',
                     'data',
                 ],
                 'nullable': [
@@ -676,7 +676,7 @@ class DocumentApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'id_reference':
+                    'id_address':
                         (str,),
                     'data':
                         (str,),
@@ -686,13 +686,13 @@ class DocumentApi(object):
                         ([file_type],),
                 },
                 'attribute_map': {
-                    'id_reference': 'id_reference',
+                    'id_address': 'id_address',
                     'data': 'data',
                     'update_uncontained': 'update_uncontained',
                     'files': 'files',
                 },
                 'location_map': {
-                    'id_reference': 'path',
+                    'id_address': 'path',
                     'data': 'form',
                     'update_uncontained': 'query',
                     'files': 'form',

@@ -20,7 +20,7 @@ from dm_cli.dmss_api.model.lookup import Lookup
 from dm_cli.dmss_api.model.pat_data import PATData
 from dm_cli.dmss_api.model.recipe import Recipe
 from dm_cli.dmss_api.model.recipe_attribute import RecipeAttribute
-from dm_cli.dmss_api.model.reference import Reference
+from dm_cli.dmss_api.model.reference_entity import ReferenceEntity
 from dm_cli.dmss_api.model.repository import Repository
 from dm_cli.dmss_api.model.repository_type import RepositoryType
 from dm_cli.dmss_api.model.storage_attribute import StorageAttribute

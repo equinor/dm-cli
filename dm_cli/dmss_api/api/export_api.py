@@ -38,20 +38,20 @@ class ExportApi(object):
 
         def __export(
             self,
-            absolute_document_ref,
+            path_address,
             **kwargs
         ):
             """Export  # noqa: E501
 
-            Download a zip-folder with one or more documents as json file(s).  - **absolute_document_ref**: <data_source>/<path>/<document_name>  # noqa: E501
+            Download a zip-folder with one or more documents as json file(s).  - **address**:   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY    The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.export(absolute_document_ref, async_req=True)
+            >>> thread = api.export(path_address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_document_ref (str):
+                path_address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -98,8 +98,8 @@ class ExportApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_document_ref'] = \
-                absolute_document_ref
+            kwargs['path_address'] = \
+                path_address
             return self.call_with_http_info(**kwargs)
 
         self.export = _Endpoint(
@@ -109,17 +109,17 @@ class ExportApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/export/{absolute_document_ref}',
+                'endpoint_path': '/api/export/{path_address}',
                 'operation_id': 'export',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'required': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'nullable': [
                 ],
@@ -134,14 +134,14 @@ class ExportApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_document_ref':
+                    'path_address':
                         (str,),
                 },
                 'attribute_map': {
-                    'absolute_document_ref': 'absolute_document_ref',
+                    'path_address': 'path_address',
                 },
                 'location_map': {
-                    'absolute_document_ref': 'path',
+                    'path_address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -160,20 +160,20 @@ class ExportApi(object):
 
         def __export_meta(
             self,
-            absolute_document_ref,
+            path_address,
             **kwargs
         ):
             """Export Meta  # noqa: E501
 
-            Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **absolute_document_ref**: <data_source>/<path_to_entity>/<entity_name>  # noqa: E501
+            Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **address**:   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY    The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.export_meta(absolute_document_ref, async_req=True)
+            >>> thread = api.export_meta(path_address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_document_ref (str):
+                path_address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -220,8 +220,8 @@ class ExportApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_document_ref'] = \
-                absolute_document_ref
+            kwargs['path_address'] = \
+                path_address
             return self.call_with_http_info(**kwargs)
 
         self.export_meta = _Endpoint(
@@ -231,17 +231,17 @@ class ExportApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/export/meta/{absolute_document_ref}',
+                'endpoint_path': '/api/export/meta/{path_address}',
                 'operation_id': 'export_meta',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'required': [
-                    'absolute_document_ref',
+                    'path_address',
                 ],
                 'nullable': [
                 ],
@@ -256,14 +256,14 @@ class ExportApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_document_ref':
+                    'path_address':
                         (str,),
                 },
                 'attribute_map': {
-                    'absolute_document_ref': 'absolute_document_ref',
+                    'path_address': 'path_address',
                 },
                 'location_map': {
-                    'absolute_document_ref': 'path',
+                    'path_address': 'path',
                 },
                 'collection_format_map': {
                 }

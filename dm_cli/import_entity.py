@@ -18,22 +18,11 @@ from .utils.utils import (
     console,
     destination_is_root,
     ensure_package_structure,
-    upload_blobs_in_document,
 )
 from .utils.zip import zip_all
 
 
-def import_single_entity(source_path: Path, destination: str):
-    ensure_package_structure(Path(destination))
-    print(f"Importing ENTITY '{source_path.name}' --> '{destination}'")
-    data_source_id, package = destination.split("/", 1)
-
-    try:  # Load the JSON document
-        with open(source_path, "r") as fh:
-            document = json.load(fh)
-    except JSONDecodeError:
-        raise Exception(f"Failed to load the file '{source_path.name}' as a JSON document")
-
+def import_document(source_path: Path, destination: str, data_source_id: str, package: str, document: dict):
     remote_dependencies = dmss_api.export_meta(f"{data_source_id}/{package}")
     old_dependencies = {v["alias"]: Dependency(**v) for v in remote_dependencies.get("dependencies", [])}
 
@@ -55,8 +44,6 @@ def import_single_entity(source_path: Path, destination: str):
             parent_directory=source_path.parent,
         )
 
-    # Upload blobs
-    prepared_document = upload_blobs_in_document(prepared_document, data_source_id)
     document_json_str = json.dumps(prepared_document)
     dmss_api.document_add(
         f"{destination}",
@@ -64,6 +51,21 @@ def import_single_entity(source_path: Path, destination: str):
         update_uncontained=True,
         files=[],
     )
+
+
+def import_single_entity(source_path: Path, destination: str):
+    ensure_package_structure(Path(destination))
+    print(f"Importing ENTITY '{source_path.name}' --> '{destination}'")
+    data_source_id, package = destination.split("/", 1)
+
+    try:  # Load the JSON document
+        with open(source_path, "r") as fh:
+            if Path(source_path).suffix == ".json":
+                import_document(source_path, destination, data_source_id, package, json.load(fh))
+            else:
+                print(f"Unsupported file type {source_path}")
+    except JSONDecodeError:
+        raise Exception(f"Failed to load the file '{source_path.name}' as a JSON document")
 
 
 def import_folder_entity(source_path: Path, destination: str) -> None:
