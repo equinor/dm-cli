@@ -2,7 +2,7 @@
 import io
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 from zipfile import ZipFile
 import emoji
 
@@ -57,14 +57,17 @@ def import_plugin_blueprints(path: str):
     import_entity(source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}")
 
 @app.command("create-lookup")
-def create_lookup(name: str, path: str):
+def create_lookup(name: str, paths: List[Path]):
     """
     Create a named Ui-/StorageRecipe-lookup-table from all RecipeLinks in a package existing in DMSS (requires admin privileges)
 
     NAME: name of the lookup(application context) to create
-    PATH: remote location for recursively looking for RecipeLinks
+    PATHS: one or more remote location for recursively looking for RecipeLinks
     """
-    dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=path, application=name)
+
+    paths_as_strings = [str(path) for path in paths]
+    print(f"Creating lookup table from paths: {paths_as_strings}")
+    dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=paths_as_strings, application=name)
 
 @app.command("export")
 def export_entity(target: str, export_location: str = "", unpack: bool = False):
