@@ -5,8 +5,12 @@ from pathlib import Path
 from typing import Dict, Union
 from zipfile import ZipFile
 
-from .domain import Dependency, Package
-from .import_package import add_file_to_package, add_package_to_package
+from .domain import Dependency, File, Package
+from .import_package import (
+    add_file_to_package,
+    add_object_to_package,
+    add_package_to_package,
+)
 from .utils.reference import replace_relative_references
 from .utils.utils import concat_dependencies
 
@@ -59,6 +63,11 @@ def package_tree_from_zip(
                 add_package_to_package(Path(filename), root_package)
                 continue
             if Path(filename).suffix != ".json":
+                file_like = io.BytesIO(zip_file.read(f"{folder_name}/{filename}"))
+                print(f"\tAdding file {filename} ({file_like.getbuffer().nbytes} bytes)")
+                file_like.name = Path(filename).name  # stem
+                file_like.destination = Path(f"/{data_source_id}/{folder_name}/{filename}").parent
+                add_object_to_package(Path(filename), root_package, file_like)
                 continue
             try:
                 json_doc = json.loads(zip_file.read(f"{folder_name}/{filename}"))
@@ -72,19 +81,24 @@ def package_tree_from_zip(
                 json_doc.get("_meta_", {}).get("dependencies", []), dependencies, filename
             )
 
+        def replace(document, file_path):
+            if not isinstance(document, File):
+                document = {
+                    key: replace_relative_references(
+                        key,
+                        value,
+                        dependencies,
+                        data_source_id,
+                        file_path=file_path,
+                        zip_file=zip_file,
+                    )
+                    for key, value in document.items()
+                }
+            return document
+
         # Now that we have the entire package as a Package tree, traverse it, and replace relative references
         root_package.traverse_documents(
-            lambda document, file_path: {
-                key: replace_relative_references(
-                    key,
-                    value,
-                    dependencies,
-                    data_source_id,
-                    file_path=file_path,
-                    zip_file=zip_file,
-                )
-                for key, value in document.items()
-            },
+            lambda document, file_path: replace(document, file_path),
             update=True,
         )
 

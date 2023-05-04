@@ -174,20 +174,20 @@ class BlueprintApi(object):
 
         def __blueprint_resolve(
             self,
-            absolute_id,
+            address,
             **kwargs
         ):
             """Resolve Blueprint Id  # noqa: E501
 
-            Resolve absolute_id of a blueprint to its type path.  - **absolute_id**: <data_source</<blueprint_uuid>  # noqa: E501
+            Resolve address of a blueprint to its type path.  - **address**: <protocol>://<data_source</$<blueprint_uuid>  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.blueprint_resolve(absolute_id, async_req=True)
+            >>> thread = api.blueprint_resolve(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_id (str):
+                address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -234,8 +234,8 @@ class BlueprintApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_id'] = \
-                absolute_id
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.blueprint_resolve = _Endpoint(
@@ -245,17 +245,17 @@ class BlueprintApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/resolve-path/{absolute_id}',
+                'endpoint_path': '/api/resolve-path/{address}',
                 'operation_id': 'blueprint_resolve',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_id',
+                    'address',
                 ],
                 'required': [
-                    'absolute_id',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -270,14 +270,14 @@ class BlueprintApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_id':
+                    'address':
                         (str,),
                 },
                 'attribute_map': {
-                    'absolute_id': 'absolute_id',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'absolute_id': 'path',
+                    'address': 'path',
                 },
                 'collection_format_map': {
                 }

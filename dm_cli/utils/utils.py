@@ -1,9 +1,7 @@
-import io
 import json
 import pprint
 from pathlib import Path
 from typing import Dict, List
-from uuid import uuid4
 
 import typer
 from rich import print
@@ -59,48 +57,6 @@ def document_already_exists(api_exception: ApiException) -> bool:
     return False
 
 
-def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
-    """
-    Uploads any 'system/SIMOS/Blob' types in the document, and replaces the data with UUIDs
-    """
-    try:
-        if document["type"] == SIMOS.BLOB.value:
-            blob_id = document.get("_blob_id", str(uuid4()))
-            blob_name = Path(document["name"]).stem
-            file_like = io.BytesIO(document["_blob_data_"])
-            file_like.name = blob_name
-            res = dmss_api.blob_upload(data_source_id, blob_id, file_like)
-            return {
-                "name": blob_name,
-                "type": SIMOS.BLOB.value,
-                "_blob_id": blob_id,
-                "size": len(document["_blob_data_"]),
-            }
-    except KeyError as error:
-        reduced_document = {k: v for k, v in document.items() if isinstance(v, str)}
-        raise KeyError(f"The document; '{reduced_document}' is missing a required attribute: {error}")
-    except ApiException as api_exception:
-        if document_already_exists(api_exception):
-            return {
-                "name": blob_name,
-                "type": SIMOS.BLOB.value,
-                "_blob_id": blob_id,
-                "size": len(document["_blob_data_"]),
-            }
-        raise
-
-    for key, value in document.items():
-        if key == "_meta_":  # meta data can never contain blob data.
-            return document
-        if isinstance(value, dict) and value:
-            document[key] = upload_blobs_in_document(value, data_source_id)
-        if isinstance(value, list) and value:
-            if len(value) > 0 and isinstance(value[0], dict):
-                document[key] = [upload_blobs_in_document(item, data_source_id) for item in document[key]]
-
-    return document
-
-
 def add_package_to_path(name: str, path: Path):
     package = Package(name, is_root=len(path.parts) == 2)
     dmss_api.document_add(
@@ -109,6 +65,24 @@ def add_package_to_path(name: str, path: Path):
         update_uncontained=False,
         files=[],
     )
+
+
+def replace_file_addresses(document: dict, data_source_id: str, files_to_upload) -> dict:
+    if document["type"] == SIMOS.REFERENCE.value and document["address"] in files_to_upload:
+        blob_id = files_to_upload[document["address"]]
+        document["address"] = f"${blob_id}"
+    for key, value in document.items():
+        if key == "_meta_":  # meta data can never contain blob data.
+            return document
+        if isinstance(value, dict) and value:
+            document[key] = replace_file_addresses(value, data_source_id, files_to_upload)
+        if isinstance(value, list) and value:
+            if len(value) > 0 and isinstance(value[0], dict):
+                document[key] = [
+                    replace_file_addresses(item, data_source_id, files_to_upload) for item in document[key]
+                ]
+
+    return document
 
 
 def destination_is_root(destination: Path) -> bool:

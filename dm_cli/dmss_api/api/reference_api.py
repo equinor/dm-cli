@@ -22,7 +22,7 @@ from dm_cli.dmss_api.model_utils import (  # noqa: F401
     validate_and_convert_types
 )
 from dm_cli.dmss_api.model.error_response import ErrorResponse
-from dm_cli.dmss_api.model.reference import Reference
+from dm_cli.dmss_api.model.reference_entity import ReferenceEntity
 
 
 class ReferenceApi(object):
@@ -39,8 +39,7 @@ class ReferenceApi(object):
 
         def __reference_delete(
             self,
-            data_source_id,
-            document_dotted_id,
+            address,
             **kwargs
         ):
             """Delete Reference  # noqa: E501
@@ -49,12 +48,11 @@ class ReferenceApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.reference_delete(data_source_id, document_dotted_id, async_req=True)
+            >>> thread = api.reference_delete(address, async_req=True)
             >>> result = thread.get()
 
             Args:
-                data_source_id (str):
-                document_dotted_id (str):
+                address (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -101,10 +99,8 @@ class ReferenceApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['data_source_id'] = \
-                data_source_id
-            kwargs['document_dotted_id'] = \
-                document_dotted_id
+            kwargs['address'] = \
+                address
             return self.call_with_http_info(**kwargs)
 
         self.reference_delete = _Endpoint(
@@ -114,19 +110,17 @@ class ReferenceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{address}',
                 'operation_id': 'reference_delete',
                 'http_method': 'DELETE',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'data_source_id',
-                    'document_dotted_id',
+                    'address',
                 ],
                 'required': [
-                    'data_source_id',
-                    'document_dotted_id',
+                    'address',
                 ],
                 'nullable': [
                 ],
@@ -141,18 +135,14 @@ class ReferenceApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'data_source_id':
-                        (str,),
-                    'document_dotted_id':
+                    'address':
                         (str,),
                 },
                 'attribute_map': {
-                    'data_source_id': 'data_source_id',
-                    'document_dotted_id': 'document_dotted_id',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'data_source_id': 'path',
-                    'document_dotted_id': 'path',
+                    'address': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -170,9 +160,8 @@ class ReferenceApi(object):
 
         def __reference_insert(
             self,
-            data_source_id,
-            document_dotted_id,
-            reference,
+            address,
+            reference_entity,
             **kwargs
         ):
             """Insert Reference  # noqa: E501
@@ -181,13 +170,12 @@ class ReferenceApi(object):
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.reference_insert(data_source_id, document_dotted_id, reference, async_req=True)
+            >>> thread = api.reference_insert(address, reference_entity, async_req=True)
             >>> result = thread.get()
 
             Args:
-                data_source_id (str):
-                document_dotted_id (str):
-                reference (Reference):
+                address (str):
+                reference_entity (ReferenceEntity):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -234,12 +222,10 @@ class ReferenceApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['data_source_id'] = \
-                data_source_id
-            kwargs['document_dotted_id'] = \
-                document_dotted_id
-            kwargs['reference'] = \
-                reference
+            kwargs['address'] = \
+                address
+            kwargs['reference_entity'] = \
+                reference_entity
             return self.call_with_http_info(**kwargs)
 
         self.reference_insert = _Endpoint(
@@ -249,21 +235,19 @@ class ReferenceApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/reference/{data_source_id}/{document_dotted_id}',
+                'endpoint_path': '/api/reference/{address}',
                 'operation_id': 'reference_insert',
                 'http_method': 'PUT',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'data_source_id',
-                    'document_dotted_id',
-                    'reference',
+                    'address',
+                    'reference_entity',
                 ],
                 'required': [
-                    'data_source_id',
-                    'document_dotted_id',
-                    'reference',
+                    'address',
+                    'reference_entity',
                 ],
                 'nullable': [
                 ],
@@ -278,21 +262,17 @@ class ReferenceApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'data_source_id':
+                    'address':
                         (str,),
-                    'document_dotted_id':
-                        (str,),
-                    'reference':
-                        (Reference,),
+                    'reference_entity':
+                        (ReferenceEntity,),
                 },
                 'attribute_map': {
-                    'data_source_id': 'data_source_id',
-                    'document_dotted_id': 'document_dotted_id',
+                    'address': 'address',
                 },
                 'location_map': {
-                    'data_source_id': 'path',
-                    'document_dotted_id': 'path',
-                    'reference': 'body',
+                    'address': 'path',
+                    'reference_entity': 'body',
                 },
                 'collection_format_map': {
                 }

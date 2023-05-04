@@ -6,6 +6,7 @@ from uuid import UUID
 from zipfile import ZipFile
 
 from dm_cli.dmss import ApplicationException
+from dm_cli.domain import File
 from dm_cli.package_tree_from_zip import package_tree_from_zip
 
 """
@@ -134,28 +135,6 @@ test_documents = {
         },
     },
     "MyRootPackage/test_pdf.pdf": None,
-    "MyRootPackage/myPDF.json": {
-        "name": "MyPdf",
-        "type": "CORE:blob_types/PDF",
-        "description": "Test",
-        "blob": {"name": "/test_pdf.pdf", "type": "CORE:Blob"},
-        "author": "Stig Oskar",
-        "size": 4003782,
-        "tags": ["Marine", "Renewable"],
-    },
-    "MyRootPackage/myNestedPDF.json": {
-        "name": "myNestedPDF",
-        "type": "CORE:Something",
-        "description": "Test",
-        "something": {
-            "name": "bla",
-            "type": "somethign/some/Thing",
-            "blob": {"name": "/test_pdf.pdf", "type": "CORE:Blob"},
-        },
-        "author": "Stig Oskar",
-        "size": 4003782,
-        "tags": ["Marine", "Renewable"],
-    },
     "MyRootPackage/Moorings/myTurbineMooring.json": {
         "_id": "fefff0e8-1581-4fa5-a9ed-9ab693e029ca",
         "name": "myTurbineMooring",
@@ -299,10 +278,9 @@ class ImportPackageTest(unittest.TestCase):
         assert specialMooring["extends"][2] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
         assert specialMooring["attributes"][1]["type"] == "dmss://test_data_source/AnotherPackage/MyType"
 
-        myPDF = root_package.search("MyPdf")
-        assert isinstance(myPDF["blob"]["_blob_data_"], bytes)
-        assert len(myPDF["blob"]["_blob_data_"]) == 531540
-        assert root_package.search("D").search("E")  # Two empty packages
+        test_pdf = root_package.search("test_pdf.pdf")
+        assert isinstance(test_pdf, File)
+        assert test_pdf.content.name == "test_pdf.pdf"
 
     def test_package_tree_from_zip_with_dependency_conflict(self):
         memory_file = io.BytesIO()

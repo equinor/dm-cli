@@ -1,8 +1,23 @@
+import io
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable, List, Literal, NewType, Union
 from uuid import UUID, uuid4
 
-from .enums import SIMOS
+from .enums import SIMOS, ReferenceTypes
+
+
+@dataclass(frozen=True)
+class File:
+    """Class for a file"""
+
+    content: io.BytesIO
+    path: Path
+    name: str = ""
+    uid: str = ""
+
+    def __getitem__(self, item):
+        return self.__getattribute__(item)
 
 
 class Package:
@@ -19,7 +34,7 @@ class Package:
         self.description = description
         self.uid = uid if uid else uuid4()
         self.is_root = is_root
-        self.content: List[Union[Package, dict]] = []
+        self.content: List[Union[Package, dict, File]] = []
         self.meta: Union[dict, None] = meta if meta else {}
         self.parent = parent if parent else None
 
@@ -89,12 +104,20 @@ class Package:
     def _content_to_ref_dict(self):
         result = []
         for child in self.content:
-            if isinstance(child, Package):
+            if isinstance(child, File):
                 result.append(
                     {
                         "address": f"${str(child.uid)}",
-                        "type": "dmss://system/SIMOS/Reference",
-                        "referenceType": "link",
+                        "type": SIMOS.REFERENCE.value,
+                        "referenceType": ReferenceTypes.LINK.value,
+                    }
+                )
+            elif isinstance(child, Package):
+                result.append(
+                    {
+                        "address": f"${str(child.uid)}",
+                        "type": SIMOS.REFERENCE.value,
+                        "referenceType": ReferenceTypes.LINK.value,
                     }
                 )
             else:  # Assume the child is a dict
@@ -102,8 +125,8 @@ class Package:
                     result.append(
                         {
                             "address": f"${child['_id']}",
-                            "type": "dmss://system/SIMOS/Reference",
-                            "referenceType": "link",
+                            "type": SIMOS.REFERENCE.value,
+                            "referenceType": ReferenceTypes.LINK.value,
                         }
                     )
 
@@ -111,8 +134,8 @@ class Package:
                     result.append(
                         {
                             "address": f"${child['_id']}",
-                            "type": "dmss://system/SIMOS/Reference",
-                            "referenceType": "link",
+                            "type": SIMOS.REFERENCE.value,
+                            "referenceType": ReferenceTypes.LINK.value,
                         }
                     )
         return result

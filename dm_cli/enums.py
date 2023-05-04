@@ -15,6 +15,7 @@ class BuiltinDataTypes(Enum):
     INT = "integer"
     BOOL = "boolean"
     OBJECT = "object"  # Any complex type (i.e. any blueprint type)
+    BINARY = "binary"
 
     def to_py_type(self):
         if self is BuiltinDataTypes.BOOL:
@@ -32,3 +33,12 @@ class BuiltinDataTypes(Enum):
 class SIMOS(Enum):
     BLOB = "dmss://system/SIMOS/Blob"
     PACKAGE = "dmss://system/SIMOS/Package"
+    REFERENCE = "dmss://system/SIMOS/Reference"
+    FILE = "dmss://system/SIMOS/File"
+    DEPENDENCY = "dmss://system/SIMOS/Dependency"
+
+
+class ReferenceTypes(Enum):
+    LINK = "link"
+    POINTER = "pointer"
+    STORAGE = "storage"

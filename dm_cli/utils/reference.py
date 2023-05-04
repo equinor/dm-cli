@@ -71,7 +71,16 @@ def replace_relative_references(
     @param zip_file:
     """
 
-    KEYS_TO_CHECK = ("type", "attributeType", "extends", "_blueprintPath_")  # These keys may contain a reference
+    KEYS_TO_CHECK = (
+        "type",
+        "attributeType",
+        "extends",
+        "_blueprintPath_",
+        "address",
+    )  # These keys may contain a reference
+
+    if value == BuiltinDataTypes.OBJECT.value or value == BuiltinDataTypes.BINARY.value:
+        return value
 
     if key in KEYS_TO_CHECK:
         if key == "extends":  # 'extends' is a list
@@ -100,61 +109,19 @@ def replace_relative_references(
         if not value.get("type"):
             raise KeyError(f"Object with key '{key}' is missing the required 'type' attribute. File: '{file_path}'")
 
-        if value.get("type") == "object":
+        if value.get("type") == BuiltinDataTypes.OBJECT.value or value.get("type") == BuiltinDataTypes.BINARY.value:
             return value
 
-        # First check if the type is a blob type
-        if (
-            replace_relative_references(
-                "type",
-                value["type"],
-                dependencies,
-                data_source,
-                file_path=file_path,
-                zip_file=zip_file,
-            )
-            == SIMOS.BLOB.value
-        ):
-            if not value.get("name"):
-                raise KeyError(
-                    f"Blob object with key '{key}' is missing the required 'name' attribute. File: '{file_path}'"
-                )
-            # Add blob data to the blob-entity
-            if parent_directory:  # entity
-                _blob_data = None
-                # value['name'] must be relative to the parent directory of the document accessing it
-                _blob_path = parent_directory.joinpath(value["name"])
-                if not _blob_path.is_file():
-                    raise FileNotFoundError(
-                        f"Failed to load the blob file '{_blob_path}' (referenced in '{key}.{value}')"
-                    )
+        resolved_type = resolve_reference(
+            value["type"],
+            dependencies,
+            data_source,
+            file_path,
+        )
 
-                with open(_blob_path, "rb") as fh:
-                    _blob_data = fh.read()
-
-                return {
-                    "_blob_data_": _blob_data,
-                    **{
-                        blob_key: blob_val
-                        if blob_key in ["name", "_id", "_blob_id"]
-                        else resolve_reference(blob_val, dependencies, data_source, file_path)
-                        for blob_key, blob_val in value.items()
-                    },
-                }
-            elif zip_file:  # package
-                if value["name"][0] == "/":  # It's a relative reference to the blob file. Get root_package_name...
-                    root_package_name = f"{zip_file.filelist[0].filename.split('/', 1)[0]}"
-                    # '_blob_data_' is a temporary key for keeping the binary data
-                    return {
-                        "_blob_data_": zip_file.read(f"{root_package_name}{value['name']}"),
-                        **value,
-                        "type": SIMOS.BLOB.value,
-                    }
-                return {"_blob_data_": zip_file.read(value["name"]), **value}
-            else:
-                raise ValueError(
-                    f"Missing required parameter: Either 'parent_directory' (entity) or 'zip_file' (package) must be provided."
-                )
+        ignore_attributes = []
+        if resolved_type == SIMOS.DEPENDENCY.value:
+            ignore_attributes.append("address")
 
         return {
             k: replace_relative_references(
@@ -165,6 +132,8 @@ def replace_relative_references(
                 file_path=file_path,
                 zip_file=zip_file,
             )
+            if k not in ignore_attributes
+            else v
             for k, v in value.items()
         }
     if isinstance(value, list):
