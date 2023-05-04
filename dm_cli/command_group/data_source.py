@@ -79,22 +79,25 @@ def initialize_data_source(path: Path):
         print(emoji.emojize(f"\t:warning: No data source definitions were found in '{data_sources_dir}'."))
 
     for data_source_definition_filename in data_source_definitions:
-        data_source_definition_filepath = Path(data_sources_dir).joinpath(data_source_definition_filename)
-        data_source_name = data_source_definition_filename.replace(".json", "")
+        import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename)
 
-        data_source_data_dir = data_dir / data_source_name
-        if not data_source_data_dir.is_dir():
-            print(
-                emoji.emojize(
-                    f"\t:warning: No data source data directory was found by the name '{data_source_name}' in '{data_dir}'."
-                )
+
+def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_definition_filename: str):
+    data_source_definition_filepath = Path(data_sources_dir).joinpath(data_source_definition_filename)
+    data_source_name = data_source_definition_filename.replace(".json", "")
+
+    data_source_data_dir = data_dir / data_source_name
+    if not data_source_data_dir.is_dir():
+        print(
+            emoji.emojize(
+                f"\t:warning: No data source data directory was found by the name '{data_source_name}' in '{data_dir}'."
             )
-            continue
-
+        )
+    else:
         import_data_source(data_source_definition_filepath)
         for root_package in [f for f in data_source_data_dir.iterdir() if f.is_dir()]:
             # Delete all packages in the data source
-            dmss_exception_wrapper(remove_by_path_ignore_404, f"{data_source_name}/{root_package.name}")
+            dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
 
             dmss_exception_wrapper(
                 import_folder_entity,
@@ -125,4 +128,4 @@ def reset_data_source(data_source: str, path: Path):
         raise FileNotFoundError(f"There is no data source directory for '{data_source}' in '{data_dir}'.")
 
     # Import all packages in the data source
-    initialize_data_source(path)
+    import_data_source_file(data_sources_dir, data_dir, f"{data_source}.json")
