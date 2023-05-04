@@ -57,7 +57,7 @@ jobs:
           source ../../.venv/bin/activate
           dm reset ../test_data/test_app_dir_struct
           dm import-plugin-blueprints package
-          dm create-lookup test DemoApplicationDataSource/models/recipe_links
+          dm create-lookup test DemoApplicationDataSource/models/recipe_links DemoApplicationDataSource/models/more_recipe_links
           dm export DemoApplicationDataSource/models/CarPackage
           dm export DemoApplicationDataSource/instances --unpack
           dm ds import ../test_data/test_app_dir_struct/data_sources/DemoApplicationDataSource.json
