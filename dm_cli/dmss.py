@@ -70,7 +70,13 @@ def dmss_exception_wrapper(
 ) -> Any:
     try:
         return function(*args, **kwargs)
-    except (ApplicationException, NotFoundException, ApiException) as e:
+    except ApplicationException as e:
+        if state.debug:
+            console.print_exception()
+        exception = e.dict()
+        console.print(exception, style="red1")
+        raise typer.Exit(code=1)
+    except (NotFoundException, ApiException) as e:
         if state.debug:
             console.print_exception()
         exception = json.loads(e.body)
