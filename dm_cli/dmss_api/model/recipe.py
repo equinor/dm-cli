@@ -96,6 +96,7 @@ class Recipe(ModelNormal):
             'roles': ([str],),  # noqa: E501
             'config': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),  # noqa: E501
             'label': (str,),  # noqa: E501
+            'dimensions': (str,),  # noqa: E501
         }
 
     @cached_property
@@ -113,6 +114,7 @@ class Recipe(ModelNormal):
         'roles': 'roles',  # noqa: E501
         'config': 'config',  # noqa: E501
         'label': 'label',  # noqa: E501
+        'dimensions': 'dimensions',  # noqa: E501
     }
 
     read_only_vars = {
@@ -167,6 +169,7 @@ class Recipe(ModelNormal):
             roles ([str]): [optional]  # noqa: E501
             config ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}): [optional]  # noqa: E501
             label (str): [optional] if omitted the server will use the default value of ""  # noqa: E501
+            dimensions (str): [optional] if omitted the server will use the default value of ""  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -260,6 +263,7 @@ class Recipe(ModelNormal):
             roles ([str]): [optional]  # noqa: E501
             config ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}): [optional]  # noqa: E501
             label (str): [optional] if omitted the server will use the default value of ""  # noqa: E501
+            dimensions (str): [optional] if omitted the server will use the default value of ""  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)

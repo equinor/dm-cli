@@ -58,13 +58,6 @@ class Reference(ModelNormal):
     }
 
     validations = {
-        ('name',): {
-            'max_length': 128,
-            'min_length': 1,
-            'regex': {
-                'pattern': r'^[A-Za-z0-9_-]*$',  # noqa: E501
-            },
-        },
         ('type',): {
             'max_length': 128,
             'min_length': 3,
@@ -95,9 +88,9 @@ class Reference(ModelNormal):
                 and the value is attribute type.
         """
         return {
-            'id': (str,),  # noqa: E501
-            'name': (str,),  # noqa: E501
+            'address': (str,),  # noqa: E501
             'type': (str,),  # noqa: E501
+            'reference_type': (str,),  # noqa: E501
         }
 
     @cached_property
@@ -106,9 +99,9 @@ class Reference(ModelNormal):
 
 
     attribute_map = {
-        'id': '_id',  # noqa: E501
-        'name': 'name',  # noqa: E501
+        'address': 'address',  # noqa: E501
         'type': 'type',  # noqa: E501
+        'reference_type': 'referenceType',  # noqa: E501
     }
 
     read_only_vars = {
@@ -118,13 +111,13 @@ class Reference(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, id, name, type, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, address, type, reference_type, *args, **kwargs):  # noqa: E501
         """Reference - a model defined in OpenAPI
 
         Args:
-            id (str):
-            name (str):
+            address (str):
             type (str):
+            reference_type (str):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -184,9 +177,9 @@ class Reference(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
-        self.id = id
-        self.name = name
+        self.address = address
         self.type = type
+        self.reference_type = reference_type
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
@@ -207,13 +200,13 @@ class Reference(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, id, name, type, *args, **kwargs):  # noqa: E501
+    def __init__(self, address, type, reference_type, *args, **kwargs):  # noqa: E501
         """Reference - a model defined in OpenAPI
 
         Args:
-            id (str):
-            name (str):
+            address (str):
             type (str):
+            reference_type (str):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -271,9 +264,9 @@ class Reference(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
-        self.id = id
-        self.name = name
+        self.address = address
         self.type = type
+        self.reference_type = reference_type
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
