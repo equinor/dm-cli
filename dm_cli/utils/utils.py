@@ -120,7 +120,7 @@ def destination_is_root(destination: Path) -> bool:
 def ensure_package_structure(path: Path):
     """Create any missing packages in the provided path (mkdir -R)"""
     try:
-        dmss_api.document_get_by_path(f"dmss://{path}/")
+        dmss_api.document_get(f"dmss://{path}/")
     except NotFoundException as e:
         error = json.loads(e.body)
         if error["status"] != 404:

@@ -72,7 +72,7 @@ def import_folder_entity(source_path: Path, destination: str) -> None:
     data_source = destination_path.parts[0]
 
     try:  # Check if target already exists on remote. Then delete or raise exception
-        dmss_api.document_get_by_path(f"dmss://{destination}/{source_path.name}")
+        dmss_api.document_get(f"dmss://{destination}/{source_path.name}")
         if not state.force:
             raise ValueError(f"Failed to upload to 'dmss://{destination}/{source_path.name}' - It already exists.")
         console.print(
