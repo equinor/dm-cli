@@ -103,8 +103,8 @@ def upload_blobs_in_document(document: dict, data_source_id: str) -> dict:
 
 def add_package_to_path(name: str, path: Path):
     package = Package(name, is_root=len(path.parts) == 2)
-    dmss_api.document_add_to_path(
-        f"/{str(path.parent)}/",
+    dmss_api.document_add(
+        str(path.parent),
         json.dumps(package.to_dict()),
         update_uncontained=False,
         files=[],

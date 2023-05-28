@@ -58,7 +58,7 @@ def import_single_entity(source_path: Path, destination: str):
     # Upload blobs
     prepared_document = upload_blobs_in_document(prepared_document, data_source_id)
     document_json_str = json.dumps(prepared_document)
-    dmss_api.document_add_to_path(
+    dmss_api.document_add(
         f"{destination}",
         document_json_str,
         update_uncontained=True,
@@ -78,7 +78,7 @@ def import_folder_entity(source_path: Path, destination: str) -> None:
         console.print(
             f"WARNING: '{destination}/{source_path.name}' already exists. Replacing it...", style="dark_orange"
         )
-        dmss_api.document_remove_by_path(f"{destination}/{source_path.name}")
+        dmss_api.document_remove(f"{destination}/{source_path.name}")
     except NotFoundException:
         pass  # The folder we're trying to upload does not exist, which is fine
 
