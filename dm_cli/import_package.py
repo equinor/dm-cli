@@ -50,7 +50,7 @@ def import_package_tree(package: Package, destination: str) -> None:
     if len(destination_parts) == 1:  # We're importing a root package
         documents_to_upload.append(package.to_dict())
     else:  # We're importing a sub folder
-        dmss_api.document_add_to_path(
+        dmss_api.document_add(
             destination,
             json.dumps(package.to_dict()),
             update_uncontained=False,

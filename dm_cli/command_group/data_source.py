@@ -59,7 +59,7 @@ def import_all_data_sources(path: Path):
 
 def remove_by_path_ignore_404(target: str):
     try:
-        dmss_api.document_remove_by_path(target)
+        dmss_api.document_remove(target)
     except NotFoundException:
         pass
 

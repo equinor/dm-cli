@@ -38,25 +38,26 @@ class DocumentApi(object):
 
         def __document_add(
             self,
-            absolute_ref,
-            body,
+            reference,
+            document,
             **kwargs
         ):
-            """Add By Parent Id  # noqa: E501
+            """Add Document  # noqa: E501
 
-            Add a new document to absolute ref (root of data source, or another document). If added to another document, a valid attribute type check is done. Select parent with format 'data_source/document_id.attribute.index.attribute'  # noqa: E501
+            Add a document to a package (or a data source) using a reference.  - **reference**:   - Reference to data source: PROTOCOL://DATA SOURCE   - Reference to package by id: PROTOCOL://DATA SOURCE/$ID   - Reference to package by path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE   The PROTOCOL is optional, and the default is dmss.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_add(absolute_ref, body, async_req=True)
+            >>> thread = api.document_add(reference, document, async_req=True)
             >>> result = thread.get()
 
             Args:
-                absolute_ref (str):
-                body ({str: (bool, date, datetime, dict, float, int, list, str, none_type)}):
+                reference (str):
+                document (str):
 
             Keyword Args:
-                update_uncontained (bool): [optional] if omitted the server will use the default value of True
+                update_uncontained (bool): [optional] if omitted the server will use the default value of False
+                files ([file_type]): [optional]
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
                 _preload_content (bool): if False, the urllib3.HTTPResponse object
@@ -101,10 +102,10 @@ class DocumentApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_ref'] = \
-                absolute_ref
-            kwargs['body'] = \
-                body
+            kwargs['reference'] = \
+                reference
+            kwargs['document'] = \
+                document
             return self.call_with_http_info(**kwargs)
 
         self.document_add = _Endpoint(
@@ -114,20 +115,21 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{absolute_ref}',
+                'endpoint_path': '/api/documents/{reference}',
                 'operation_id': 'document_add',
                 'http_method': 'POST',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'absolute_ref',
-                    'body',
+                    'reference',
+                    'document',
                     'update_uncontained',
+                    'files',
                 ],
                 'required': [
-                    'absolute_ref',
-                    'body',
+                    'reference',
+                    'document',
                 ],
                 'nullable': [
                 ],
@@ -142,23 +144,29 @@ class DocumentApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'absolute_ref':
+                    'reference':
                         (str,),
-                    'body':
-                        ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
+                    'document':
+                        (str,),
                     'update_uncontained':
                         (bool,),
+                    'files':
+                        ([file_type],),
                 },
                 'attribute_map': {
-                    'absolute_ref': 'absolute_ref',
+                    'reference': 'reference',
+                    'document': 'document',
                     'update_uncontained': 'update_uncontained',
+                    'files': 'files',
                 },
                 'location_map': {
-                    'absolute_ref': 'path',
-                    'body': 'body',
+                    'reference': 'path',
+                    'document': 'form',
                     'update_uncontained': 'query',
+                    'files': 'form',
                 },
                 'collection_format_map': {
+                    'files': 'csv',
                 }
             },
             headers_map={
@@ -167,7 +175,7 @@ class DocumentApi(object):
                     'text/plain'
                 ],
                 'content_type': [
-                    'application/json'
+                    'multipart/form-data'
                 ]
             },
             api_client=api_client,
@@ -251,7 +259,7 @@ class DocumentApi(object):
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{data_source_id}/add-raw',
+                'endpoint_path': '/api/documents-add-raw/{data_source_id}',
                 'operation_id': 'document_add_simple',
                 'http_method': 'POST',
                 'servers': None,
@@ -306,152 +314,6 @@ class DocumentApi(object):
             callable=__document_add_simple
         )
 
-        def __document_add_to_path(
-            self,
-            path_reference,
-            document,
-            **kwargs
-        ):
-            """Add To Path  # noqa: E501
-
-            Same as 'add_to_parent', but reference parent by path instead of ID. Also supports files.  - **path_reference**: <data_source>/<path_to_entity>/<entity_name>.<attribute>  # noqa: E501
-            This method makes a synchronous HTTP request by default. To make an
-            asynchronous HTTP request, please pass async_req=True
-
-            >>> thread = api.document_add_to_path(path_reference, document, async_req=True)
-            >>> result = thread.get()
-
-            Args:
-                path_reference (str):
-                document (str):
-
-            Keyword Args:
-                update_uncontained (bool): [optional] if omitted the server will use the default value of False
-                files ([file_type]): [optional]
-                _return_http_data_only (bool): response data without head status
-                    code and headers. Default is True.
-                _preload_content (bool): if False, the urllib3.HTTPResponse object
-                    will be returned without reading/decoding response data.
-                    Default is True.
-                _request_timeout (int/float/tuple): timeout setting for this request. If
-                    one number provided, it will be total request timeout. It can also
-                    be a pair (tuple) of (connection, read) timeouts.
-                    Default is None.
-                _check_input_type (bool): specifies if type checking
-                    should be done one the data sent to the server.
-                    Default is True.
-                _check_return_type (bool): specifies if type checking
-                    should be done one the data received from the server.
-                    Default is True.
-                _host_index (int/None): specifies the index of the server
-                    that we want to use.
-                    Default is read from the configuration.
-                async_req (bool): execute request asynchronously
-
-            Returns:
-                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
-                    If the method is called asynchronously, returns the request
-                    thread.
-            """
-            kwargs['async_req'] = kwargs.get(
-                'async_req', False
-            )
-            kwargs['_return_http_data_only'] = kwargs.get(
-                '_return_http_data_only', True
-            )
-            kwargs['_preload_content'] = kwargs.get(
-                '_preload_content', True
-            )
-            kwargs['_request_timeout'] = kwargs.get(
-                '_request_timeout', None
-            )
-            kwargs['_check_input_type'] = kwargs.get(
-                '_check_input_type', True
-            )
-            kwargs['_check_return_type'] = kwargs.get(
-                '_check_return_type', True
-            )
-            kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['path_reference'] = \
-                path_reference
-            kwargs['document'] = \
-                document
-            return self.call_with_http_info(**kwargs)
-
-        self.document_add_to_path = _Endpoint(
-            settings={
-                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
-                'auth': [
-                    'APIKeyHeader',
-                    'OAuth2AuthorizationCodeBearer'
-                ],
-                'endpoint_path': '/api/documents-by-path/{path_reference}',
-                'operation_id': 'document_add_to_path',
-                'http_method': 'POST',
-                'servers': None,
-            },
-            params_map={
-                'all': [
-                    'path_reference',
-                    'document',
-                    'update_uncontained',
-                    'files',
-                ],
-                'required': [
-                    'path_reference',
-                    'document',
-                ],
-                'nullable': [
-                ],
-                'enum': [
-                ],
-                'validation': [
-                ]
-            },
-            root_map={
-                'validations': {
-                },
-                'allowed_values': {
-                },
-                'openapi_types': {
-                    'path_reference':
-                        (str,),
-                    'document':
-                        (str,),
-                    'update_uncontained':
-                        (bool,),
-                    'files':
-                        ([file_type],),
-                },
-                'attribute_map': {
-                    'path_reference': 'path_reference',
-                    'document': 'document',
-                    'update_uncontained': 'update_uncontained',
-                    'files': 'files',
-                },
-                'location_map': {
-                    'path_reference': 'path',
-                    'document': 'form',
-                    'update_uncontained': 'query',
-                    'files': 'form',
-                },
-                'collection_format_map': {
-                    'files': 'csv',
-                }
-            },
-            headers_map={
-                'accept': [
-                    'application/json',
-                    'text/plain'
-                ],
-                'content_type': [
-                    'multipart/form-data'
-                ]
-            },
-            api_client=api_client,
-            callable=__document_add_to_path
-        )
-
         def __document_get(
             self,
             reference,
@@ -459,7 +321,7 @@ class DocumentApi(object):
         ):
             """Get  # noqa: E501
 
-            Get document as JSON string.  - **reference**:   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)    The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
+            Get document as JSON string.  - **reference**: A reference to a package or a data source   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)  The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -587,141 +449,20 @@ class DocumentApi(object):
 
         def __document_remove(
             self,
-            id_reference,
+            reference,
             **kwargs
         ):
             """Remove  # noqa: E501
 
-            Remove document - **id_reference**: <data_source>/<document_uuid>.<attribute_path>  Example: id_reference=SomeDataSource/3978d9ca-2d7a-4b47-8fed-57710f6cf50b.attributes.1 will remove the first element in the attribute list of a blueprint with the given id in data source 'SomeDataSource'.  # noqa: E501
+            Remove a document from DMSS.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_remove(id_reference, async_req=True)
+            >>> thread = api.document_remove(reference, async_req=True)
             >>> result = thread.get()
 
             Args:
-                id_reference (str):
-
-            Keyword Args:
-                _return_http_data_only (bool): response data without head status
-                    code and headers. Default is True.
-                _preload_content (bool): if False, the urllib3.HTTPResponse object
-                    will be returned without reading/decoding response data.
-                    Default is True.
-                _request_timeout (int/float/tuple): timeout setting for this request. If
-                    one number provided, it will be total request timeout. It can also
-                    be a pair (tuple) of (connection, read) timeouts.
-                    Default is None.
-                _check_input_type (bool): specifies if type checking
-                    should be done one the data sent to the server.
-                    Default is True.
-                _check_return_type (bool): specifies if type checking
-                    should be done one the data received from the server.
-                    Default is True.
-                _host_index (int/None): specifies the index of the server
-                    that we want to use.
-                    Default is read from the configuration.
-                async_req (bool): execute request asynchronously
-
-            Returns:
-                str
-                    If the method is called asynchronously, returns the request
-                    thread.
-            """
-            kwargs['async_req'] = kwargs.get(
-                'async_req', False
-            )
-            kwargs['_return_http_data_only'] = kwargs.get(
-                '_return_http_data_only', True
-            )
-            kwargs['_preload_content'] = kwargs.get(
-                '_preload_content', True
-            )
-            kwargs['_request_timeout'] = kwargs.get(
-                '_request_timeout', None
-            )
-            kwargs['_check_input_type'] = kwargs.get(
-                '_check_input_type', True
-            )
-            kwargs['_check_return_type'] = kwargs.get(
-                '_check_return_type', True
-            )
-            kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['id_reference'] = \
-                id_reference
-            return self.call_with_http_info(**kwargs)
-
-        self.document_remove = _Endpoint(
-            settings={
-                'response_type': (str,),
-                'auth': [
-                    'APIKeyHeader',
-                    'OAuth2AuthorizationCodeBearer'
-                ],
-                'endpoint_path': '/api/documents/{id_reference}',
-                'operation_id': 'document_remove',
-                'http_method': 'DELETE',
-                'servers': None,
-            },
-            params_map={
-                'all': [
-                    'id_reference',
-                ],
-                'required': [
-                    'id_reference',
-                ],
-                'nullable': [
-                ],
-                'enum': [
-                ],
-                'validation': [
-                ]
-            },
-            root_map={
-                'validations': {
-                },
-                'allowed_values': {
-                },
-                'openapi_types': {
-                    'id_reference':
-                        (str,),
-                },
-                'attribute_map': {
-                    'id_reference': 'id_reference',
-                },
-                'location_map': {
-                    'id_reference': 'path',
-                },
-                'collection_format_map': {
-                }
-            },
-            headers_map={
-                'accept': [
-                    'application/json',
-                    'text/plain'
-                ],
-                'content_type': [],
-            },
-            api_client=api_client,
-            callable=__document_remove
-        )
-
-        def __document_remove_by_path(
-            self,
-            path_reference,
-            **kwargs
-        ):
-            """Remove By Path  # noqa: E501
-
-            Remove a document from DMSS.  - **path_reference**: <data_source>/<path>.<attribute>  # noqa: E501
-            This method makes a synchronous HTTP request by default. To make an
-            asynchronous HTTP request, please pass async_req=True
-
-            >>> thread = api.document_remove_by_path(path_reference, async_req=True)
-            >>> result = thread.get()
-
-            Args:
-                path_reference (str):
+                reference (str):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -768,28 +509,28 @@ class DocumentApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['path_reference'] = \
-                path_reference
+            kwargs['reference'] = \
+                reference
             return self.call_with_http_info(**kwargs)
 
-        self.document_remove_by_path = _Endpoint(
+        self.document_remove = _Endpoint(
             settings={
                 'response_type': (bool, date, datetime, dict, float, int, list, str, none_type,),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents-by-path/{path_reference}',
-                'operation_id': 'document_remove_by_path',
+                'endpoint_path': '/api/documents/{reference}',
+                'operation_id': 'document_remove',
                 'http_method': 'DELETE',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'path_reference',
+                    'reference',
                 ],
                 'required': [
-                    'path_reference',
+                    'reference',
                 ],
                 'nullable': [
                 ],
@@ -804,14 +545,14 @@ class DocumentApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'path_reference':
+                    'reference':
                         (str,),
                 },
                 'attribute_map': {
-                    'path_reference': 'path_reference',
+                    'reference': 'reference',
                 },
                 'location_map': {
-                    'path_reference': 'path',
+                    'reference': 'path',
                 },
                 'collection_format_map': {
                 }
@@ -824,7 +565,7 @@ class DocumentApi(object):
                 'content_type': [],
             },
             api_client=api_client,
-            callable=__document_remove_by_path
+            callable=__document_remove
         )
 
         def __document_update(
