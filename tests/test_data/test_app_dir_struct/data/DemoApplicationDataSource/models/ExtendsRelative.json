@@ -17,13 +17,5 @@
       "dimensions": "*",
       "optional": false
     }
-  ],
-  "uiRecipes": [
-    {
-      "name": "Default",
-      "type": "CORE:UiRecipe",
-      "plugin": "demoApp",
-      "category": "Application"
-    }
   ]
 }
