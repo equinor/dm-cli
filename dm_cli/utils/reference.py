@@ -99,6 +99,10 @@ def replace_relative_references(
     if isinstance(value, dict) and value != {}:
         if not value.get("type"):
             raise KeyError(f"Object with key '{key}' is missing the required 'type' attribute. File: '{file_path}'")
+
+        if value.get("type") == "object":
+            return value
+
         # First check if the type is a blob type
         if (
             replace_relative_references(
