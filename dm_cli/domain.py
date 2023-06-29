@@ -109,7 +109,7 @@ class Package:
                     {
                         "address": f"${str(child.uid)}",
                         "type": SIMOS.REFERENCE.value,
-                        "referenceType": ReferenceTypes.LINK.value,
+                        "referenceType": ReferenceTypes.STORAGE.value,
                     }
                 )
             elif isinstance(child, Package):
@@ -117,7 +117,7 @@ class Package:
                     {
                         "address": f"${str(child.uid)}",
                         "type": SIMOS.REFERENCE.value,
-                        "referenceType": ReferenceTypes.LINK.value,
+                        "referenceType": ReferenceTypes.STORAGE.value,
                     }
                 )
             else:  # Assume the child is a dict
@@ -126,7 +126,7 @@ class Package:
                         {
                             "address": f"${child['_id']}",
                             "type": SIMOS.REFERENCE.value,
-                            "referenceType": ReferenceTypes.LINK.value,
+                            "referenceType": ReferenceTypes.STORAGE.value,
                         }
                     )
 
@@ -135,7 +135,7 @@ class Package:
                         {
                             "address": f"${child['_id']}",
                             "type": SIMOS.REFERENCE.value,
-                            "referenceType": ReferenceTypes.LINK.value,
+                            "referenceType": ReferenceTypes.STORAGE.value,
                         }
                     )
         return result
