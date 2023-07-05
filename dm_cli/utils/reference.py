@@ -10,11 +10,11 @@ from .utils import resolve_dependency
 def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
     root_package = file_path.split("/", 1)[0]
 
-    if "://" in reference or reference == "_default_":
+    if "://" in reference or reference == "_default_" or reference[0] == "^":
         return reference
     if ":" in reference:
         return resolve_dependency(reference, dependencies)
-    if "." in reference:
+    if reference[0] == ".":
         normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
         return f"dmss://{data_source}/{normalized_dotted_ref}"
     if reference[0] == "/":
