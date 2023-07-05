@@ -1,42 +1,25 @@
 from os.path import normpath
 from pathlib import Path
-from typing import Dict, List, Literal, Union
+from typing import Dict, List, Union
 
-from ..dmss import ApplicationException
 from ..domain import Dependency
 from ..enums import SIMOS, BuiltinDataTypes
 from .utils import resolve_dependency
 
 
-def find_reference_schema(reference: str) -> Literal["dmss", "alias", "dotted", "package", "data_source"]:
-    if "://" in reference:
-        return "dmss"
-    if ":" in reference:
-        return "alias"
-    if "." in reference:
-        return "dotted"
-    if reference[0] == "/":
-        return "data_source"
-    return "package"
-
-
 def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
     root_package = file_path.split("/", 1)[0]
-    ref_schema = find_reference_schema(reference)
 
-    if ref_schema == "dmss" or reference == "_default_":
+    if "://" in reference or reference == "_default_":
         return reference
-    if ref_schema == "alias":
+    if ":" in reference:
         return resolve_dependency(reference, dependencies)
-    if ref_schema == "data_source":
-        return f"dmss://{data_source}{reference}"
-    if ref_schema == "package":
-        return f"dmss://{data_source}/{root_package}/{reference}"
-    if ref_schema in "dotted":
+    if "." in reference:
         normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
         return f"dmss://{data_source}/{normalized_dotted_ref}"
-
-    raise ApplicationException(f"'{reference}' is not a valid reference for resolving dependencies")
+    if reference[0] == "/":
+        return f"dmss://{data_source}{reference}"
+    return f"dmss://{data_source}/{root_package}/{reference}"
 
 
 def replace_relative_references(
