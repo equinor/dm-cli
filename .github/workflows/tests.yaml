@@ -56,7 +56,7 @@ jobs:
         run: |
           source ../../.venv/bin/activate
           dm reset ../test_data/test_app_dir_struct
-          dm import-plugin-blueprints package
+          dm import-plugin-blueprints ../test_data/plugins_example
           dm create-lookup test DemoApplicationDataSource/models/recipe_links DemoApplicationDataSource/models/more_recipe_links
           dm export DemoApplicationDataSource/models/CarPackage
           dm export DemoApplicationDataSource/instances --unpack

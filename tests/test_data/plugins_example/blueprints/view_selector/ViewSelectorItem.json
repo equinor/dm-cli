@@ -1,0 +1,22 @@
+{
+  "type": "CORE:Blueprint",
+  "name": "ViewSelectorItem",
+  "attributes": [
+    {
+      "attributeType": "string",
+      "type": "CORE:BlueprintAttribute",
+      "name": "type"
+    },
+    {
+      "attributeType": "CORE:ViewConfig",
+      "type": "CORE:BlueprintAttribute",
+      "name": "view"
+    },
+    {
+      "attributeType": "string",
+      "type": "CORE:BlueprintAttribute",
+      "name": "label",
+      "optional": true
+    }
+  ]
+}
