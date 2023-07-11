@@ -12,6 +12,7 @@ from rich.text import Text
 from dm_cli.state import state
 
 from .dmss import dmss_api
+from .dmss_api.model.entity import Entity
 from .domain import File, Package
 from .utils.utils import replace_file_addresses
 
@@ -130,3 +131,9 @@ def import_package_tree(package: Package, destination: str) -> None:
                     console.print(text, style="red1")
                     raise typer.Exit(code=1)
         bar.next()
+
+    # Validation needs to happen after all entities are uploaded, since validation cannot be done until after all blueprints exist in DMSS
+    for document in documents_to_upload:
+        if not isinstance(document, File):
+            document = replace_file_addresses(document, data_source, files_to_upload)
+            dmss_api.validate_entity(Entity(**document))
