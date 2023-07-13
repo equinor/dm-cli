@@ -54,6 +54,7 @@ def import_plugin_blueprints(path: str):
     PATH: Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself
     """
     state.force = True
+    # TODO validate
     import_entity(source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}")
 
 @app.command("create-lookup")
@@ -119,6 +120,17 @@ def reset(path: str):
             continue
 
         reset_data_source(data_source=data_source_name, path=path)
+    # TODO validate
+    # hardcoded folders in data source
+    data_source_contents = {"DemoDataSource": ["apps", "plugins", "recipes"],
+     "ExtraDataSource": ["remote-package"],
+     "WorkflowDS": ["Blueprints"]}
+    for data_source_name in data_source_contents:
+        root_packages = data_source_contents[data_source_name]
+        for root_package_name in root_packages:
+            print("Validating entities in: ", f"{data_source_name}/{root_package_name}")
+            dmss_exception_wrapper(dmss_api.validate_existing_entity, f"{data_source_name}/{root_package_name}")
+
 
 if __name__ == "__main__":
     app()

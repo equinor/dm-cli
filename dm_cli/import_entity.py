@@ -5,7 +5,6 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from rich import print
-
 from .dmss import dmss_api
 from .dmss_api.exceptions import NotFoundException
 from .domain import Dependency
@@ -45,6 +44,7 @@ def import_document(source_path: Path, destination: str, data_source_id: str, pa
         )
 
     document_json_str = json.dumps(prepared_document)
+    # TODO dmss_api.validate_entity(Entity(**prepared_document))
     dmss_api.document_add(
         f"{destination}",
         document_json_str,
@@ -62,6 +62,7 @@ def import_single_entity(source_path: Path, destination: str):
         with open(source_path, "r") as fh:
             if Path(source_path).suffix == ".json":
                 import_document(source_path, destination, data_source_id, package, json.load(fh))
+                # TODO validate
             else:
                 print(f"Unsupported file type {source_path}")
     except JSONDecodeError:
@@ -102,3 +103,4 @@ def import_folder_entity(source_path: Path, destination: str) -> None:
 
     package = package_tree_from_zip(data_source, memory_file, is_root=is_root, extra_dependencies=dependencies)
     import_package_tree(package, destination)
+    # TODO validate

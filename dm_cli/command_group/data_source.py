@@ -81,7 +81,6 @@ def initialize_data_source(path: Path):
     for data_source_definition_filename in data_source_definitions:
         import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename)
 
-
 def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_definition_filename: str):
     data_source_definition_filepath = Path(data_sources_dir).joinpath(data_source_definition_filename)
     data_source_name = data_source_definition_filename.replace(".json", "")
@@ -95,7 +94,8 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
         )
     else:
         import_data_source(data_source_definition_filepath)
-        for root_package in [f for f in data_source_data_dir.iterdir() if f.is_dir()]:
+        root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir()]
+        for root_package in root_packages:
             # Delete all packages in the data source
             dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
 
