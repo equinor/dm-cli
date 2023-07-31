@@ -81,6 +81,7 @@ def initialize_data_source(path: Path):
     for data_source_definition_filename in data_source_definitions:
         import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename)
 
+
 def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_definition_filename: str):
     data_source_definition_filepath = Path(data_sources_dir).joinpath(data_source_definition_filename)
     data_source_name = data_source_definition_filename.replace(".json", "")

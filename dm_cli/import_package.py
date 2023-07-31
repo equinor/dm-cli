@@ -131,5 +131,3 @@ def import_package_tree(package: Package, destination: str) -> None:
                     console.print(text, style="red1")
                     raise typer.Exit(code=1)
         bar.next()
-
-

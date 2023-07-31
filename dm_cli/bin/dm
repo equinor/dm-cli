@@ -95,6 +95,28 @@ def export_entity(target: str, export_location: str = "", unpack: bool = False):
         else:
             save_as_zip_file(export_location=export_location, filename=zip_file.filename, data=response.content)
 
+# TODO add unit test for function
+def get_root_packages_in_data_sources(path: str) -> dict:
+    """
+    Generate a dict that contains what root packages are included in a data source. Example structure:
+    {
+        "dataSourceA": [rootPackageA, rootPackageB],
+        "dataSourceB": [rootPackageC]
+    }
+    """
+    data_sources_dir, data_dir = get_app_dir_structure(Path(path))
+    data_source_definitions: list[str] = get_json_files_in_dir(data_sources_dir)
+    data_source_names: list[str] = []
+    for data_source_definition in data_source_definitions:
+        data_source_names.append(data_source_definition.replace(".json", ""))
+    root_packages_in_data_sources = {}
+    for data_source in data_source_names:
+        root_packages: list[str] = os.listdir(data_dir / data_source)
+        root_packages_in_data_sources[data_source] = root_packages
+    return root_packages_in_data_sources
+
+
+
 @app.command("reset")
 def reset(path: str):
     """
@@ -102,6 +124,7 @@ def reset(path: str):
     """
     # Check for presence of expected directories, 'data_sources' and 'data'
     data_sources_dir, data_dir = get_app_dir_structure(Path(path))
+    data_sources_to_reset = []
 
     data_source_definitions = get_json_files_in_dir(data_sources_dir)
     if not data_source_definitions:
@@ -109,7 +132,7 @@ def reset(path: str):
 
     for data_source_definition_filename in data_source_definitions:
         data_source_name = data_source_definition_filename.replace(".json", "")
-
+        data_sources_to_reset.append(data_source_name)
         data_source_data_dir = data_dir.joinpath(data_source_name)
         if not data_source_data_dir.is_dir():
             print(
@@ -120,11 +143,7 @@ def reset(path: str):
             continue
 
         reset_data_source(data_source=data_source_name, path=path)
-    # TODO validate
-    # hardcoded folders in data source
-    data_source_contents = {"DemoDataSource": ["apps", "plugins", "recipes"],
-     "ExtraDataSource": ["remote-package"],
-     "WorkflowDS": ["Blueprints"]}
+    data_source_contents = get_root_packages_in_data_sources(path)
     for data_source_name in data_source_contents:
         root_packages = data_source_contents[data_source_name]
         for root_package_name in root_packages:
