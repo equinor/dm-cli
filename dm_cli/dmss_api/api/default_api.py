@@ -4439,7 +4439,7 @@ class DefaultApi(object):
         address,
         **kwargs
     ):
-        """Validate Package  # noqa: E501
+        """Validate Existing  # noqa: E501
 
         Validate an existing entity in dmss. Will return detailed error messages and status code 422 if an entity is invalid.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
