@@ -98,7 +98,6 @@ Initialize the data sources
 
 ```sh
 $ dm ds init [<path>]
-# Optionally specify a path to the directory containing data sources and data
 $ dm ds init app/
 ```
 By default, the init command will also validate all entities that are uploaded to the database. This feature can be turned off with the flag `--no-validate-entities`:

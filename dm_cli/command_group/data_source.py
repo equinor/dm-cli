@@ -80,10 +80,7 @@ def initialize_data_source(path: Path, validate_entities: bool = True):
     data_source_definitions = get_json_files_in_dir(data_sources_dir)
     if not data_source_definitions:
         print(emoji.emojize(f"\t:warning: No data source definitions were found in '{data_sources_dir}'."))
-    data_sources_to_reset = []
     for data_source_definition_filename in data_source_definitions:
-        data_source_name = data_source_definition_filename.replace(".json", "")
-        data_sources_to_reset.append(data_source_name)
         import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename)
     data_source_contents = get_root_packages_in_data_sources(path)
     if validate_entities:
