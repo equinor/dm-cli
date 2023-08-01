@@ -9,6 +9,10 @@ from dm_cli.dmss import dmss_api, dmss_exception_wrapper
 from dm_cli.dmss_api.exceptions import NotFoundException
 from dm_cli.import_entity import import_folder_entity
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
+from dm_cli.utils.utils import (
+    get_root_packages_in_data_sources,
+    validate_entities_in_data_sources,
+)
 
 data_source_app = typer.Typer()
 
@@ -64,22 +68,26 @@ def remove_by_path_ignore_404(target: str):
         pass
 
 
-@data_source_app.command("init", help="Initialize the data sources and import all packages")
-def initialize_data_source(path: Path):
+@data_source_app.command("init")
+def initialize_data_source(path: Path, validate_entities: bool = True):
     """
     Initialize the data sources and import all packages.
     The packages in a data sources will be deleted before data sources are imported.
     """
-
     # Check for presence of expected directories, 'data_sources' and 'data'
     data_sources_dir, data_dir = get_app_dir_structure(Path(path))
 
     data_source_definitions = get_json_files_in_dir(data_sources_dir)
     if not data_source_definitions:
         print(emoji.emojize(f"\t:warning: No data source definitions were found in '{data_sources_dir}'."))
-
+    data_sources_to_reset = []
     for data_source_definition_filename in data_source_definitions:
+        data_source_name = data_source_definition_filename.replace(".json", "")
+        data_sources_to_reset.append(data_source_name)
         import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename)
+    data_source_contents = get_root_packages_in_data_sources(path)
+    if validate_entities:
+        dmss_exception_wrapper(validate_entities_in_data_sources, data_source_contents)
 
 
 def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_definition_filename: str):
