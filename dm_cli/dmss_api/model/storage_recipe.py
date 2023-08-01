@@ -24,14 +24,16 @@ from dm_cli.dmss_api.model_utils import (  # noqa: F401
     file_type,
     none_type,
     validate_get_composed_info,
+    OpenApiModel
 )
-from ..model_utils import OpenApiModel
 from dm_cli.dmss_api.exceptions import ApiAttributeError
 
 
 def lazy_import():
     from dm_cli.dmss_api.model.storage_attribute import StorageAttribute
+    from dm_cli.dmss_api.model.storage_data_types import StorageDataTypes
     globals()['StorageAttribute'] = StorageAttribute
+    globals()['StorageDataTypes'] = StorageDataTypes
 
 
 class StorageRecipe(ModelNormal):
@@ -90,7 +92,7 @@ class StorageRecipe(ModelNormal):
             'name': (str,),  # noqa: E501
             'type': (str,),  # noqa: E501
             'attributes': ({str: (StorageAttribute,)},),  # noqa: E501
-            'storage_affinity': (dict,),  # noqa: E501
+            'storage_affinity': (bool, date, datetime, dict, float, int, list, str, none_type,),  # noqa: E501
             'description': (str,),  # noqa: E501
         }
 
@@ -153,12 +155,12 @@ class StorageRecipe(ModelNormal):
                                 _visited_composed_classes = (Animal,)
             type (str): [optional] if omitted the server will use the default value of "dmss://system/SIMOS/StorageRecipe"  # noqa: E501
             attributes ({str: (StorageAttribute,)}): [optional] if omitted the server will use the default value of {}  # noqa: E501
-            storage_affinity (dict): [optional]  # noqa: E501
+            storage_affinity (bool, date, datetime, dict, float, int, list, str, none_type): [optional]  # noqa: E501
             description (str): [optional] if omitted the server will use the default value of ""  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
-        _spec_property_naming = kwargs.pop('_spec_property_naming', False)
+        _spec_property_naming = kwargs.pop('_spec_property_naming', True)
         _path_to_item = kwargs.pop('_path_to_item', ())
         _configuration = kwargs.pop('_configuration', None)
         _visited_composed_classes = kwargs.pop('_visited_composed_classes', ())
@@ -166,14 +168,18 @@ class StorageRecipe(ModelNormal):
         self = super(OpenApiModel, cls).__new__(cls)
 
         if args:
-            raise ApiTypeError(
-                "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments." % (
-                    args,
-                    self.__class__.__name__,
-                ),
-                path_to_item=_path_to_item,
-                valid_classes=(self.__class__,),
-            )
+            for arg in args:
+                if isinstance(arg, dict):
+                    kwargs.update(arg)
+                else:
+                    raise ApiTypeError(
+                        "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments." % (
+                            args,
+                            self.__class__.__name__,
+                        ),
+                        path_to_item=_path_to_item,
+                        valid_classes=(self.__class__,),
+                    )
 
         self._data_store = {}
         self._check_type = _check_type
@@ -242,7 +248,7 @@ class StorageRecipe(ModelNormal):
                                 _visited_composed_classes = (Animal,)
             type (str): [optional] if omitted the server will use the default value of "dmss://system/SIMOS/StorageRecipe"  # noqa: E501
             attributes ({str: (StorageAttribute,)}): [optional] if omitted the server will use the default value of {}  # noqa: E501
-            storage_affinity (dict): [optional]  # noqa: E501
+            storage_affinity (bool, date, datetime, dict, float, int, list, str, none_type): [optional]  # noqa: E501
             description (str): [optional] if omitted the server will use the default value of ""  # noqa: E501
         """
 
@@ -253,14 +259,18 @@ class StorageRecipe(ModelNormal):
         _visited_composed_classes = kwargs.pop('_visited_composed_classes', ())
 
         if args:
-            raise ApiTypeError(
-                "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments." % (
-                    args,
-                    self.__class__.__name__,
-                ),
-                path_to_item=_path_to_item,
-                valid_classes=(self.__class__,),
-            )
+            for arg in args:
+                if isinstance(arg, dict):
+                    kwargs.update(arg)
+                else:
+                    raise ApiTypeError(
+                        "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments." % (
+                            args,
+                            self.__class__.__name__,
+                        ),
+                        path_to_item=_path_to_item,
+                        valid_classes=(self.__class__,),
+                    )
 
         self._data_store = {}
         self._check_type = _check_type

@@ -6,7 +6,7 @@
 # raise a `RecursionError`.
 # In order to avoid this, import only the API that you directly need like:
 #
-#   from .api.access_control_api import AccessControlApi
+#   from dm_cli.dmss_api.api.access_control_api import AccessControlApi
 #
 # or import this package, but before doing it, use:
 #
