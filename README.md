@@ -45,7 +45,7 @@ reset                     Reset all data sources (deletes and reuploads...
 For each of the `commands` listed above, you can run `dm <COMMAND> --help` to see subcommand-specific help messages, e.g. `dm ds import --help` or `dm pkg --help`
 
 ### Expected directory structure
-Certain commands expect a specific directory structure, such as the commands `dm reset`, `dm init`, and `dm ds reset`.
+Certain commands expect a specific directory structure, such as the commands `dm reset`, `dm ds init`, and `dm ds reset`.
 For these commands, the `path` argument must be the path to a directory with two subdirectories, `data_sources` and `data`.
 
 ```sh
@@ -97,11 +97,13 @@ Initialize the data sources
 *i.e. import datasources and their packages*
 
 ```sh
-$ dm init [<path>]
-# By default, the `PATH` argument is set to the current working directory
-$ dm init
+$ dm ds init [<path>]
 # Optionally specify a path to the directory containing data sources and data
-$ dm init app/
+$ dm ds init app/
+```
+By default, the init command will also validate all entities that are uploaded to the database. This feature can be turned off with the flag `--no-validate-entities`:
+```sh
+$ dm ds init app/ --no-validate-entities
 ```
 
 Reset all data sources
@@ -238,7 +240,7 @@ dm create-lookup myApplicationName path/To/A/Package/With/RecipeLinks
 $ python3 -m venv .venv
 $ source .venv/bin/activate
 $ pip3 install -e .
-$ dm init
+$ dm ds init
 ```
 
 ### Generating the DMSS API client
