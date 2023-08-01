@@ -117,6 +117,11 @@ $ dm reset
 $ dm reset app/
 ```
 
+By default, the reset command will also validate all entities that are uploaded to the database. This feature can be turned off with the flag `--no-validate-entities`:
+```sh
+$ dm reset app --no-validate-entities
+```
+
 ### Datasources
 Import a datasource
 

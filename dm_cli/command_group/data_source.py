@@ -95,7 +95,8 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
         )
     else:
         import_data_source(data_source_definition_filepath)
-        for root_package in [f for f in data_source_data_dir.iterdir() if f.is_dir()]:
+        root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir()]
+        for root_package in root_packages:
             # Delete all packages in the data source
             dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
 
