@@ -11,7 +11,10 @@ from .import_package import (
     add_object_to_package,
     add_package_to_package,
 )
-from .utils.reference import replace_relative_references
+from .utils.reference import (
+    replace_relative_references,
+    replace_relative_references_in_package_meta,
+)
 from .utils.utils import concat_dependencies
 
 
@@ -102,9 +105,7 @@ def package_tree_from_zip(
             update=True,
         )
 
-        # Make sure to replace relative references in _meta_
-        root_package.meta = replace_relative_references(
-            "_meta_", root_package.meta, dependencies, data_source_id, file_path=root_package.path()
-        )
+        # Make sure to replace relative references in _meta_ for all packages
+        replace_relative_references_in_package_meta(root_package, dependencies, data_source_id)
 
     return root_package
