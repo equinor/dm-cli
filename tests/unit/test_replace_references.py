@@ -2,8 +2,12 @@ import unittest
 from pathlib import Path
 
 from dm_cli.dmss import ApplicationException
-from dm_cli.utils.reference import replace_relative_references
-from dm_cli.utils.utils import concat_dependencies
+from dm_cli.domain import Dependency
+from dm_cli.utils.reference import (
+    replace_relative_references,
+    replace_relative_references_in_package_meta,
+)
+from dm_cli.utils.utils import Package, concat_dependencies
 
 """
 ROOT
@@ -89,7 +93,7 @@ test_documents = {
 }
 
 
-class ImportEntityTest(unittest.TestCase):
+class ReplaceReferences(unittest.TestCase):
     def test_replace_relative_references(self):
         src_path = Path("MyRootPackage/Moorings/Mooring.json")  # path
         dst_path = "MyRootPackage/Moorings"  # path_reference
@@ -149,3 +153,37 @@ class ImportEntityTest(unittest.TestCase):
                     package,
                     src_path.parent,
                 )
+
+    def test_replace_relative_references_in_package(self):
+        dependencies = {
+            "CORE": Dependency(
+                alias="CORE", protocol="dmss", address="system/SIMOS", version="0.0.1", type="CORE:Dependency"
+            )
+        }
+        general_meta = {
+            "type": "CORE:Meta",
+            "version": "0.0.1",
+            "dependencies": [
+                {
+                    "type": "CORE:Dependency",
+                    "alias": "CORE",
+                    "address": "system/SIMOS",
+                    "version": "0.0.1",
+                    "protocol": "dmss",
+                }
+            ],
+        }
+        root_package = Package(name="models", is_root=True, meta=general_meta)
+        car_package = Package(name="carPackage", is_root=False, meta=general_meta)
+        engine_package = Package(name="engine_package", is_root=False, meta=general_meta)
+
+        root_package.content.append(car_package)
+        root_package.content[0].content.append(engine_package)
+
+        root_package = replace_relative_references_in_package_meta(
+            root_package, dependencies=dependencies, data_source_id="DemoApplicationDataSource"
+        )
+
+        assert "CORE" not in root_package.meta["type"]
+        assert "CORE" not in root_package.content[0].meta["type"]
+        assert "CORE" not in root_package.content[0].content[0].meta["type"]

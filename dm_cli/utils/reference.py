@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 
 from ..domain import Dependency
 from ..enums import SIMOS, BuiltinDataTypes
-from .utils import resolve_dependency
+from .utils import Package, resolve_dependency
 
 
 def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
@@ -20,6 +20,25 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     if reference[0] == "/":
         return f"dmss://{data_source}{reference}"
     return f"dmss://{data_source}/{root_package}/{reference}"
+
+
+def replace_relative_references_in_package_meta(
+    package: Package, dependencies: Dict[str, Dependency], data_source_id: str
+) -> Package:
+    """
+    Replace relative references in meta attribute of the package and subpackages inside the package's content list.
+    Recursively dig down into the package structure and replace the references inside the meta attribute of the package.
+    """
+
+    package.meta = replace_relative_references(
+        "_meta_", package.meta, dependencies, data_source_id, file_path=package.path()
+    )
+
+    for document in package.content:
+        if type(document) == Package:
+            replace_relative_references_in_package_meta(document, dependencies, data_source_id)
+
+    return package
 
 
 def replace_relative_references(
