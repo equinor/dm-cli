@@ -126,7 +126,10 @@ def get_root_packages_in_data_sources(path: str) -> dict:
         data_source_names.append(data_source_definition.replace(".json", ""))
     root_packages_in_data_sources = {}
     for data_source in data_source_names:
-        root_packages: list[str] = os.listdir(os.path.join(data_dir, data_source))
+        data_source_path = os.path.join(data_dir, data_source)
+        root_packages: list[str] = [
+            folder for folder in os.listdir(data_source_path) if os.path.isdir(os.path.join(data_source_path, folder))
+        ]
         root_packages_in_data_sources[data_source] = root_packages
     return root_packages_in_data_sources
 
