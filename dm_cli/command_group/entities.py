@@ -2,6 +2,7 @@ from pathlib import Path
 
 import typer
 from rich import print
+from typing_extensions import Annotated
 
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper
 from dm_cli.import_entity import import_folder_entity, import_single_entity
@@ -10,11 +11,22 @@ entities_app = typer.Typer()
 
 
 @entities_app.command("import")
-def import_entity(source: str, destination: str) -> bool:
-    """Import the entity (file or package) <source> to the given <destination>.
-
-    SOURCE is the path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself.
-    DESTINATION is the destination for the folder or file (consists of a data source and package name).
+def import_entity(
+    source: Annotated[
+        str,
+        typer.Argument(
+            help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself."
+        ),
+    ],
+    destination: Annotated[
+        str,
+        typer.Argument(
+            help="Address for the folder or file. Should be on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
+        ),
+    ],
+) -> bool:
+    """
+    Import an entity (file or package) <source> to the given <destination>.
     """
     source_path = Path(source)
     destination = destination.rstrip("/\\")
@@ -37,9 +49,16 @@ def import_entity(source: str, destination: str) -> bool:
 
 
 @entities_app.command("delete")
-def delete_entity(target: str):
+def delete_entity(
+    target: Annotated[
+        str,
+        typer.Argument(
+            help="Delete an entity from DMSS. Target should be an address on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
+        ),
+    ]
+):
     """
-    Delete the entity located at remote <target>
+    Delete an entity from DMSS.
     """
     # TODO: Add exception handling
     dmss_api.document_remove(target)
