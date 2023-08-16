@@ -41,5 +41,4 @@ def delete_entity(target: str):
     """
     Delete the entity located at remote <target>
     """
-    # TODO: Add exception handling
-    dmss_api.document_remove(target)
+    dmss_exception_wrapper(dmss_api.document_remove, target)

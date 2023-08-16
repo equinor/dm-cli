@@ -64,6 +64,7 @@ jobs:
           dm ds import-all ../test_data/test_app_dir_struct/data_sources
           dm entities import ../test_data/more_documents/bmw.json DemoApplicationDataSource/instances
           dm entities import ../test_data/more_documents/engines DemoApplicationDataSource/instances
-          dm entities delete DemoApplicationDataSource/instances
+          dm entities delete DemoApplicationDataSource/models/ExternalFile
+          dm entities delete DemoApplicationDataSource/models/CarPackage
           dm ds reset DemoApplicationDataSource ../test_data/test_app_dir_struct
           dm ds init ../test_data/test_app_dir_struct

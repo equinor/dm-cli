@@ -218,7 +218,7 @@ class EntityApi(object):
     ):
         """Instantiate  # noqa: E501
 
-        Create a new entity and return it.  (entity is not saved in DMSS)  # noqa: E501
+        Create a new entity and return it.  (entity is not saved in DMSS) Rules for instantiation: - all required attributes, as defined in the blueprint, are included.   If the required attribute has a default value, that value will be used.   If not, an 'empty' value will be used. For example empty string,   an empty list, the number 0, etc. - optional attributes are not included (also true if optional attribute has a default value)  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
