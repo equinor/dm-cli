@@ -7,7 +7,7 @@ from zipfile import ZipFile
 import emoji
 
 import typer
-
+from typing_extensions import Annotated
 from dm_cli.command_group.data_source import data_source_app, reset_data_source
 from dm_cli.command_group.entities import entities_app, import_entity
 from dm_cli.state import state
@@ -49,40 +49,37 @@ def main(
     dmss_api.api_client.configuration.host = dmss_url
 
 @app.command("import-plugin-blueprints")
-def import_plugin_blueprints(path: str):
-    """Import blueprints from a plugin into the standard location 'system/Plugins/<plugin-name>'
-
-    PATH: Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself
+def import_plugin_blueprints(path: Annotated[str, typer.Argument(help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself.")]):
+    """
+    Import blueprints from a plugin into the standard location 'system/Plugins/<plugin-name>'.
     """
     state.force = True
     import_entity(source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}")
 
 @app.command("create-lookup")
-def create_lookup(name: str, paths: List[Path]):
+def create_lookup(name: Annotated[str, typer.Argument(help="Name of the lookup (application context) to create.")],
+                  paths: Annotated[List[Path], typer.Argument(help="one or more remote location for recursively looking for RecipeLinks. "
+                                                                  "A remote location is a path in DMSS on the format <dataSource>/<rootPackage>/<subPacakge>/...")]):
     """
-    Create a named Ui-/StorageRecipe-lookup-table from all RecipeLinks in a package existing in DMSS (requires admin privileges)
-
-    NAME: name of the lookup(application context) to create
-    PATHS: one or more remote location for recursively looking for RecipeLinks
+    Create a named Ui-/StorageRecipe-lookup-table from all RecipeLinks in a package existing in DMSS (requires admin privileges).
     """
-
+    # TODO change type of paths argument to be list of str to avoid this path as strings conversion below
     paths_as_strings = [str(path) for path in paths]
     print(f"Creating lookup table from paths: {paths_as_strings}")
     dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=paths_as_strings, application=name)
 
 @app.command("export")
-def export_entity(target: str, export_location: str = "", unpack: bool = False):
+def export_entity(target: Annotated[str, typer.Argument(help="Address to the entity to export. Format: <dataSource>/<path>.")],
+                  export_location: Annotated[str, typer.Argument(help="Path on local filesystem to store the exported document(s) to. If not provided, will export to current folder.")] = "",
+                  unpack: Annotated[bool, typer.Option(help="Whether or not to unpack the zip file containing the exported entities(s).")] = False):
     """
-    Export entities by a given <data_source>/<path>
+    Export one or more entities.
 
     Example: if you have a data_source "DemoApplicationDataSource" with the root package "models" and a sub package "Windmill",
-    the entire "Windmill" package can be exported using: absolute_document_reference = "DemoApplicationDataSource/models/Windmill"
+    the entire "Windmill" package can be exported using: target = "DemoApplicationDataSource/models/Windmill".
+    The 'target' parameter can either point to a single entity or to a package.
 
     If the file or folder to export already exists on local disk, an exception is raised.
-
-    Arguments:
-    target: Path to the entity to export. Format: <dataSource>/<path>
-    export_location (Optional): Path to specify where to store the exported document(s). If not provided, will export to current folder.
     """
     response = dmss_exception_wrapper(export, target)
 
@@ -97,12 +94,11 @@ def export_entity(target: str, export_location: str = "", unpack: bool = False):
 
 
 
-
 @app.command("reset")
-def reset(path: str, validate_entities: bool = True):
+def reset(path: Annotated[str, typer.Argument(help="The path on local file system to the data source you want to reset.")],
+          validate_entities: Annotated[bool, typer.Option(help="if True, all entities uploaded to DMSS will be validated.")] = True):
     """
-    Reset all data sources (deletes and re-uploads all packages).
-    If validate_entities is True, all entities uploaded to DMSS will be validated.
+    Reset all data sources (deletes and re-uploads all packages to DMSS).
     """
     # Check for presence of expected directories, 'data_sources' and 'data'
     data_sources_dir, data_dir = get_app_dir_structure(Path(path))

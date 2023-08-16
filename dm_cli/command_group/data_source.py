@@ -4,6 +4,7 @@ from pathlib import Path
 import emoji
 import typer
 from rich import print
+from typing_extensions import Annotated
 
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper
 from dm_cli.dmss_api.exceptions import NotFoundException
@@ -18,7 +19,9 @@ data_source_app = typer.Typer()
 
 
 @data_source_app.command("import", help="Subcommand for working with data sources")
-def import_data_source(path: Path):
+def import_data_source(
+    path: Annotated[Path, typer.Argument(help="Path on local filesystem to a data source JSON file.")]
+):
     """
     Import a single data source definition to DMSS.
     """
@@ -40,9 +43,13 @@ def import_data_source(path: Path):
 
 
 @data_source_app.command("import-all", help="Import all datasources found in the directory given by 'path'")
-def import_all_data_sources(path: Path):
+def import_all_data_sources(
+    path: Annotated[
+        Path, typer.Argument(help="Path on local filesystem to the folder containing the data sources to import.")
+    ]
+):
     """
-    Import all data source definitions to DMSS
+    Import all data source definitions to DMSS.
     """
     data_sources_dir = Path(path)
     if not data_sources_dir.is_dir():
@@ -69,7 +76,12 @@ def remove_by_path_ignore_404(target: str):
 
 
 @data_source_app.command("init")
-def initialize_data_source(path: Path, validate_entities: bool = True):
+def initialize_data_source(
+    path: Annotated[Path, typer.Argument(help="Path on local filesystem to data source folder.")],
+    validate_entities: Annotated[
+        bool, typer.Option(help="If True, all entities uploaded to DMSS will be validated.")
+    ] = True,
+):
     """
     Initialize the data sources and import all packages.
     The packages in a data sources will be deleted before data sources are imported.
@@ -113,7 +125,10 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
 
 
 @data_source_app.command("reset")
-def reset_data_source(data_source: str, path: Path):
+def reset_data_source(
+    data_source: Annotated[str, typer.Argument(help="Name of data source to reset")],
+    path: Annotated[Path, typer.Argument(help="Path on local filesystem to data source folder.")],
+):
     """
     Reset a single data source (deletes and re-uploads root-packages)
     """
