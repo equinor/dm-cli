@@ -27,7 +27,6 @@ $ dm --help
 Usage: dm [OPTIONS] COMMAND [ARGS]...
 
 Options:
---version         Show the version and exit.
 -t, --token TEXT  Token for authentication against DMSS.
 -u, --url TEXT    URL to the Data Modelling Storage Service (DMSS).
 -h, --help        Show this message and exit.

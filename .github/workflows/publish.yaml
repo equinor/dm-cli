@@ -4,6 +4,14 @@ on:
     secrets:
       PYPI_DM_CLI_TOKEN:
         required: true
+    inputs:
+      version:
+        description: "The new package version"
+        required: true
+        type: string
+
+env:
+  VERSION_FILE_PATH: dm_cli/__init__.py
 
 jobs:
   build-n-publish:
