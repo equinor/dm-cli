@@ -27,7 +27,6 @@ def version_callback(print_version: bool):
         print(VERSION)
         raise typer.Exit()
 
-
 @app.callback()
 def main(
         force: bool = typer.Option(False,"--force", "-f", help="Force the operation. Overwriting and potentially deleting data."),

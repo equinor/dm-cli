@@ -7,3 +7,15 @@ on:
 jobs:
   tests:
     uses: ./.github/workflows/tests.yaml
+
+  release-please:
+    needs: tests
+    uses: ./.github/workflows/create-release-pr.yaml
+
+
+  publish-new-pypi-package:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    uses: ./.github/workflows/publish.yaml
+    secrets:
+      PYPI_DM_CLI_TOKEN: ${{ secrets.PYPI_DM_CLI_TOKEN }}
