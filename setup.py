@@ -7,7 +7,6 @@ with open("requirements.txt", "r") as fh:
     requirements = fh.read()
 
 
-
 setup(
     name="dm-cli",
     version="1.1.0",
