@@ -5,7 +5,7 @@
 # Data Modelling CLI Tool
 
 ## Requirements
-This package requires Python >=3.8
+This package requires Python >=3.11
 
 ## Installing
 To install this CLI tool you can run the below command
