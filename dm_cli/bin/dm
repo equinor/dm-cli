@@ -13,7 +13,7 @@ from dm_cli.command_group.entities import entities_app, import_entity
 from dm_cli.state import state
 from dm_cli.dmss import export, dmss_api, dmss_exception_wrapper
 from dm_cli.utils.zip import unpack_and_save_zipfile, save_as_zip_file
-from dm_cli import VERSION
+
 from dm_cli.utils.utils import get_root_packages_in_data_sources, validate_entities_in_data_sources
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 
@@ -22,10 +22,10 @@ app.add_typer(data_source_app, name="ds")
 app.add_typer(entities_app, name="entities")
 
 
-def version_callback(print_version: bool):
-    if print_version:
-        print(VERSION)
-        raise typer.Exit()
+# def version_callback(print_version: bool):
+#     if print_version:
+#         print(VERSION)
+#         raise typer.Exit()
 
 
 @app.callback()
