@@ -1,7 +1,9 @@
 {
   "_id": "4483c9b0-d505-46c9-a157-94c79f4d7a6a",
+  "name": "DemoApplication",
   "type": "TEST-MODELS:DemoApplication",
   "label": "Demo App",
-  "dataSources": ["DemoApplicationDataSource"],
-  "name": "DemoApplication"
+  "dataSources": [
+    "DemoApplicationDataSource"
+  ]
 }

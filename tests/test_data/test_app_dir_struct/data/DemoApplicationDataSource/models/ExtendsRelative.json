@@ -1,8 +1,10 @@
 {
   "name": "ExtendedApplication",
   "type": "CORE:Blueprint",
-  "extends": ["DemoApplication"],
   "description": "",
+  "extends": [
+    "DemoApplication"
+  ],
   "attributes": [
     {
       "name": "label2",

@@ -1,17 +1,17 @@
 {
-  "type": "CORE:Blueprint",
   "name": "Wheel",
+  "type": "CORE:Blueprint",
   "attributes": [
     {
       "name": "brand",
+      "type": "CORE:BlueprintAttribute",
       "optional": false,
-      "attributeType": "string",
-      "type": "CORE:BlueprintAttribute"
+      "attributeType": "string"
     },
     {
       "name": "dimensions",
-      "attributeType": "string",
       "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
       "label": "string"
     }
   ]
