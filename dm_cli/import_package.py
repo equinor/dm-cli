@@ -5,9 +5,9 @@ from typing import List
 from uuid import uuid4
 
 import typer
-from progress.bar import IncrementalBar
 from rich.console import Console
 from rich.text import Text
+from tqdm import tqdm
 
 from dm_cli.state import state
 
@@ -95,11 +95,7 @@ def import_package_tree(package: Package, destination: str) -> None:
     package.traverse_package(lambda package: documents_to_upload.append(package.to_dict()))
 
     files_to_upload = {}
-    with IncrementalBar(
-        f"\tImporting documents of type 'File' from {package.name}",
-        max=len(documents_to_upload),
-        suffix="%(percent).0f%% - [%(eta)ds/%(elapsed)ds]",
-    ) as bar:
+    with tqdm(documents_to_upload, desc=f"Importing documents of type 'File' from {package.name}") as bar:
         for document in documents_to_upload:
             if isinstance(document, File):
                 try:
@@ -111,13 +107,9 @@ def import_package_tree(package: Package, destination: str) -> None:
                     text = Text(str(error))
                     console.print(text, style="red1")
                     raise typer.Exit(code=1)
-        bar.next()
+            bar.update()
 
-    with IncrementalBar(
-        f"\tImporting {package.name}",
-        max=len(documents_to_upload),
-        suffix="%(percent).0f%% - [%(eta)ds/%(elapsed)ds]",
-    ) as bar:
+    with tqdm(documents_to_upload, desc=f"Importing {package.name}") as bar:
         for document in documents_to_upload:
             if not isinstance(document, File):
                 document = replace_file_addresses(document, data_source, files_to_upload)
@@ -129,4 +121,4 @@ def import_package_tree(package: Package, destination: str) -> None:
                     text = Text(str(error))
                     console.print(text, style="red1")
                     raise typer.Exit(code=1)
-        bar.next()
+            bar.update()
