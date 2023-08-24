@@ -9,3 +9,9 @@ on:
 jobs:
   tests:
     uses: ./.github/workflows/tests.yaml
+
+  # TODO remove, only for testing
+  release-please:
+    needs: tests
+    uses: ./.github/workflows/create-release-pr.yaml
+
