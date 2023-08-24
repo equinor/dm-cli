@@ -6,10 +6,11 @@ with open("README.md", "r") as fh:
 with open("requirements.txt", "r") as fh:
     requirements = fh.read()
 
+from dm_cli import VERSION
 
 setup(
     name="dm-cli",
-    version="1.0.0",  # x-release-please-version
+    version=VERSION,
     author="",
     author_email="",
     license="MIT",

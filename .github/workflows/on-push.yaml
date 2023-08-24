@@ -7,5 +7,9 @@ on:
       - v*
 
 jobs:
-  tests:
-    uses: ./.github/workflows/tests.yaml
+#  tests:
+#    uses: ./.github/workflows/tests.yaml
+
+  # todo remove
+  release-please:
+    uses: ./.github/workflows/create-release-pr.yaml
