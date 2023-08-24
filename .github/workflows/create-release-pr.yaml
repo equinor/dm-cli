@@ -18,7 +18,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          release-type: python
+          release-type: simple
           package-name: "dm-cli"
           extra-files: |
             setup.py
