@@ -8,8 +8,8 @@
       "plugin": "@development-framework/dm-core-plugins/yaml"
     },
     {
-      "type": "CORE:UiRecipe",
       "name": "Form",
+      "type": "CORE:UiRecipe",
       "plugin": "@development-framework/dm-core-plugins/form"
     }
   ]

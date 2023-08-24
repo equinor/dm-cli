@@ -1,8 +1,10 @@
 {
   "name": "Engine",
   "type": "CORE:Blueprint",
-  "extends": ["CORE:NamedEntity"],
   "description": "",
+  "extends": [
+    "CORE:NamedEntity"
+  ],
   "attributes": [
     {
       "name": "hp",

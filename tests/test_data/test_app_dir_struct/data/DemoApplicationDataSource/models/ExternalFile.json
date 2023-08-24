@@ -1,19 +1,21 @@
 {
   "name": "ExternalFile",
   "type": "CORE:Blueprint",
-  "extends": ["CORE:NamedEntity"],
   "description": "Blueprint with a file",
+  "extends": [
+    "CORE:NamedEntity"
+  ],
   "attributes": [
     {
-      "type": "CORE:BlueprintAttribute",
       "name": "file",
+      "type": "CORE:BlueprintAttribute",
       "description": "External file with binary data",
       "attributeType": "CORE:File",
       "contained": false
     },
     {
-      "type": "CORE:BlueprintAttribute",
       "name": "tag",
+      "type": "CORE:BlueprintAttribute",
       "description": "",
       "attributeType": "string",
       "optional": true

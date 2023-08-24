@@ -1,6 +1,6 @@
 {
-	"name": "Bmw",
-	"type": "TEST-MODELS:CarPackage/Car",
-	"color": "white",
-	"wheels": []
+  "name": "Bmw",
+  "type": "TEST-MODELS:CarPackage/Car",
+  "color": "white",
+  "wheels": []
 }

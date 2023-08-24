@@ -1,8 +1,10 @@
 {
   "name": "Car",
   "type": "CORE:Blueprint",
-  "extends": ["CORE:NamedEntity"],
   "description": "",
+  "extends": [
+    "CORE:NamedEntity"
+  ],
   "_meta_": {
     "type": "CORE:Meta",
     "version": "0.0.1",
