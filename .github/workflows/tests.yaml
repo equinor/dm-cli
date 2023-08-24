@@ -6,9 +6,13 @@ on:
 
 jobs:
   linting:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
       - name: Install pre-commit
         run: pip install pre-commit
@@ -20,6 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
       - name: install requirements
         run: pip install -r requirements.txt && pip install -r dev-requirements.txt && pip install -e .
@@ -34,6 +42,10 @@ jobs:
         working-directory: tests/integration
     steps:
       - uses: actions/checkout@master
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
       - name: Start DMSS
         run: docker-compose pull && docker-compose up -d && sleep 60 && docker-compose run --rm dmss reset-app
