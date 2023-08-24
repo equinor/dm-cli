@@ -9,7 +9,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="dm-cli",
-    version="1.0.0",  # x-release-please-version
+    version="1.1.0",  # x-release-please-version
     author="",
     author_email="",
     license="MIT",
