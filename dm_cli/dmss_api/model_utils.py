@@ -8,8 +8,6 @@
 """
 
 
-from datetime import date, datetime  # noqa: F401
-from copy import deepcopy
 import inspect
 import io
 import os
@@ -17,12 +15,12 @@ import pprint
 import re
 import tempfile
 import uuid
-
-from dateutil.parser import parse
+from copy import deepcopy
+from datetime import date, datetime  # noqa: F401
 
 from dm_cli.dmss_api.exceptions import (
-    ApiKeyError,
     ApiAttributeError,
+    ApiKeyError,
     ApiTypeError,
     ApiValueError,
 )
@@ -1249,11 +1247,12 @@ def deserialize_primitive(data, klass, path_to_item):
                 "string value, please set its type as `type: {}` in your "
                 "spec. That allows the value to be any type. "
             )
+
+            # The string should be in iso8601 datetime format.
+            if not isinstance(data, str) or len(data) < 8:
+                raise ValueError("This is not a datetime")
+            parsed_datetime = datetime.fromisoformat(data)
             if klass == datetime:
-                if len(data) < 8:
-                    raise ValueError("This is not a datetime")
-                # The string should be in iso8601 datetime format.
-                parsed_datetime = parse(data)
                 date_only = (
                     parsed_datetime.hour == 0 and
                     parsed_datetime.minute == 0 and
@@ -1265,9 +1264,7 @@ def deserialize_primitive(data, klass, path_to_item):
                     raise ValueError("This is a date, not a datetime")
                 return parsed_datetime
             elif klass == date:
-                if len(data) < 8:
-                    raise ValueError("This is not a date")
-                return parse(data).date()
+                return parsed_datetime.date()
         else:
             converted_value = klass(data)
             if isinstance(data, str) and klass == float:
@@ -1275,7 +1272,7 @@ def deserialize_primitive(data, klass, path_to_item):
                     # '7' -> 7.0 -> '7.0' != '7'
                     raise ValueError('This is not a float')
             return converted_value
-    except (OverflowError, ValueError) as ex:
+    except ValueError as ex:
         # parse can raise OverflowError
         raise ApiValueError(
             "{0}Failed to parse {1} as {2}".format(
