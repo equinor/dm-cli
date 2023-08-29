@@ -38,7 +38,7 @@ class EntityApi(object):
         self.api_client = api_client
         self.instantiate_entity_endpoint = _Endpoint(
             settings={
-                'response_type': (Entity,),
+                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
@@ -218,7 +218,7 @@ class EntityApi(object):
     ):
         """Instantiate  # noqa: E501
 
-        Returns a default entity of specified type. This entity is not stored in the database.  Rules for instantiation: - all required attributes, as defined in the blueprint, are included.   If the required attribute has a default value, that value will be used.   If not, an 'empty' value will be used. For example empty string,   an empty list, the number 0, etc. - optional attributes are not included (also true if optional attribute has a default value)  # noqa: E501
+        Returns a default entity of specified type. This entity is not stored in the database.  This endpoint creates a default entity of the specified type. A default entity of that type is specified to contain all the required fields with their default values. If no default value is set for the field, then an 'empty' value will be set for that field. For an int that would be 0, and for a string that would be \"\". Optional attributes are not filled in, even if a default value is specified for that optional field.  Args: - entity (Entity): A JSON object with only a \"type\" parameter. Any other fields will be ignored. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: A default entity of the specified type.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -261,7 +261,7 @@ class EntityApi(object):
             async_req (bool): execute request asynchronously
 
         Returns:
-            Entity
+            {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
                 If the method is called asynchronously, returns the request
                 thread.
         """
@@ -301,7 +301,7 @@ class EntityApi(object):
     ):
         """Validate  # noqa: E501
 
-        Validate an entity. Will return detailed error messages and status code 422 if the entity is invalid.  \"as_type\": Optional. Validate the root entity against this type instead of the one defined in the entity.  # noqa: E501
+        Validate an entity according to its blueprint.  This endpoint compares the entity to the specifications of its blueprint. The entity's blueprint is specified as the 'type' parameter. The entity is required to have all attributes that are specified as required in the blueprint, and they must be on the correct format.  This endpoint returns a detailed error messages and status code 422 if the entity is invalid.  Args: - entity (Entity): a dict object with \"type\" specified.  Returns: - str: \"OK\" (200)  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -385,7 +385,7 @@ class EntityApi(object):
     ):
         """Validate Existing  # noqa: E501
 
-        Validate an existing entity in dmss. Will return detailed error messages and status code 422 if an entity is invalid.  # noqa: E501
+        Validate an entity stored in the database according to its blueprint .  This endpoint compares the entity to the specifications of its blueprint. The entity's blueprint is specified as the 'type' parameter. The entity is required to have all attributes that are specified as required in the blueprint, and they must be on the correct format.  This endpoint returns a detailed error messages and status code 422 if the entity is invalid.  Args: - address (str): address path to the entity that is to be validated. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - str: \"OK\" (200)  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

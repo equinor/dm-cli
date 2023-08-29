@@ -158,7 +158,7 @@ class LookupTableApi(object):
     ):
         """Create Lookup  # noqa: E501
 
-        Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application - **recipe_package**: List with one or more paths to package(s) that contain recipe links. (Example: 'system/SIMOS/recipe_links')  # noqa: E501
+        Creates a Recipe Lookup Table for an Application, given a Package Containing RecipeLinks.  This endpoint creates a lookup table for an application. This lookup table is used to find UI- and Storage recipes given a blueprint. This recipe is associated with an application, based on application name.  Args: - application (str): Name of an application. - recipe_package (list[str]): A list of one or more paths to packages that contain recipe links.     - Example: [\"system/SIMOS/recipe_links\"] - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - None, with status Code 204 (No Content).  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -244,7 +244,7 @@ class LookupTableApi(object):
     ):
         """Get Lookup  # noqa: E501
 
-        Fetch a single lookup table.  - **application**: name of application  # noqa: E501
+        Get The Lookup Table for UI- and Storage Recipes the Provided Application  This endpoint fetches the recipe lookup table for the application provided. This lookup table is used to find UI- and Storage recipes given a blueprint.  Args: - application (str): The name of the desired application. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: The recipe lookup table for the provided application.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

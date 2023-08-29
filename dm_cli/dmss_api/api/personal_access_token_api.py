@@ -195,7 +195,7 @@ class PersonalAccessTokenApi(object):
     ):
         """New Personal Access Token  # noqa: E501
 
-        Create a personal access token (PAT).  - **scope**: WRITE, READ or NONE - **time_to_live**: Optional parameter to set time to life in seconds (default is 30 days)  # noqa: E501
+        Create a Personal Access Token (PAT).  This endpoint creates a PAT token for the currently logged in user, stores it in the database and returns it to the user.  Args: - scope (WRITE | READ | NONE): Access level for the PAT. - time_to_live (int): Optional parameter specifying the lifespan of the PAT in seconds. Default lifespan is 30 days.  Returns: - str: The generated PAT token  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -276,7 +276,7 @@ class PersonalAccessTokenApi(object):
     ):
         """Revoke Personal Access Token  # noqa: E501
 
-        Delete a personal access token (PAT).  # noqa: E501
+        Revoke a Personal Access Token (PAT).  This endpoint revokes a PAT token so that it is invalid and can no longer be used to gain access.  Args:     token_id (str): The ID of the token to be revoked.  Returns:     str: A string with the message \"OK\" when the token has been revoked.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -358,7 +358,7 @@ class PersonalAccessTokenApi(object):
     ):
         """List All Pats  # noqa: E501
 
-        Get a list of all personal access tokens (PATs).  # noqa: E501
+        Get All Personal Access Tokens for the Current User.  Get a list of all personal access tokens (PATs) for the currently logged in user.  Args:     user (User): The authenticated user accessing the endpoint.  Returns:     list: A list of all personal access tokens for the currently logged in user.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

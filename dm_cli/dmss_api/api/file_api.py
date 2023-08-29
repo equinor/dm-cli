@@ -112,7 +112,7 @@ class FileApi(object):
     ):
         """Upload File  # noqa: E501
 
-        Upload a new binary file and create a file entity with the binary data as content.  **file_id** The data source ID to be used for the file entity that will be created.  # noqa: E501
+        Upload a New Binary File  This endpoint uploads a new file and creates a file entity with the uploaded binary data as content.  Args: - data_source_id (str): ID of the data source to which the file should be uploaded. - data (dict with a \"file_id\" attribute): A dict containing data source ID to be used for the file entity that will be created. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: The file entity that was created to contain the file.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

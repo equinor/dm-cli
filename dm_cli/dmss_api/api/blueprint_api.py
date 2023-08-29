@@ -163,7 +163,7 @@ class BlueprintApi(object):
     ):
         """Get Blueprint  # noqa: E501
 
-        Fetch the Blueprint and Recipes from a type reference (including inherited attributes).  - **type_ref**: <protocol>://<data_source>/<path_to_blueprint> - **context**: name of application that has Ui-/StorageRecipe lookup table (optional attribute)  # noqa: E501
+        Get a Blueprint and all Ui- and StorageRecipes connected to it, given a Blueprint address.  Args: - type_ref (str): The address of the blueprint.     - Example: PROTOCOL://<DATA-SOURCE>/<PACKAGE>/<FOLDER>/<NAME> - context (str): Optional name of application that has Ui-/StorageRecipe lookup table. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - GetBlueprintResponse: An object containing the blueprint, a list of all UI- recipes and a list of all StorageRecipes.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -247,7 +247,7 @@ class BlueprintApi(object):
     ):
         """Resolve Blueprint Id  # noqa: E501
 
-        Resolve address of a blueprint to its type path.  - **address**: <protocol>://<data_source</$<blueprint_uuid>  # noqa: E501
+        Resolve path address of a blueprint given id address.  This endpoint takes in an ID-address of a blueprint and finds the full path address to the blueprint.  Args: - address (str): The ID address of the blueprint.     - Example: PROTOCOL://<DATA-SOURCE>/$<UUID>  Returns: - str: the path address of the blueprint.     - Example:  PROTOCOL://<DATA-SOURCE>/<PACKAGE>/<FOLDER>/<NAME>  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

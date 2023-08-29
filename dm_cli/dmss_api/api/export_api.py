@@ -22,6 +22,7 @@ from dm_cli.dmss_api.model_utils import (  # noqa: F401
     validate_and_convert_types
 )
 from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.export_meta_response import ExportMetaResponse
 
 
 class ExportApi(object):
@@ -91,7 +92,7 @@ class ExportApi(object):
         )
         self.export_meta_endpoint = _Endpoint(
             settings={
-                'response_type': (bool, date, datetime, dict, float, int, list, str, none_type,),
+                'response_type': (ExportMetaResponse,),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
@@ -150,7 +151,7 @@ class ExportApi(object):
     ):
         """Export  # noqa: E501
 
-        Download a zip-folder with one or more documents as json file(s).  - **address**:   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY    The PROTOCOL is optional, and the default is dmss.  # noqa: E501
+        Download a zip-folder Containing One or More Documents as JSON Files.  This endpoint creates a zip-folder with the contents of the document and it's children.  Args: - path_address: Address to the entity or package that should be exported.   - Example: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY (PROTOCOL is optional, and the default is dmss.) - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - FileResponse: A FileResponse containing the zip file.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -233,7 +234,7 @@ class ExportApi(object):
     ):
         """Export Meta  # noqa: E501
 
-        Export only the metadata of an entity. An entities metadata is concatenated from the \"top down\". Inheriting parents meta, and overriding for any specified further down.  If no metadata is defined anywhere in the tree, an empty object is returned.  - **address**:   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY    The PROTOCOL is optional, and the default is dmss.  # noqa: E501
+        Get Meta Information About a Document  This endpoint returns meta information about a document provided document id and data source id in which it is located. For more information about the meta-object, see [the docs](https://equinor.github.io/dm-docs/docs/concepts/meta)  Args: - path_address (str): Address of the object for which to get the meta-information.     - Example: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY (PROTOCOL is optional, and the default is dmss.) - user (User): The authenticated user accessing the endpoint.  Returns: - dict: A dictionary containing the meta information for the object.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -276,7 +277,7 @@ class ExportApi(object):
             async_req (bool): execute request asynchronously
 
         Returns:
-            bool, date, datetime, dict, float, int, list, str, none_type
+            ExportMetaResponse
                 If the method is called asynchronously, returns the request
                 thread.
         """

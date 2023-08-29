@@ -96,7 +96,7 @@ class AttributeApi(object):
     ):
         """Get Attribute  # noqa: E501
 
-        Fetch the attribute from a address.  # noqa: E501
+        Fetch the BlueprintAttribute which is the container for the addressed object.  This endpoint is used for fetching a BlueprintAttribute in which the addressed entity is contained.  Args: - address (str): The address to the entity. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: The blueprint-attribute object.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

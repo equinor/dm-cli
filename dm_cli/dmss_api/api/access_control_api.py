@@ -21,7 +21,7 @@ from dm_cli.dmss_api.model_utils import (  # noqa: F401
     none_type,
     validate_and_convert_types
 )
-from dm_cli.dmss_api.model.acl import ACL
+from dm_cli.dmss_api.model.access_control_list import AccessControlList
 from dm_cli.dmss_api.model.error_response import ErrorResponse
 
 
@@ -38,7 +38,7 @@ class AccessControlApi(object):
         self.api_client = api_client
         self.get_acl_endpoint = _Endpoint(
             settings={
-                'response_type': (ACL,),
+                'response_type': (AccessControlList,),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
@@ -111,13 +111,13 @@ class AccessControlApi(object):
                 'all': [
                     'data_source_id',
                     'document_id',
-                    'acl',
+                    'access_control_list',
                     'recursively',
                 ],
                 'required': [
                     'data_source_id',
                     'document_id',
-                    'acl',
+                    'access_control_list',
                 ],
                 'nullable': [
                 ],
@@ -136,8 +136,8 @@ class AccessControlApi(object):
                         (str,),
                     'document_id':
                         (str,),
-                    'acl':
-                        (ACL,),
+                    'access_control_list':
+                        (AccessControlList,),
                     'recursively':
                         (bool,),
                 },
@@ -149,7 +149,7 @@ class AccessControlApi(object):
                 'location_map': {
                     'data_source_id': 'path',
                     'document_id': 'path',
-                    'acl': 'body',
+                    'access_control_list': 'body',
                     'recursively': 'query',
                 },
                 'collection_format_map': {
@@ -175,7 +175,7 @@ class AccessControlApi(object):
     ):
         """Get Acl  # noqa: E501
 
-        get access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  # noqa: E501
+        GET the access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  Args: - data_source_id (str): The ID of the data source which the document resides in. - document_id (str): The ID of the document for which to check the ACL. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - ACL: The access control list requested.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -219,7 +219,7 @@ class AccessControlApi(object):
             async_req (bool): execute request asynchronously
 
         Returns:
-            ACL
+            AccessControlList
                 If the method is called asynchronously, returns the request
                 thread.
         """
@@ -258,22 +258,22 @@ class AccessControlApi(object):
         self,
         data_source_id,
         document_id,
-        acl,
+        access_control_list,
         **kwargs
     ):
         """Set Acl  # noqa: E501
 
-        Update access control list (ACL) for a document.  The ACL determines which access a given user has for a document (Read, Write or None).  # noqa: E501
+        Update access control list (ACL) for a document.  Args: - data_source_id (str): The ID of the data source which the document resides in. - document_id (str): The ID of the document for which to set the ACL. - acl (ACL): An access control list. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - str: \"OK\" (200)  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.set_acl(data_source_id, document_id, acl, async_req=True)
+        >>> thread = api.set_acl(data_source_id, document_id, access_control_list, async_req=True)
         >>> result = thread.get()
 
         Args:
             data_source_id (str):
             document_id (str):
-            acl (ACL):
+            access_control_list (AccessControlList):
 
         Keyword Args:
             recursively (bool): [optional] if omitted the server will use the default value of True
@@ -342,7 +342,7 @@ class AccessControlApi(object):
             data_source_id
         kwargs['document_id'] = \
             document_id
-        kwargs['acl'] = \
-            acl
+        kwargs['access_control_list'] = \
+            access_control_list
         return self.set_acl_endpoint.call_with_http_info(**kwargs)
 

@@ -88,7 +88,7 @@ class WhoamiApi(object):
     ):
         """Get Information On Authenticated User  # noqa: E501
 
-        Get information about the user sending the request.  If no user is authenticated, a default \"nologin\" user is returned.  # noqa: E501
+        Get information about the user who sent the request.  If no user is authenticated, a default \"nologin\" user is returned. This endpoint always responds with a status code of 200 (OK).  Args: - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: A dictionary containing information about the user who sent the request.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

@@ -204,7 +204,7 @@ class DatasourceApi(object):
     ):
         """Get  # noqa: E501
 
-        Get configuration of a single data source.  # noqa: E501
+        Get configuration of a single data source.  Args: - data_source_id (str): ID of the data source - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: A dictionary containing configuration for the specified data source.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -286,7 +286,7 @@ class DatasourceApi(object):
     ):
         """Get All  # noqa: E501
 
-        Get list of all data sources found in DMSS (name and id for each data source).  # noqa: E501
+        Get list of all data sources found in DMSS.  Args: - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - list (DataSourceInformation): A list of information about each data source found in the DMSS protocol.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
@@ -366,7 +366,7 @@ class DatasourceApi(object):
     ):
         """Save  # noqa: E501
 
-        Create or update a data source configuration.  # noqa: E501
+        Create or update a data source configuration.  This endpoint is used for creating or updating a data source configuration. A data source can have multiple repositories.  Args: - data_source_id (str): ID of the data source - new_data_source (DataSourceRequest): A dict object with keys \"name\" and \"repositories\" which is another dict of str and repository configuration. This is the config of the data source. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.   Returns: - str: The ID of the newly created or updated data source.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

@@ -103,7 +103,7 @@ class MetaApi(object):
     ):
         """Get Meta By Id  # noqa: E501
 
-        Get meta information from data source id.  # noqa: E501
+        Get Meta Information About a blob.  This endpoint returns meta information for a blob file provided document id and the id of the data source of which it is located.  Args: - data_source_id (str): The ID of the data source. - document_id (str): The ID of the document. - user (User): The authenticated user accessing the endpoint, automatically generated from provided bearer token or Access-Key.  Returns: - dict: A dictionary containing the meta information about the blob file of the document.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 

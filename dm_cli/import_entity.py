@@ -24,7 +24,7 @@ from .utils.zip import zip_all
 
 def import_document(source_path: Path, destination: str, data_source_id: str, package: str, document: dict):
     remote_dependencies = dmss_api.export_meta(f"{data_source_id}/{package}")
-    old_dependencies = {v["alias"]: Dependency(**v) for v in remote_dependencies.get("dependencies", [])}
+    old_dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
 
     dependencies = concat_dependencies(
         new_dependencies=document.get("_meta_", {}).get("dependencies", []),

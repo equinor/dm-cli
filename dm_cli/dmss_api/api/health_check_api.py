@@ -85,7 +85,7 @@ class HealthCheckApi(object):
     ):
         """Get  # noqa: E501
 
-        Healthcheck endpoint. Responds with \"OK\" - 200.  # noqa: E501
+        Get the Health Status Of the Service.  This endpoint can be used to check the health status of the service. It always returns a 200 OK response to indicate that the service is up and running.  Returns: - string: A string indicating the health status. (\"OK\")  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
