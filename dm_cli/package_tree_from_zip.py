@@ -48,7 +48,8 @@ def package_tree_from_zip(
         if package_file in zip_file.filelist:
             zip_file.filelist.remove(package_file)
         dependencies: Dict[str, Dependency] = {
-            v["alias"]: Dependency(**v) for v in package_entity.get("_meta_", {}).get("dependencies", [])
+            dependency["alias"]: Dependency(**dependency)
+            for dependency in package_entity.get("_meta_", {}).get("dependencies", [])
         }
         if extra_dependencies:
             dependencies.update(extra_dependencies)

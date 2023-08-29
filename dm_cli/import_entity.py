@@ -89,7 +89,7 @@ def import_folder_entity(source_path: Path, destination: str) -> None:
     if not is_root:
         ensure_package_structure(destination_path)
         remote_dependencies = dmss_api.export_meta(f"{destination}")
-        dependencies = {v["alias"]: Dependency(**v) for v in remote_dependencies.get("dependencies", [])}
+        dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
 
     memory_file = io.BytesIO()
     with ZipFile(memory_file, mode="w") as zip_file:

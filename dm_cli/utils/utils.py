@@ -40,7 +40,7 @@ def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> st
 def concat_dependencies(
     new_dependencies: List[dict], old_dependencies: Dict[str, Dependency], filename: str
 ) -> Dict[str, Dependency]:
-    entity_dependencies = {v["alias"]: Dependency(**v) for v in new_dependencies}
+    entity_dependencies = {dependency["alias"]: Dependency(**dependency) for dependency in new_dependencies}
     alias_intersect = entity_dependencies.keys() & old_dependencies.keys()
 
     # If there are duplicated aliases, raise error if they are not identical to the existing one
