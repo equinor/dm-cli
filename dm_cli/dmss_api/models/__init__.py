@@ -9,12 +9,14 @@
 # import sys
 # sys.setrecursionlimit(n)
 
-from dm_cli.dmss_api.model.acl import ACL
+from dm_cli.dmss_api.model.access_control_list import AccessControlList
 from dm_cli.dmss_api.model.access_level import AccessLevel
 from dm_cli.dmss_api.model.data_source_information import DataSourceInformation
 from dm_cli.dmss_api.model.data_source_request import DataSourceRequest
+from dm_cli.dmss_api.model.dependency import Dependency
 from dm_cli.dmss_api.model.entity import Entity
 from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.export_meta_response import ExportMetaResponse
 from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 from dm_cli.dmss_api.model.lookup import Lookup
 from dm_cli.dmss_api.model.pat_data import PATData

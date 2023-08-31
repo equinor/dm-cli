@@ -28,6 +28,5 @@ from dm_cli.dmss_api.api.health_check_api import HealthCheckApi
 from dm_cli.dmss_api.api.lookup_table_api import LookupTableApi
 from dm_cli.dmss_api.api.meta_api import MetaApi
 from dm_cli.dmss_api.api.personal_access_token_api import PersonalAccessTokenApi
-from dm_cli.dmss_api.api.reference_api import ReferenceApi
 from dm_cli.dmss_api.api.search_api import SearchApi
 from dm_cli.dmss_api.api.whoami_api import WhoamiApi

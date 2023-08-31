@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# DMSS must be running locally on port 5000
+# DMSS must be running locally on port 5000.
+# This can be achieved by running "docker-compose pull && docker-compose up -d" from the ./tests/integration folder
 # Must be run from repository root, and will create folder 'dmss-api' under ./dm-cli
 
 # !NOTE!
