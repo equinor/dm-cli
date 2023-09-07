@@ -121,6 +121,7 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
                 import_folder_entity,
                 source_path=data_source_data_dir / root_package.name,
                 destination=data_source_name,
+                raw=True
             )
 
 
