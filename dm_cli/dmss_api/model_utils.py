@@ -1594,6 +1594,11 @@ def validate_and_convert_types(input_value, required_types_mixed, path_to_item,
             raise get_type_error(input_value, path_to_item, valid_classes,
                                  key_type=False)
 
+    if child_req_types_by_current_type == {}:
+        # all types are of the required types and there are no more inner
+        # variables left to look at
+        return input_value
+
     # input_value's type is in valid_classes
     if len(valid_classes) > 1 and configuration:
         # there are valid classes which are not the current class
@@ -1612,10 +1617,6 @@ def validate_and_convert_types(input_value, required_types_mixed, path_to_item,
             )
             return converted_instance
 
-    if child_req_types_by_current_type == {}:
-        # all types are of the required types and there are no more inner
-        # variables left to look at
-        return input_value
     inner_required_types = child_req_types_by_current_type.get(
         type(input_value)
     )
