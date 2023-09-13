@@ -4,9 +4,6 @@
 # This can be achieved by running "docker-compose pull && docker-compose up -d" from the ./tests/integration folder
 # Must be run from repository root, and will create folder 'dmss-api' under ./dm-cli
 
-# !NOTE!
-# The generated code is not correctly scope. Need to do a search and replace "from dmss_api" -> "from dm_cli.dmss_api"
-
 echo "Creating DMSS Python package version $PACKAGE_VERSION"
 docker run --rm \
 --network="host" \
@@ -15,4 +12,4 @@ openapitools/openapi-generator-cli:v6.0.0 generate \
 -i http://localhost:5000/openapi.json  \
 -g python \
 -o /local/dm_cli \
---additional-properties=packageName=dmss_api
+--additional-properties=packageName=dm_cli.dmss_api
