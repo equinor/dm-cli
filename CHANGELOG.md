@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/equinor/dm-cli/compare/v1.1.0...v1.1.1) (2023-09-14)
+
+
+### Bug Fixes
+
+* temporary fix for OpenApi type conversion error ([7e322b9](https://github.com/equinor/dm-cli/commit/7e322b98e4cd08a7670b534f147db216f7a69d37))
+
 ## [1.1.0](https://github.com/equinor/dm-cli/compare/v1.0.14...v1.1.0) (2023-08-31)
 
 
