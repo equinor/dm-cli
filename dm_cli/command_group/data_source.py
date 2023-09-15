@@ -121,7 +121,10 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
                 import_folder_entity,
                 source_path=data_source_data_dir / root_package.name,
                 destination=data_source_name,
-                raw=True
+                # Use the document raw endpoint,
+                # so that uploaded packages will not be resolved,
+                # this is to support uploading core blueprints.
+                raw_package_import=True,
             )
 
 

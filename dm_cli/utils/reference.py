@@ -81,7 +81,11 @@ def replace_relative_references(
         "address",
     )  # These keys may contain a reference
 
-    if value == BuiltinDataTypes.OBJECT.value or value == BuiltinDataTypes.BINARY.value:
+    if (
+        value == BuiltinDataTypes.OBJECT.value
+        or value == BuiltinDataTypes.BINARY.value
+        or value == BuiltinDataTypes.ANY.value
+    ):
         return value
 
     if key in KEYS_TO_CHECK:
@@ -111,7 +115,11 @@ def replace_relative_references(
         if not value.get("type"):
             raise KeyError(f"Object with key '{key}' is missing the required 'type' attribute. File: '{file_path}'")
 
-        if value.get("type") == BuiltinDataTypes.OBJECT.value or value.get("type") == BuiltinDataTypes.BINARY.value:
+        if (
+            value.get("type") == BuiltinDataTypes.OBJECT.value
+            or value.get("type") == BuiltinDataTypes.BINARY.value
+            or value.get("type") == BuiltinDataTypes.ANY.value
+        ):
             return value
 
         resolved_type = resolve_reference(
