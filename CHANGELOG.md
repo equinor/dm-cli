@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.1.2](https://github.com/equinor/dm-cli/compare/v1.1.1...v1.1.2) (2023-09-15)
+
+
+### Bug Fixes
+
+* support any attribute type ([d1629e8](https://github.com/equinor/dm-cli/commit/d1629e8d08d3a7de8bd9cd92659067510cda4b60))
+
+
+### Miscellaneous Chores
+
+* fix api generator scope ([be2efef](https://github.com/equinor/dm-cli/commit/be2efefff7066575bf162e8b07a6f8816822f415))
+
+
+### Code Refactoring
+
+* import simple for reset command ([20edaaf](https://github.com/equinor/dm-cli/commit/20edaaf76424ff6070c5ba4562f9ddd9daa24162))
+
 ## [1.1.1](https://github.com/equinor/dm-cli/compare/v1.1.0...v1.1.1) (2023-09-14)
 
 
