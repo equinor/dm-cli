@@ -16,6 +16,7 @@ class BuiltinDataTypes(Enum):
     BOOL = "boolean"
     OBJECT = "object"  # Any complex type (i.e. any blueprint type)
     BINARY = "binary"
+    ANY = "any"
 
     def to_py_type(self):
         if self is BuiltinDataTypes.BOOL:

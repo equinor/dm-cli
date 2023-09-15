@@ -71,36 +71,19 @@ def add_package_to_package(path: Path, package: Package) -> None:
     return add_package_to_package(Path(new_path), sub_folder)
 
 
-def import_package_tree(package: Package, destination: str, raw: bool) -> None:
+def import_package_tree(package: Package, destination: str, raw_package_import: bool) -> None:
     destination_parts = destination.split("/")
     data_source = destination_parts[0]
 
-    if len(destination_parts) == 1:  # We're importing a root package
-        if raw:
-            dmss_api.document_add_simple(
-                data_source,
-                body=package.to_dict()
-            )
-        else:
-            dmss_api.document_add(
-                destination,
-                json.dumps(package.to_dict()),
-                update_uncontained=False,
-                files=[],
-            )
-    else:  # We're importing a sub folder
-        if raw:
-            dmss_api.document_add_simple(
-                data_source,
-                body=package.to_dict()
-            )
-        else:
-            dmss_api.document_add(
-                destination,
-                json.dumps(package.to_dict()),
-                update_uncontained=False,
-                files=[],
-            )
+    if raw_package_import:
+        dmss_api.document_add_simple(data_source, body=package.to_dict())
+    else:
+        dmss_api.document_add(
+            destination,
+            json.dumps(package.to_dict()),
+            update_uncontained=False,
+            files=[],
+        )
 
     documents_to_upload: List[dict] = []
     package.traverse_documents(lambda document, **kwargs: documents_to_upload.append(document))
