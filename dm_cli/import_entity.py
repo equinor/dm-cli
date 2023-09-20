@@ -68,7 +68,9 @@ def import_single_entity(source_path: Path, destination: str):
         raise Exception(f"Failed to load the file '{source_path.name}' as a JSON document")
 
 
-def import_folder_entity(source_path: Path, destination: str, raw_package_import=False) -> None:
+def import_folder_entity(
+    source_path: Path, destination: str, raw_package_import: bool = False, resolve_local_ids: bool = False
+) -> None:
     print(f"Importing PACKAGE '{source_path.name}' --> '{destination}/'")
     destination_path = Path(destination)
     data_source = destination_path.parts[0]
@@ -101,4 +103,4 @@ def import_folder_entity(source_path: Path, destination: str, raw_package_import
     memory_file.seek(0)
 
     package = package_tree_from_zip(data_source, memory_file, is_root=is_root, extra_dependencies=dependencies)
-    import_package_tree(package, destination, raw_package_import)
+    import_package_tree(package, destination, raw_package_import, resolve_local_ids)

@@ -95,7 +95,8 @@ def export_entity(target: Annotated[str, typer.Argument(help="Address to the ent
 
 @app.command("reset")
 def reset(path: Annotated[str, typer.Argument(help="The path on local file system to the data source you want to reset.")],
-          validate_entities: Annotated[bool, typer.Option(help="if True, all entities uploaded to DMSS will be validated.")] = True):
+          validate_entities: Annotated[bool, typer.Option(help="if True, all entities uploaded to DMSS will be validated.")] = True,
+          resolve_local_ids: Annotated[bool, typer.Option(help="if True, will resolve all local ids found in all entities")] = True):
     """
     Reset all data sources (deletes and re-uploads all packages to DMSS).
     """
@@ -118,7 +119,7 @@ def reset(path: Annotated[str, typer.Argument(help="The path on local file syste
             )
             continue
 
-        reset_data_source(data_source=data_source_name, path=path)
+        reset_data_source(data_source=data_source_name, path=path, resolve_local_ids=resolve_local_ids)
     data_source_contents = get_root_packages_in_data_sources(path)
     if (validate_entities):
         dmss_exception_wrapper(validate_entities_in_data_sources, data_source_contents)

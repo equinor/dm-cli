@@ -13,6 +13,7 @@ from dm_cli.state import state
 
 from .dmss import dmss_api
 from .domain import File, Package
+from .utils.resolve_local_ids import resolve_local_ids_in_document
 from .utils.utils import replace_file_addresses
 
 console = Console()
@@ -71,7 +72,7 @@ def add_package_to_package(path: Path, package: Package) -> None:
     return add_package_to_package(Path(new_path), sub_folder)
 
 
-def import_package_tree(package: Package, destination: str, raw_package_import: bool) -> None:
+def import_package_tree(package: Package, destination: str, raw_package_import: bool, resolve_local_ids: bool) -> None:
     destination_parts = destination.split("/")
     data_source = destination_parts[0]
 
@@ -108,6 +109,10 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
         for document in documents_to_upload:
             if not isinstance(document, File):
                 document = replace_file_addresses(document, data_source, files_to_upload)
+                if resolve_local_ids:
+                    name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
+                    document = resolve_local_ids_in_document(document)
+                    print(f"Successfully resolved local IDs in:\t{data_source}{name}")
                 try:
                     dmss_api.document_add_simple(data_source, document)
                 except Exception as error:

@@ -93,13 +93,15 @@ def initialize_data_source(
     if not data_source_definitions:
         print(emoji.emojize(f"\t:warning: No data source definitions were found in '{data_sources_dir}'."))
     for data_source_definition_filename in data_source_definitions:
-        import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename)
+        import_data_source_file(data_sources_dir, data_dir, data_source_definition_filename, False)
     data_source_contents = get_root_packages_in_data_sources(path)
     if validate_entities:
         dmss_exception_wrapper(validate_entities_in_data_sources, data_source_contents)
 
 
-def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_definition_filename: str):
+def import_data_source_file(
+    data_sources_dir: str, data_dir: str, data_source_definition_filename: str, resolve_local_ids: bool
+):
     data_source_definition_filepath = Path(data_sources_dir).joinpath(data_source_definition_filename)
     data_source_name = data_source_definition_filename.replace(".json", "")
 
@@ -125,6 +127,7 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
                 # so that uploaded packages will not be resolved,
                 # this is to support uploading core blueprints.
                 raw_package_import=True,
+                resolve_local_ids=resolve_local_ids,
             )
 
 
@@ -132,6 +135,7 @@ def import_data_source_file(data_sources_dir: str, data_dir: str, data_source_de
 def reset_data_source(
     data_source: Annotated[str, typer.Argument(help="Name of data source to reset")],
     path: Annotated[Path, typer.Argument(help="Path on local filesystem to data source folder.")],
+    resolve_local_ids: Annotated[bool, typer.Argument(help="Resolve local ids")] = False,
 ):
     """
     Reset a single data source (deletes and re-uploads root-packages)
@@ -153,4 +157,4 @@ def reset_data_source(
         raise FileNotFoundError(f"There is no data source directory for '{data_source}' in '{data_dir}'.")
 
     # Import all packages in the data source
-    import_data_source_file(data_sources_dir, data_dir, f"{data_source}.json")
+    import_data_source_file(data_sources_dir, data_dir, f"{data_source}.json", resolve_local_ids)
