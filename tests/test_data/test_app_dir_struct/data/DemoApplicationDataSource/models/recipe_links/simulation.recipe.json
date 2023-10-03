@@ -1,0 +1,18 @@
+{
+  "type": "CORE:RecipeLink",
+  "_blueprintPath_": "/models/storage_uncontained/Simulation",
+  "storageRecipes": [
+    {
+      "name": "DEFAULT",
+      "type": "dmss://system/SIMOS/StorageRecipe",
+      "description": "",
+      "attributes": [
+        {
+          "name": "result",
+          "type": "dmss://system/SIMOS/StorageAttribute",
+          "contained": false
+        }
+      ]
+    }
+  ]
+}

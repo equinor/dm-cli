@@ -69,19 +69,24 @@ def add_package_to_path(name: str, path: Path):
     )
 
 
-def replace_file_addresses(document: dict, data_source_id: str, files_to_upload) -> dict:
+def replace_file_addresses(document: dict, data_source_id: str, files_to_upload, global_ids) -> dict:
     if document["type"] == SIMOS.REFERENCE.value and document["address"] in files_to_upload:
         blob_id = files_to_upload[document["address"]]
         document["address"] = f"${blob_id}"
+    if document["type"] == SIMOS.REFERENCE.value and document["referenceType"] == "storage":
+        if document["address"] not in global_ids:
+            raise Exception(f"Could not find any global id for {document['address']}")
+        document_id = global_ids[document["address"]]
+        document["address"] = f"${document_id}"
     for key, value in document.items():
         if key == "_meta_":  # meta data can never contain blob data.
             return document
         if isinstance(value, dict) and value:
-            document[key] = replace_file_addresses(value, data_source_id, files_to_upload)
+            document[key] = replace_file_addresses(value, data_source_id, files_to_upload, global_ids)
         if isinstance(value, list) and value:
             if len(value) > 0 and isinstance(value[0], dict):
                 document[key] = [
-                    replace_file_addresses(item, data_source_id, files_to_upload) for item in document[key]
+                    replace_file_addresses(item, data_source_id, files_to_upload, global_ids) for item in document[key]
                 ]
 
     return document
@@ -121,16 +126,21 @@ def get_root_packages_in_data_sources(path: str) -> dict:
     """
     data_sources_dir, data_dir = get_app_dir_structure(Path(path))
     data_source_definitions: list[str] = get_json_files_in_dir(data_sources_dir)
-    data_source_names: list[str] = []
-    for data_source_definition in data_source_definitions:
-        data_source_names.append(data_source_definition.replace(".json", ""))
     root_packages_in_data_sources = {}
-    for data_source in data_source_names:
-        data_source_path = os.path.join(data_dir, data_source)
-        root_packages: list[str] = [
-            folder for folder in os.listdir(data_source_path) if os.path.isdir(os.path.join(data_source_path, folder))
-        ]
-        root_packages_in_data_sources[data_source] = root_packages
+    for data_source_definition in data_source_definitions:
+        with open(os.path.join(data_sources_dir, data_source_definition)) as file:
+            data_source_document = json.load(file)
+            # Global folders should be uploaded directly to the data source
+            # and should not be included in the root packages of the data source.
+            global_folders = data_source_document.get("global_folders", [])
+            data_source = data_source_definition.replace(".json", "")
+            data_source_path = os.path.join(data_dir, data_source)
+            root_packages: list[str] = [
+                folder
+                for folder in os.listdir(data_source_path)
+                if os.path.isdir(os.path.join(data_source_path, folder)) and folder not in global_folders
+            ]
+            root_packages_in_data_sources[data_source] = root_packages
     return root_packages_in_data_sources
 
 

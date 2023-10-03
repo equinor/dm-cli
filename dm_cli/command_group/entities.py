@@ -38,10 +38,10 @@ def import_entity(
                 if file.is_file():
                     dmss_exception_wrapper(import_single_entity, file, destination)
                     continue
-                dmss_exception_wrapper(import_folder_entity, file, destination)
+                dmss_exception_wrapper(import_folder_entity, file, destination, None)
             return True
         print(f"Importing PACKAGE '{source}' --> '{destination}'")
-        dmss_exception_wrapper(import_folder_entity, source_path, destination)
+        dmss_exception_wrapper(import_folder_entity, source_path, destination, None)
         return True
     else:
         dmss_exception_wrapper(import_single_entity, source_path, destination)

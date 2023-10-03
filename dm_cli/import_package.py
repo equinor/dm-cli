@@ -1,7 +1,7 @@
 import io
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Union
 from uuid import uuid4
 
 import typer
@@ -12,7 +12,7 @@ from tqdm import tqdm
 from dm_cli.state import state
 
 from .dmss import dmss_api
-from .domain import File, Package
+from .domain import Entity, File, Package
 from .utils.resolve_local_ids import resolve_local_ids_in_document
 from .utils.utils import replace_file_addresses
 
@@ -46,9 +46,16 @@ def add_file_to_package(path: Path, package: Package, document: dict) -> None:
             package.meta = document["_meta_"]
             return
         # Create a UUID if the document does not have one
-        package.content.append({**document, "_id": document.get("_id", str(uuid4()))})
+        uid = document.get("_id", str(uuid4()))
+        entity = Entity(
+            name=document.get("name", ""),
+            content={**document, "_id": uid},
+            filename=str(path),
+            directory=f"{package.path()}",
+        )
+        package.content.append(entity)
         return
-    items = [item for item in package.content if not isinstance(item, File)]
+    items = [item for item in package.content if not isinstance(item, Entity)]
     sub_folder = next((p for p in items if p["name"] == path.parts[0]), None)
     if not sub_folder:  # If the sub folder has not already been created on parent, create it
         sub_folder = Package(name=path.parts[0], parent=package)
@@ -72,7 +79,9 @@ def add_package_to_package(path: Path, package: Package) -> None:
     return add_package_to_package(Path(new_path), sub_folder)
 
 
-def import_package_tree(package: Package, destination: str, raw_package_import: bool, resolve_local_ids: bool) -> None:
+def import_package_tree(
+    package: Package, destination: str, global_ids: dict, raw_package_import: bool, resolve_local_ids: bool
+) -> None:
     destination_parts = destination.split("/")
     data_source = destination_parts[0]
 
@@ -86,39 +95,66 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
             files=[],
         )
 
-    documents_to_upload: List[dict] = []
-    package.traverse_documents(lambda document, **kwargs: documents_to_upload.append(document))
-    package.traverse_package(lambda package: documents_to_upload.append(package.to_dict()))
+    data_source = destination_parts[0]
+    import_package_content(package, data_source, global_ids, resolve_local_ids)
 
-    files_to_upload = {}
-    with tqdm(documents_to_upload, desc=f"Importing documents of type 'File' from {package.name}") as bar:
-        for document in documents_to_upload:
-            if isinstance(document, File):
+
+def import_package_content(package: Package, data_source: str, global_ids: dict, resolve_local_ids: bool) -> dict:
+    files: List[File] = []
+    entities: List[Entity] = []
+    package.traverse_documents(
+        lambda document, **kwargs: files.append(document) if isinstance(document, File) else entities.append(document)
+    )
+    uploaded_file_ids = {}
+    if len(files) > 0:
+        with tqdm(files, desc=f"  Adding files") as bar:
+            for file in files:
                 try:
-                    dmss_api.file_upload(data_source, json.dumps({"file_id": document.uid}), document.content)
-                    files_to_upload[f"dmss:/{document.content.destination}/{document.path.stem}"] = document.uid
+                    dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
+                    uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
                 except Exception as error:
                     if state.debug:
                         console.print_exception()
                     text = Text(str(error))
                     console.print(text, style="red1")
                     raise typer.Exit(code=1)
-            bar.update()
+                bar.update()
 
-    with tqdm(documents_to_upload, desc=f"Importing {package.name}") as bar:
-        for document in documents_to_upload:
-            if not isinstance(document, File):
-                document = replace_file_addresses(document, data_source, files_to_upload)
-                if resolve_local_ids:
-                    name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
-                    document = resolve_local_ids_in_document(document)
-                    print(f"Successfully resolved local IDs in:\t{data_source}{name}")
+    uploaded_entity_ids = {}
+    if len(entities) > 0:
+        with tqdm(entities, desc=f"  Adding entities") as bar:
+            for entity in entities:
                 try:
-                    dmss_api.document_add_simple(data_source, document)
+                    document = replace_file_addresses(entity.content, data_source, uploaded_file_ids, global_ids)
+                    if resolve_local_ids:
+                        name = (
+                            f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
+                        )
+                        document = resolve_local_ids_in_document(document)
+                        print(f"Successfully resolved local IDs in:\t{data_source}{name}")
+                    document_id = dmss_api.document_add_simple(data_source, document)
+                    uploaded_entity_ids[f"dmss://{data_source}/{entity.directory}/{entity.filename}"] = document_id
                 except Exception as error:
                     if state.debug:
                         console.print_exception()
                     text = Text(str(error))
                     console.print(text, style="red1")
                     raise typer.Exit(code=1)
-            bar.update()
+                bar.update()
+
+    packages: List[Package] = []
+    package.traverse_package(lambda package: packages.append(package))
+    if len(packages) > 0:
+        with tqdm(packages, desc=f"  Adding packages") as bar:
+            for package in packages:
+                try:
+                    dmss_api.document_add_simple(data_source, package.to_dict())
+                except Exception as error:
+                    if state.debug:
+                        console.print_exception()
+                    text = Text(str(error))
+                    console.print(text, style="red1")
+                    raise typer.Exit(code=1)
+                bar.update()
+
+    return uploaded_entity_ids

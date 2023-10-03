@@ -254,29 +254,35 @@ class ImportPackageTest(unittest.TestCase):
         folder_SubFolder = folder_A.search("SubFolder")
         myTurbine2 = folder_SubFolder.search("myTurbine2")
 
-        assert mooringBlueprint["type"] == "dmss://system/SIMOS/Blueprint"
+        assert mooringBlueprint.content["type"] == "dmss://system/SIMOS/Blueprint"
 
-        assert myTurbine2["type"] == "dmss://test_data_source/MyRootPackage/WindTurbine"
-        assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
-        assert myTurbine2["Mooring"]["type"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
-        assert myTurbine2["Mooring"]["_id"] == myTurbineMooring["_id"]
+        assert myTurbine2.content["type"] == "dmss://test_data_source/MyRootPackage/WindTurbine"
+        assert isinstance(UUID(myTurbine2.content["Mooring"]["_id"]), UUID)
+        assert myTurbine2.content["Mooring"]["type"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert myTurbine2.content["Mooring"]["_id"] == myTurbineMooring.content["_id"]
 
         windTurbine = root_package.search("WindTurbine")
-        assert isinstance(UUID(windTurbine["_id"]), UUID)
+        assert isinstance(UUID(windTurbine.content["_id"]), UUID)
         assert (
-            windTurbine["attributes"][0]["attributeType"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+            windTurbine.content["attributes"][0]["attributeType"]
+            == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
         )
-        assert (windTurbine["attributes"][1]["attributeType"]) == "http://marine-models.sintef.com/Signals/Default"
-        assert windTurbine["extends"] == [
+        assert (
+            windTurbine.content["attributes"][1]["attributeType"]
+        ) == "http://marine-models.sintef.com/Signals/Default"
+        assert windTurbine.content["extends"] == [
             "dmss://system/SIMOS/DefaultUiRecipes",
             "dmss://system/SIMOS/NamedEntity",
         ]
-        assert windTurbine["_meta_"]["version"] == "0.0.1" and len(windTurbine["_meta_"]["dependencies"]) == 1
+        assert (
+            windTurbine.content["_meta_"]["version"] == "0.0.1"
+            and len(windTurbine.content["_meta_"]["dependencies"]) == 1
+        )
 
         specialMooring = folder_Moorings.search("SpecialMooring")
-        assert len(specialMooring["extends"]) == 3
-        assert specialMooring["extends"][2] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
-        assert specialMooring["attributes"][1]["type"] == "dmss://test_data_source/AnotherPackage/MyType"
+        assert len(specialMooring.content["extends"]) == 3
+        assert specialMooring.content["extends"][2] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert specialMooring.content["attributes"][1]["type"] == "dmss://test_data_source/AnotherPackage/MyType"
 
         test_pdf = root_package.search("test_pdf.pdf")
         assert isinstance(test_pdf, File)

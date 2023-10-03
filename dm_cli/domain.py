@@ -7,6 +7,17 @@ from uuid import UUID, uuid4
 from .enums import SIMOS, ReferenceTypes
 
 
+@dataclass(frozen=False)
+class Entity:
+    content: dict
+    filename: str
+    name: str = ""
+    directory: str = ""
+
+    def __getitem__(self, item):
+        return self.__getattribute__(item)
+
+
 @dataclass(frozen=True)
 class File:
     """Class for a file"""
@@ -34,7 +45,7 @@ class Package:
         self.description = description
         self.uid = uid if uid else uuid4()
         self.is_root = is_root
-        self.content: List[Union[Package, dict, File]] = []
+        self.content: List[Union[Package, File, Entity]] = []
         self.meta: Union[dict, None] = meta if meta else {}
         self.parent = parent if parent else None
 
@@ -120,24 +131,14 @@ class Package:
                         "referenceType": ReferenceTypes.STORAGE.value,
                     }
                 )
-            else:  # Assume the child is a dict
-                if "name" in child:
-                    result.append(
-                        {
-                            "address": f"${child['_id']}",
-                            "type": SIMOS.REFERENCE.value,
-                            "referenceType": ReferenceTypes.STORAGE.value,
-                        }
-                    )
-
-                else:
-                    result.append(
-                        {
-                            "address": f"${child['_id']}",
-                            "type": SIMOS.REFERENCE.value,
-                            "referenceType": ReferenceTypes.STORAGE.value,
-                        }
-                    )
+            elif isinstance(child, Entity):
+                result.append(
+                    {
+                        "address": f"${str(child.content['_id'])}",
+                        "type": SIMOS.REFERENCE.value,
+                        "referenceType": ReferenceTypes.STORAGE.value,
+                    }
+                )
         return result
 
 

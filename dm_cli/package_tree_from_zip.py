@@ -68,7 +68,7 @@ def package_tree_from_zip(
                 continue
             if Path(filename).suffix != ".json":
                 file_like = io.BytesIO(zip_file.read(f"{folder_name}/{filename}"))
-                print(f"\tAdding file {filename} ({file_like.getbuffer().nbytes} bytes)")
+                # print(f"\tAdding file {filename} ({file_like.getbuffer().nbytes} bytes)")
                 file_like.name = Path(filename).name  # stem
                 file_like.destination = Path(f"/{data_source_id}/{folder_name}/{filename}").parent
                 add_object_to_package(Path(filename), root_package, file_like)
@@ -87,7 +87,7 @@ def package_tree_from_zip(
 
         def replace(document, file_path):
             if not isinstance(document, File):
-                document = {
+                document.content = {
                     key: replace_relative_references(
                         key,
                         value,
@@ -96,7 +96,7 @@ def package_tree_from_zip(
                         file_path=file_path,
                         zip_file=zip_file,
                     )
-                    for key, value in document.items()
+                    for key, value in document.content.items()
                 }
             return document
 

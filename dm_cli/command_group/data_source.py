@@ -1,5 +1,7 @@
+import io
 import json
 from pathlib import Path
+from zipfile import ZipFile
 
 import emoji
 import typer
@@ -8,12 +10,16 @@ from typing_extensions import Annotated
 
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper
 from dm_cli.dmss_api.exceptions import NotFoundException
+from dm_cli.domain import Package
 from dm_cli.import_entity import import_folder_entity
+from dm_cli.import_package import import_package_content, import_package_tree
+from dm_cli.package_tree_from_zip import package_tree_from_zip
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 from dm_cli.utils.utils import (
     get_root_packages_in_data_sources,
     validate_entities_in_data_sources,
 )
+from dm_cli.utils.zip import zip_all
 
 data_source_app = typer.Typer()
 
@@ -37,7 +43,6 @@ def import_data_source(
         existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
         if any(existing_document["name"] == document["name"] for existing_document in existing_data_sources):
             print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
-
         dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
         print(f"\tImported data source '{document['name']}' ✓")
 
@@ -114,21 +119,49 @@ def import_data_source_file(
         )
     else:
         import_data_source(data_source_definition_filepath)
-        root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir()]
-        for root_package in root_packages:
-            # Delete all packages in the data source
-            dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
+        with open(data_source_definition_filepath) as file:
+            data_source_document = json.load(file)
+            global_folders = data_source_document.get("global_folders", [])
+            root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir() and f.name not in global_folders]
+            # Remove root packages from the data source
+            for root_package in root_packages:
+                dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
 
-            dmss_exception_wrapper(
-                import_folder_entity,
-                source_path=data_source_data_dir / root_package.name,
-                destination=data_source_name,
-                # Use the document raw endpoint,
-                # so that uploaded packages will not be resolved,
-                # this is to support uploading core blueprints.
-                raw_package_import=True,
-                resolve_local_ids=resolve_local_ids,
-            )
+            # Upload global folders and store the global ids inside a look-up table
+            # so that the other root packages can replace any file addresses with global ids.
+            global_ids = {}
+            for global_folder in global_folders:
+                if not Path(data_source_data_dir / global_folder).is_dir():
+                    raise Exception(f"The global folder does not exist '{global_folder}'")
+                memory_file = io.BytesIO()
+                with ZipFile(memory_file, mode="w") as zip_file:
+                    zip_all(
+                        zip_file,
+                        data_source_data_dir / global_folder,
+                        write_folder=True,
+                    )
+                memory_file.seek(0)
+                package: Package = package_tree_from_zip(data_source_name, memory_file)
+                global_ids = import_package_content(
+                    package=package,
+                    data_source=data_source_name,
+                    global_ids={},
+                    resolve_local_ids=resolve_local_ids,
+                )
+
+            # Import all root packages
+            for root_package in root_packages:
+                dmss_exception_wrapper(
+                    import_folder_entity,
+                    source_path=data_source_data_dir / root_package.name,
+                    destination=data_source_name,
+                    # Use the document raw endpoint,
+                    # so that uploaded packages will not be resolved,
+                    # this is to support uploading core blueprints.
+                    raw_package_import=True,
+                    global_ids=global_ids,
+                    resolve_local_ids=resolve_local_ids,
+                )
 
 
 @data_source_app.command("reset")
