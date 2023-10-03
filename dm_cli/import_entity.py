@@ -69,8 +69,12 @@ def import_single_entity(source_path: Path, destination: str):
 
 
 def import_folder_entity(
-    source_path: Path, destination: str, raw_package_import: bool = False, resolve_local_ids: bool = False
-) -> None:
+    source_path: Path,
+    destination: str,
+    raw_package_import: bool = False,
+    resolve_local_ids: bool = False,
+    global_files: io.BytesIO = None,
+) -> dict:
     print(f"Importing PACKAGE '{source_path.name}' --> '{destination}/'")
     destination_path = Path(destination)
     data_source = destination_path.parts[0]
@@ -103,4 +107,4 @@ def import_folder_entity(
     memory_file.seek(0)
 
     package = package_tree_from_zip(data_source, memory_file, is_root=is_root, extra_dependencies=dependencies)
-    import_package_tree(package, destination, raw_package_import, resolve_local_ids)
+    import_package_tree(package, destination, raw_package_import, resolve_local_ids, global_files)

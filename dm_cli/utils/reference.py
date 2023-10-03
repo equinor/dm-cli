@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List, Union
 
 from ..domain import Dependency
-from ..enums import SIMOS, BuiltinDataTypes
+from ..enums import SIMOS, BuiltinDataTypes, ReferenceTypes
 from .utils import Package, resolve_dependency
 
 
@@ -128,6 +128,10 @@ def replace_relative_references(
             data_source,
             file_path,
         )
+
+        # Do nothing with the address for references of type storage
+        if resolved_type == SIMOS.REFERENCE.value and value.get("referenceType") == ReferenceTypes.STORAGE.value:
+            return {"type": SIMOS.REFERENCE.value, "address": f"{value['address']}", "referenceType": "storage"}
 
         ignore_attributes = []
         if resolved_type == SIMOS.DEPENDENCY.value:

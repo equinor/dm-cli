@@ -1,0 +1,21 @@
+{
+  "name": "Simulation",
+  "type": "CORE:Blueprint",
+  "extends": [
+    "CORE:NamedEntity"
+  ],
+  "attributes": [
+    {
+      "name": "result",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "./Result",
+      "optional": true
+    },
+    {
+      "name": "plot",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "binary",
+      "optional": true
+    }
+  ]
+}
