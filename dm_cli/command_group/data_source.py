@@ -1,5 +1,7 @@
+import io
 import json
 from pathlib import Path
+from zipfile import ZipFile
 
 import emoji
 import typer
@@ -14,6 +16,7 @@ from dm_cli.utils.utils import (
     get_root_packages_in_data_sources,
     validate_entities_in_data_sources,
 )
+from dm_cli.utils.zip import zip_all
 
 data_source_app = typer.Typer()
 
@@ -114,21 +117,37 @@ def import_data_source_file(
         )
     else:
         import_data_source(data_source_definition_filepath)
-        root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir()]
-        for root_package in root_packages:
-            # Delete all packages in the data source
-            dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
+        with open(data_source_definition_filepath) as file:
+            data_source_document = json.load(file)
+            global_folders = data_source_document.get("global_folders", [])
+            root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir() and f.name not in global_folders]
+            # Remove existing root packages from the data source.
+            # This will also remove any files in the global folders that are references from files in the root packages.
+            for root_package in root_packages:
+                dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
 
-            dmss_exception_wrapper(
-                import_folder_entity,
-                source_path=data_source_data_dir / root_package.name,
-                destination=data_source_name,
-                # Use the document raw endpoint,
-                # so that uploaded packages will not be resolved,
-                # this is to support uploading core blueprints.
-                raw_package_import=True,
-                resolve_local_ids=resolve_local_ids,
-            )
+            global_files_storage = io.BytesIO()
+            with ZipFile(global_files_storage, mode="w") as global_files:
+                # Zip all files from the global folders  for easy access to these files later on.
+                # If there will be any performance issues, we should instead use repository pattern.
+                for global_folder in global_folders:
+                    if not Path(data_source_data_dir / global_folder).is_dir():
+                        raise Exception(f"The global folder does not exist '{global_folder}'")
+                    zip_all(global_files, data_source_data_dir / global_folder, write_folder=True)
+
+                # Import all root packages
+                for root_package in root_packages:
+                    dmss_exception_wrapper(
+                        import_folder_entity,
+                        source_path=data_source_data_dir / root_package.name,
+                        destination=data_source_name,
+                        # Use the document raw endpoint,
+                        # so that uploaded packages will not be resolved,
+                        # this is to support uploading core blueprints.
+                        raw_package_import=True,
+                        resolve_local_ids=resolve_local_ids,
+                        global_files=global_files,
+                    )
 
 
 @data_source_app.command("reset")
