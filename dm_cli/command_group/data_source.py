@@ -131,9 +131,8 @@ def import_data_source_file(
                 # Zip all files from the global folders  for easy access to these files later on.
                 # If there will be any performance issues, we should instead use repository pattern.
                 for global_folder in global_folders:
-                    if not Path(data_source_data_dir / global_folder).is_dir():
-                        raise Exception(f"The global folder does not exist '{global_folder}'")
-                    zip_all(global_files, data_source_data_dir / global_folder, write_folder=True)
+                    if Path(data_source_data_dir / global_folder).is_dir():
+                        zip_all(global_files, data_source_data_dir / global_folder, write_folder=True)
 
                 # Import all root packages
                 for root_package in root_packages:
