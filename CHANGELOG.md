@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/equinor/dm-cli/compare/v1.1.2...v1.2.0) (2023-10-06)
+
+
+### Features
+
+* add support for global data source storage ([89a810b](https://github.com/equinor/dm-cli/commit/89a810bf8effcacc49c11a520b5c7cada4182f2b))
+* resolve local id ([b8ce10a](https://github.com/equinor/dm-cli/commit/b8ce10a3d3da752c29f03519b12c1a9218966f3d))
+
+
+### Code Refactoring
+
+* from PR feedback ([b10c028](https://github.com/equinor/dm-cli/commit/b10c02843f21fbf014d67aab00ad74d7b62666ae))
+
 ## [1.1.2](https://github.com/equinor/dm-cli/compare/v1.1.1...v1.1.2) (2023-09-15)
 
 
