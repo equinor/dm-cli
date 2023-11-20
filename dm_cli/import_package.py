@@ -2,18 +2,24 @@ import io
 import json
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List
 from uuid import uuid4
 from zipfile import ZipFile
 
 import typer
 from rich.console import Console
 from rich.text import Text
+from tenacity import (
+    retry,
+    retry_if_not_exception_type,
+    stop_after_attempt,
+    wait_random_exponential,
+)
 from tqdm import tqdm
 
 from dm_cli.state import state
 
-from .dmss import dmss_api
+from .dmss import ApplicationException, dmss_api
 from .domain import Dependency, File, Package
 from .utils.reference import replace_relative_references
 from .utils.resolve_local_ids import resolve_local_ids_in_document
@@ -95,6 +101,12 @@ def import_package_tree(
     import_package_content(package, data_source, resolve_local_ids, global_files)
 
 
+@retry(
+    wait=wait_random_exponential(multiplier=1, max=60),
+    stop=stop_after_attempt(5),
+    reraise=True,
+    retry=retry_if_not_exception_type(ApplicationException),
+)
 def import_package_content(package: Package, data_source: str, resolve_local_ids: bool, global_files: ZipFile) -> None:
     files: List[File] = []
     entities: List[dict] = []

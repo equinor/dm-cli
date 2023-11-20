@@ -5,10 +5,15 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from rich import print
+from tenacity import (
+    retry,
+    retry_if_not_exception_type,
+    stop_after_attempt,
+    wait_random_exponential,
+)
 
-from .dmss import dmss_api
+from .dmss import ApplicationException, dmss_api
 from .dmss_api.exceptions import NotFoundException
-from .domain import Dependency
 from .import_package import import_package_tree
 from .package_tree_from_zip import package_tree_from_zip
 from .state import state
@@ -22,6 +27,12 @@ from .utils.utils import (
 from .utils.zip import zip_all
 
 
+@retry(
+    wait=wait_random_exponential(multiplier=1, max=60),
+    stop=stop_after_attempt(5),
+    reraise=True,
+    retry=retry_if_not_exception_type(ApplicationException),
+)
 def import_document(source_path: Path, destination: str, data_source_id: str, package: str, document: dict):
     remote_dependencies = dmss_api.export_meta(f"{data_source_id}/{package}")
     old_dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
@@ -68,6 +79,12 @@ def import_single_entity(source_path: Path, destination: str):
         raise Exception(f"Failed to load the file '{source_path.name}' as a JSON document")
 
 
+@retry(
+    wait=wait_random_exponential(multiplier=1, max=60),
+    stop=stop_after_attempt(5),
+    reraise=True,
+    retry=retry_if_not_exception_type(ApplicationException),
+)
 def import_folder_entity(
     source_path: Path,
     destination: str,
