@@ -5,6 +5,12 @@ import requests
 import typer
 from rich.console import Console
 from rich.text import Text
+from tenacity import (
+    retry,
+    retry_if_not_exception_type,
+    stop_after_attempt,
+    wait_random_exponential,
+)
 
 from dm_cli.dmss_api import ApiException
 from dm_cli.dmss_api.api.default_api import DefaultApi
@@ -46,6 +52,12 @@ class ApplicationException(Exception):
         }
 
 
+@retry(
+    wait=wait_random_exponential(multiplier=1, max=60),
+    stop=stop_after_attempt(5),
+    reraise=True,
+    retry=retry_if_not_exception_type(ApplicationException),
+)
 def export(absolute_document_ref: str):
     """Call export endpoint from DMSS to download document(s) as zip.
 
