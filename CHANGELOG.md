@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/equinor/dm-cli/compare/v1.2.0...v1.3.0) (2023-11-21)
+
+
+### Features
+
+* retry requests on network errors ([098845c](https://github.com/equinor/dm-cli/commit/098845c6da5ca107d44d8d20b37b6e6a2d60ec96))
+
 ## [1.2.0](https://github.com/equinor/dm-cli/compare/v1.1.2...v1.2.0) (2023-10-06)
 
 
