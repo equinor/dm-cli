@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/equinor/dm-cli/compare/v1.3.0...v1.4.0) (2023-11-24)
+
+
+### Features
+
+* add enum support ([3a5edeb](https://github.com/equinor/dm-cli/commit/3a5edeb650a84b1fa6837d69e7b726c0ca9e87c6))
+* resolve enum type ([0d6fe2a](https://github.com/equinor/dm-cli/commit/0d6fe2a040c8ccee6410f3253b0a4fb74e1c9c46))
+
 ## [1.3.0](https://github.com/equinor/dm-cli/compare/v1.2.0...v1.3.0) (2023-11-21)
 
 
