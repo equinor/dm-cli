@@ -79,7 +79,7 @@ def replace_relative_references(
         "extends",
         "_blueprintPath_",
         "address",
-        "enumType"
+        "enumType",
     )  # These keys may contain a reference
 
     if (
