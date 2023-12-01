@@ -1,9 +1,9 @@
 import io
-import json
 from json import JSONDecodeError
 from pathlib import Path
 from zipfile import ZipFile
 
+import orjson as json
 from rich import print
 from tenacity import (
     retry,
@@ -55,7 +55,7 @@ def import_document(source_path: Path, destination: str, data_source_id: str, pa
             parent_directory=source_path.parent,
         )
 
-    document_json_str = json.dumps(prepared_document)
+    document_json_str = json.dumps(prepared_document).decode()
     dmss_api.document_add(
         f"{destination}",
         document_json_str,
@@ -70,9 +70,9 @@ def import_single_entity(source_path: Path, destination: str):
     data_source_id, package = destination.split("/", 1)
 
     try:  # Load the JSON document
-        with open(source_path, "r") as fh:
+        with open(source_path, "rb") as fh:
             if Path(source_path).suffix == ".json":
-                import_document(source_path, destination, data_source_id, package, json.load(fh))
+                import_document(source_path, destination, data_source_id, package, json.loads(fh.read()))
             else:
                 print(f"Unsupported file type {source_path}")
     except JSONDecodeError:

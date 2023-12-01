@@ -1,10 +1,10 @@
 import io
-import json
 from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
+import orjson as json
 import typer
 from rich.console import Console
 from rich.text import Text
@@ -89,7 +89,7 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
     else:
         dmss_api.document_add(
             destination,
-            json.dumps(package.to_dict()),
+            json.dumps(package.to_dict()).decode(),
             update_uncontained=False,
             files=[],
         )
@@ -115,7 +115,7 @@ def import_package_content(package: Package, data_source: str, resolve_local_ids
         with tqdm(files, desc=f"  Adding files") as bar:
             for file in files:
                 try:
-                    dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
+                    dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}).decode(), file.content)
                     uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
                 except Exception as error:
                     if state.debug:

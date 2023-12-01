@@ -10,7 +10,7 @@
 
 import io
 import ipaddress
-import json
+import orjson as json
 import logging
 import re
 import ssl

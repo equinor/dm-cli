@@ -1,6 +1,6 @@
-import json
 from typing import Any, Callable
 
+import orjson as json
 import requests
 import typer
 from rich.console import Console

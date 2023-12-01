@@ -10,7 +10,7 @@
 
 import atexit
 import io
-import json
+import orjson as json
 import mimetypes
 import os
 import re

@@ -1,7 +1,7 @@
-import json
 from pathlib import Path
 
 import emoji
+import orjson as json
 import typer
 from rich import print
 from typing_extensions import Annotated
@@ -31,8 +31,8 @@ def import_data_source(
     print(f"IMPORTING DATA SOURCE '{data_source_path.name}'")
 
     # Read the data source definition
-    with open(data_source_path) as file:
-        document = json.load(file)
+    with open(data_source_path, "rb") as file:
+        document = json.loads(file.read())
         existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
         if any(existing_document["name"] == document["name"] for existing_document in existing_data_sources):
             print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
@@ -106,8 +106,8 @@ def import_data_source_file(
         )
     else:
         import_data_source(data_source_definition_filepath)
-        with open(data_source_definition_filepath) as file:
-            data_source_document = json.load(file)
+        with open(data_source_definition_filepath, "rb") as file:
+            data_source_document = json.loads(file.read())
             global_folders = data_source_document.get("global_folders", [])
             root_packages = [f for f in data_source_data_dir.iterdir() if f.is_dir() and f.name not in global_folders]
             # Remove existing root packages from the data source.

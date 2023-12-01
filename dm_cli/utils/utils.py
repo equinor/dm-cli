@@ -1,9 +1,9 @@
-import json
 import os
 import pprint
 from pathlib import Path
 from typing import Callable, Dict, List
 
+import orjson as json
 import typer
 from rich import print
 from rich.console import Console
@@ -63,7 +63,7 @@ def add_package_to_path(name: str, path: Path):
     package = Package(name, is_root=len(path.parts) == 2)
     dmss_api.document_add(
         str(path.parent),
-        json.dumps(package.to_dict()),
+        json.dumps(package.to_dict()).decode(),
         update_uncontained=False,
         files=[],
     )
@@ -129,8 +129,8 @@ def get_root_packages_in_data_sources(path: str) -> dict:
     data_source_definitions: list[str] = get_json_files_in_dir(data_sources_dir)
     root_packages_in_data_sources = {}
     for data_source_definition in data_source_definitions:
-        with open(os.path.join(data_sources_dir, data_source_definition)) as file:
-            data_source_document = json.load(file)
+        with open(os.path.join(data_sources_dir, data_source_definition), "rb") as file:
+            data_source_document = json.loads(file.read())
             # Global folders should be uploaded directly to the data source
             # and should not be included in the root packages of the data source.
             global_folders = data_source_document.get("global_folders", [])

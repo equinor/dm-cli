@@ -1,9 +1,10 @@
 import io
-import json
 from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, Union
 from zipfile import ZipFile
+
+import orjson as json
 
 from .domain import Dependency, File, Package
 from .import_package import (
