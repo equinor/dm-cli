@@ -79,6 +79,13 @@ def import_single_entity(source_path: Path, destination: str):
         raise Exception(f"Failed to load the file '{source_path.name}' as a JSON document")
 
 
+def remove_by_path_ignore_404(target: str):
+    try:
+        dmss_api.document_remove(target)
+    except NotFoundException:
+        pass
+
+
 @retry(
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
@@ -90,22 +97,19 @@ def import_folder_entity(
     destination: str,
     raw_package_import: bool = False,
     resolve_local_ids: bool = False,
-    global_files: io.BytesIO = None,
 ) -> dict:
     print(f"Importing PACKAGE '{source_path.name}' --> '{destination}/'")
     destination_path = Path(destination)
     data_source = destination_path.parts[0]
 
-    try:  # Check if target already exists on remote. Then delete or raise exception
-        dmss_api.document_get(f"dmss://{destination}/{source_path.name}")
+    # Check if target already exists on remote. Then delete or raise exception
+    target = f"{destination}/{source_path.name}"
+    exists = dmss_api.document_check(target)
+    if exists:
         if not state.force:
-            raise ValueError(f"Failed to upload to 'dmss://{destination}/{source_path.name}' - It already exists.")
-        console.print(
-            f"WARNING: '{destination}/{source_path.name}' already exists. Replacing it...", style="dark_orange"
-        )
-        dmss_api.document_remove(f"{destination}/{source_path.name}")
-    except NotFoundException:
-        pass  # The folder we're trying to upload does not exist, which is fine
+            raise ValueError(f"Failed to upload to '{target}' - It already exists.")
+        console.print(f"'{target}' already exists.  Replacing it...", style="dark_orange")
+        dmss_api.document_remove(target)
 
     dependencies = {}
     is_root = destination_is_root(destination_path)
@@ -123,5 +127,7 @@ def import_folder_entity(
         )
     memory_file.seek(0)
 
-    package = package_tree_from_zip(data_source, memory_file, is_root=is_root, extra_dependencies=dependencies)
-    import_package_tree(package, destination, raw_package_import, resolve_local_ids, global_files)
+    package = package_tree_from_zip(
+        data_source, memory_file, is_root=is_root, extra_dependencies=dependencies, source_path=source_path
+    )
+    import_package_tree(package, destination, raw_package_import, resolve_local_ids)

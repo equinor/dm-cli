@@ -22,6 +22,17 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     return f"dmss://{data_source}/{root_package}/{reference}"
 
 
+def resolve_storage_reference(reference: str, data_source: str, file_path: str, source_path: Path):
+    path_to_root_package_from_data_dir = f"{data_source}/{file_path}"
+    data_dir_path = str(source_path)[: -len(path_to_root_package_from_data_dir)]  # app/data
+    if reference[0] == ".":
+        return normpath(f"{source_path}/{reference}")
+    elif reference[0] == "/":
+        return f"{data_dir_path}{data_source}{reference}"
+    else:
+        return f"{data_dir_path}{data_source}/{reference}"
+
+
 def replace_relative_references_in_package_meta(
     package: Package, dependencies: Dict[str, Dependency], data_source_id: str
 ) -> Package:
@@ -52,6 +63,7 @@ def replace_relative_references(
     parent_directory: Union[Path, None] = None,
     # for packages
     zip_file: Union[str, None] = None,
+    source_path: Path = None,
 ) -> Union[str, List[str], dict]:
     """
     Takes a key-value pair and returns the passed value, with
@@ -71,6 +83,7 @@ def replace_relative_references(
 
     When importing packages, the following additional parameter is required:
     @param zip_file:
+    @param source_path: path to the root folder
     """
 
     KEYS_TO_CHECK = (
@@ -132,7 +145,8 @@ def replace_relative_references(
 
         # Do nothing with the address for references of type storage
         if resolved_type == SIMOS.REFERENCE.value and value.get("referenceType") == ReferenceTypes.STORAGE.value:
-            return {"type": SIMOS.REFERENCE.value, "address": f"{value['address']}", "referenceType": "storage"}
+            resolved_path = resolve_storage_reference(value["address"], data_source, file_path, source_path)
+            return {"type": SIMOS.REFERENCE.value, "address": f"{resolved_path}", "referenceType": "storage"}
 
         ignore_attributes = []
         if resolved_type == SIMOS.DEPENDENCY.value:
@@ -140,12 +154,7 @@ def replace_relative_references(
 
         return {
             k: replace_relative_references(
-                k,
-                v,
-                dependencies,
-                data_source,
-                file_path=file_path,
-                zip_file=zip_file,
+                k, v, dependencies, data_source, file_path=file_path, zip_file=zip_file, source_path=source_path
             )
             if k not in ignore_attributes
             else v
@@ -154,12 +163,7 @@ def replace_relative_references(
     if isinstance(value, list):
         return [
             replace_relative_references(
-                key,
-                v,
-                dependencies,
-                data_source,
-                file_path=file_path,
-                zip_file=zip_file,
+                key, v, dependencies, data_source, file_path=file_path, zip_file=zip_file, source_path=source_path
             )
             for v in value
         ]

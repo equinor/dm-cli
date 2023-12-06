@@ -4,7 +4,6 @@ from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
-from zipfile import ZipFile
 
 import typer
 from rich.console import Console
@@ -81,9 +80,7 @@ def add_package_to_package(path: Path, package: Package) -> None:
     return add_package_to_package(Path(new_path), sub_folder)
 
 
-def import_package_tree(
-    package: Package, destination: str, raw_package_import: bool, resolve_local_ids: bool, global_files: ZipFile
-) -> None:
+def import_package_tree(package: Package, destination: str, raw_package_import: bool, resolve_local_ids: bool) -> None:
     destination_parts = destination.split("/")
     data_source = destination_parts[0]
 
@@ -98,7 +95,7 @@ def import_package_tree(
         )
 
     data_source = destination_parts[0]
-    import_package_content(package, data_source, resolve_local_ids, global_files)
+    import_package_content(package, data_source, resolve_local_ids)
 
 
 @retry(
@@ -107,7 +104,7 @@ def import_package_tree(
     reraise=True,
     retry=retry_if_not_exception_type(ApplicationException),
 )
-def import_package_content(package: Package, data_source: str, resolve_local_ids: bool, global_files: ZipFile) -> None:
+def import_package_content(package: Package, data_source: str, resolve_local_ids: bool) -> None:
     files: List[File] = []
     entities: List[dict] = []
     package.traverse_documents(
@@ -133,14 +130,16 @@ def import_package_content(package: Package, data_source: str, resolve_local_ids
         filepath = Path(address)
         if filepath.suffix != ".json":
             # Binary files
-            file_like = io.BytesIO(global_files.read(address[1:]))
+            with open(address, "rb") as f:
+                file_like = io.BytesIO(f.read())
             file_like.name = filepath.stem
             global_id = str(uuid4())
             dmss_api.blob_upload(data_source, global_id, file_like)
             return global_id
         else:
             try:
-                global_document = json.loads(global_files.read(address[1:]))
+                with open(address) as f:
+                    global_document = json.load(f)
                 # Get dependencies from package
                 dependencies: Dict[str, Dependency] = {
                     dependency["alias"]: Dependency(**dependency)
