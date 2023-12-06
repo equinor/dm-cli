@@ -23,6 +23,7 @@ def package_tree_from_zip(
     zip_package: io.BytesIO,
     is_root: bool = True,
     extra_dependencies: Union[Dict[str, Dependency], None] = None,
+    source_path: Path = None,
 ) -> Package:
     """
     Converts a Zip-folder into a DMSS Package structure.
@@ -32,6 +33,8 @@ def package_tree_from_zip(
 
     @param data_source_id: A string with the name/id of an existing data source to import package to
     @param zip_package: A zip-folder represented as an in-memory io.BytesIO object
+    @param source_path: path to the root folder
+
     @return: A Package object with sub folders(Package) and documents(dict)
     """
 
@@ -94,6 +97,7 @@ def package_tree_from_zip(
                         data_source_id,
                         file_path=file_path,
                         zip_file=zip_file,
+                        source_path=source_path,
                     )
                     for key, value in document.items()
                 }

@@ -1,7 +1,5 @@
-import io
 import json
 from pathlib import Path
-from zipfile import ZipFile
 
 import emoji
 import typer
@@ -9,14 +7,12 @@ from rich import print
 from typing_extensions import Annotated
 
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper
-from dm_cli.dmss_api.exceptions import NotFoundException
-from dm_cli.import_entity import import_folder_entity
+from dm_cli.import_entity import import_folder_entity, remove_by_path_ignore_404
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 from dm_cli.utils.utils import (
     get_root_packages_in_data_sources,
     validate_entities_in_data_sources,
 )
-from dm_cli.utils.zip import zip_all
 
 data_source_app = typer.Typer()
 
@@ -71,13 +67,6 @@ def import_all_data_sources(
         import_data_source(filepath)
 
 
-def remove_by_path_ignore_404(target: str):
-    try:
-        dmss_api.document_remove(target)
-    except NotFoundException:
-        pass
-
-
 @data_source_app.command("init")
 def initialize_data_source(
     path: Annotated[Path, typer.Argument(help="Path on local filesystem to data source folder.")],
@@ -126,27 +115,18 @@ def import_data_source_file(
             for root_package in root_packages:
                 dmss_exception_wrapper(remove_by_path_ignore_404, f"/{data_source_name}/{root_package.name}")
 
-            global_files_storage = io.BytesIO()
-            with ZipFile(global_files_storage, mode="w") as global_files:
-                # Zip all files from the global folders  for easy access to these files later on.
-                # If there will be any performance issues, we should instead use repository pattern.
-                for global_folder in global_folders:
-                    if Path(data_source_data_dir / global_folder).is_dir():
-                        zip_all(global_files, data_source_data_dir / global_folder, write_folder=True)
-
-                # Import all root packages
-                for root_package in root_packages:
-                    dmss_exception_wrapper(
-                        import_folder_entity,
-                        source_path=data_source_data_dir / root_package.name,
-                        destination=data_source_name,
-                        # Use the document raw endpoint,
-                        # so that uploaded packages will not be resolved,
-                        # this is to support uploading core blueprints.
-                        raw_package_import=True,
-                        resolve_local_ids=resolve_local_ids,
-                        global_files=global_files,
-                    )
+            # Import all root packages
+            for root_package in root_packages:
+                dmss_exception_wrapper(
+                    import_folder_entity,
+                    source_path=data_source_data_dir / root_package.name,
+                    destination=data_source_name,
+                    # Use the document raw endpoint,
+                    # so that uploaded packages will not be resolved,
+                    # this is to support uploading core blueprints.
+                    raw_package_import=True,
+                    resolve_local_ids=resolve_local_ids,
+                )
 
 
 @data_source_app.command("reset")
