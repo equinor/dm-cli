@@ -21,6 +21,15 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
         return f"dmss://{data_source}{reference}"
     return f"dmss://{data_source}/{root_package}/{reference}"
 
+def resolve_storage_reference(reference: str, data_source: str, file_path: str) -> str:
+    root_package = file_path.split("/", 1)[0]
+    if reference[0] == ".":
+        normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
+        return f"{data_source}/{normalized_dotted_ref}"
+    if reference[0] == "/":
+        return f"{data_source}{reference}"
+    return f"{data_source}/{root_package}/{reference}"
+
 
 def replace_relative_references_in_package_meta(
     package: Package, dependencies: Dict[str, Dependency], data_source_id: str
@@ -132,7 +141,12 @@ def replace_relative_references(
 
         # Do nothing with the address for references of type storage
         if resolved_type == SIMOS.REFERENCE.value and value.get("referenceType") == ReferenceTypes.STORAGE.value:
-            return {"type": SIMOS.REFERENCE.value, "address": f"{value['address']}", "referenceType": "storage"}
+            #return {"type": SIMOS.REFERENCE.value, "address": f"{value['address']}", "referenceType": "storage"}
+            return {
+                "type": SIMOS.REFERENCE.value,
+                "address": f"{resolve_storage_reference(value['address'], data_source, file_path)}",
+                "referenceType": "storage"
+            }
 
         ignore_attributes = []
         if resolved_type == SIMOS.DEPENDENCY.value:

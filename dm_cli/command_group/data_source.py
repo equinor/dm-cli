@@ -2,7 +2,7 @@ import io
 import json
 from pathlib import Path
 from zipfile import ZipFile
-
+from hashlib import md5
 import emoji
 import typer
 from rich import print
@@ -11,6 +11,7 @@ from typing_extensions import Annotated
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper
 from dm_cli.dmss_api.exceptions import NotFoundException
 from dm_cli.import_entity import import_folder_entity
+from dm_cli.utils.directory_hash import dir_hash
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 from dm_cli.utils.utils import (
     get_root_packages_in_data_sources,
@@ -132,6 +133,7 @@ def import_data_source_file(
                 # If there will be any performance issues, we should instead use repository pattern.
                 for global_folder in global_folders:
                     if Path(data_source_data_dir / global_folder).is_dir():
+                        #print(dir_hash(data_source_data_dir / global_folder))
                         zip_all(global_files, data_source_data_dir / global_folder, write_folder=True)
 
                 # Import all root packages

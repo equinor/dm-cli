@@ -129,18 +129,22 @@ def import_package_content(package: Package, data_source: str, resolve_local_ids
                 bar.update()
 
     def upload_global_file(address: str) -> str:
+        print(address)
         """Handling uploading of global files."""
         filepath = Path(address)
         if filepath.suffix != ".json":
             # Binary files
-            file_like = io.BytesIO(global_files.read(address[1:]))
+            binary_file = open(address, "r")
+            file_like = io.BytesIO(binary_file.read())
             file_like.name = filepath.stem
             global_id = str(uuid4())
             dmss_api.blob_upload(data_source, global_id, file_like)
             return global_id
         else:
             try:
-                global_document = json.loads(global_files.read(address[1:]))
+
+                global_file = open(address, "r")
+                global_document = json.loads(global_file.read())
                 # Get dependencies from package
                 dependencies: Dict[str, Dependency] = {
                     dependency["alias"]: Dependency(**dependency)
