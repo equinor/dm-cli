@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/equinor/dm-cli/compare/v1.4.0...v1.4.1) (2023-12-08)
+
+
+### Bug Fixes
+
+* resolve storage references on disk ([0ce0722](https://github.com/equinor/dm-cli/commit/0ce0722a6dcbf9906f6db2103acc1f05ea60e69c))
+
 ## [1.4.0](https://github.com/equinor/dm-cli/compare/v1.3.0...v1.4.0) (2023-11-24)
 
 
