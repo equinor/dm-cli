@@ -9,7 +9,6 @@ from .utils import Package, resolve_dependency
 
 def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
     root_package = file_path.split("/", 1)[0]
-
     if "://" in reference or reference == "_default_" or reference[0] == "^" or reference[0] == "~":
         return reference
     if ":" in reference:
@@ -22,15 +21,25 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     return f"dmss://{data_source}/{root_package}/{reference}"
 
 
-def resolve_storage_reference(reference: str, data_source: str, file_path: str, source_path: Path):
-    path_to_root_package_from_data_dir = f"{data_source}/{file_path}"
-    data_dir_path = str(source_path)[: -len(path_to_root_package_from_data_dir)]  # app/data
-    if reference[0] == ".":
-        return normpath(f"{source_path}/{reference}")
-    elif reference[0] == "/":
-        return f"{data_dir_path}{data_source}{reference}"
+def resolve_storage_reference(address: str, data_source: str, file_path: str, source_path: Path):
+    """
+    Resolve the address into a file path that should points to a file on disk.
+
+    @param address: The address to be resolved that points to a file on disk
+    @param data_source: The name of the data source
+    @param file_path: The path to where the file is root_package_name/package_name/sub_package_name/
+    @param source_path: The source path app_data_dir_name/data_source_name/root_package_name
+    """
+    # Remove duplicates in the source path and file path to get to the app data folder app_name/data
+    source_path_items = str(source_path).split("/")
+    file_path_items = f"{data_source}/{file_path}".split("/")
+    app_data_folder = "/".join([elem for elem in source_path_items if elem not in file_path_items])
+    if address[0] == ".":
+        return normpath(f"{source_path}/{address}")
+    elif address[0] == "/":
+        return f"{app_data_folder}/{data_source}{address}"
     else:
-        return f"{data_dir_path}{data_source}/{reference}"
+        return f"{app_data_folder}/{data_source}/{address}"
 
 
 def replace_relative_references_in_package_meta(
