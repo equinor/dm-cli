@@ -10,7 +10,7 @@ from .utils import Package, resolve_dependency
 def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
     root_package = file_path.split("/", 1)[0]
 
-    if "://" in reference or reference == "_default_" or reference[0] == "^":
+    if "://" in reference or reference == "_default_" or reference[0] == "^" or reference[0] == "~":
         return reference
     if ":" in reference:
         return resolve_dependency(reference, dependencies)
