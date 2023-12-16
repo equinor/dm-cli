@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/equinor/dm-cli/compare/v1.4.1...v1.4.2) (2023-12-16)
+
+
+### Bug Fixes
+
+* ignore tilde symbol ([47592e7](https://github.com/equinor/dm-cli/commit/47592e79475fa0a06d14a33aaef0a951cba0e427))
+
 ## [1.4.1](https://github.com/equinor/dm-cli/compare/v1.4.0...v1.4.1) (2023-12-08)
 
 
