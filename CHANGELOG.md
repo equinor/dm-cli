@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.3](https://github.com/equinor/dm-cli/compare/v1.4.2...v1.4.3) (2023-12-18)
+
+
+### Bug Fixes
+
+* relative storage references ([bf9cc4f](https://github.com/equinor/dm-cli/commit/bf9cc4f2af83784110d60bb7adf111c828bc2d31))
+* resolve global files on disk ([d5809c9](https://github.com/equinor/dm-cli/commit/d5809c9383f1e2dd3571cd1873a7c6ccb74e1e63))
+
 ## [1.4.2](https://github.com/equinor/dm-cli/compare/v1.4.1...v1.4.2) (2023-12-16)
 
 
