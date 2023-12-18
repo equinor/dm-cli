@@ -2,6 +2,7 @@ from os.path import normpath
 from pathlib import Path
 from typing import Dict, List, Union
 
+from ..dmss import ApplicationException
 from ..domain import Dependency
 from ..enums import SIMOS, BuiltinDataTypes, ReferenceTypes
 from .utils import Package, resolve_dependency
@@ -21,25 +22,22 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
     return f"dmss://{data_source}/{root_package}/{reference}"
 
 
-def resolve_storage_reference(address: str, data_source: str, file_path: str, source_path: Path):
+def resolve_storage_reference(address: str, source_path: Path):
     """
     Resolve the address into a file path that should points to a file on disk.
 
     @param address: The address to be resolved that points to a file on disk
-    @param data_source: The name of the data source
-    @param file_path: The path to where the file is root_package_name/package_name/sub_package_name/
     @param source_path: The source path app_data_dir_name/data_source_name/root_package_name
     """
-    # Remove duplicates in the source path and file path to get to the app data folder app_name/data
-    source_path_items = str(source_path).split("/")
-    file_path_items = f"{data_source}/{file_path}".split("/")
-    app_data_folder = "/".join([elem for elem in source_path_items if elem not in file_path_items])
+
+    # Remove last item in source path to get to the data source directory
+    source_path_items = str(source_path).split("/")[:-1]
+    app_data_folder = "/".join(source_path_items)
+
     if address[0] == ".":
-        return normpath(f"{source_path}/{address}")
-    elif address[0] == "/":
-        return f"{app_data_folder}/{data_source}{address}"
-    else:
-        return f"{app_data_folder}/{data_source}/{address}"
+        raise ApplicationException("Relative references by . are not supported")
+
+    return f"{app_data_folder}/{address}"
 
 
 def replace_relative_references_in_package_meta(
@@ -154,7 +152,7 @@ def replace_relative_references(
 
         # Do nothing with the address for references of type storage
         if resolved_type == SIMOS.REFERENCE.value and value.get("referenceType") == ReferenceTypes.STORAGE.value:
-            resolved_path = resolve_storage_reference(value["address"], data_source, file_path, source_path)
+            resolved_path = resolve_storage_reference(value["address"], source_path)
             return {"type": SIMOS.REFERENCE.value, "address": f"{resolved_path}", "referenceType": "storage"}
 
         ignore_attributes = []

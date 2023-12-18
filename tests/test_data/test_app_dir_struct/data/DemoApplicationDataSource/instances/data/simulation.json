@@ -1,0 +1,16 @@
+{
+  "_id": "simulation1_inside_data",
+  "name": "simulation1",
+  "type": "/models/storage_uncontained/Simulation",
+  "description": "Example simulation",
+  "result": {
+    "type": "CORE:Reference",
+    "address": "/global/globalEntity.json",
+    "referenceType": "storage"
+  },
+  "plot": {
+    "type": "CORE:Reference",
+    "address": "/global/globalImage.jpg",
+    "referenceType": "storage"
+  }
+}

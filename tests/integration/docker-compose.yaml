@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   dmss:
-    image: datamodelingtool.azurecr.io/dmss:v1.3.0
+    image: datamodelingtool.azurecr.io/dmss:v1.15.1
     restart: unless-stopped
     environment:
       AUTH_ENABLED: 0
@@ -21,3 +21,14 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: maf
       MONGO_INITDB_ROOT_PASSWORD: maf
+
+#  db-ui:
+#    image: mongo-express:1.0.0-alpha
+#    restart: unless-stopped
+#    ports:
+#      - "8082:8081"
+#    environment:
+#      ME_CONFIG_MONGODB_SERVER: db
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: maf
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: maf
+#      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
