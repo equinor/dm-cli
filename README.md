@@ -259,3 +259,7 @@ The DMSS API client, found in [`dm_cli/dmss_api/`](./dm_cli/dmss_api/), can be r
 
 ## Feedback
 Please feel free to leave feedback in issues/PRs.
+
+<a id="Contributing"></a>
+## :+1: Contributing
+If you would like to contribute, please read our [Contribution guide](https://equinor.github.io/dm-docs/contributing/).
