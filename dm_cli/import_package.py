@@ -51,7 +51,7 @@ def add_file_to_package(path: Path, package: Package, document: dict) -> None:
     if len(path.parts) == 1:  # End of path means the actual document
         if path.name.endswith("package.json"):
             # if document is a package.json file, add meta info to package instead of adding it to content list.
-            package.meta = document["_meta_"]
+            package.meta = document.get("_meta_", {})
             return
         # Create a UUID if the document does not have one
         package.content.append({**document, "_id": document.get("_id", str(uuid4()))})
@@ -90,7 +90,6 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
         dmss_api.document_add(
             destination,
             json.dumps(package.to_dict()),
-            update_uncontained=False,
             files=[],
         )
 

@@ -117,6 +117,7 @@ def import_data_source_file(
 
             # Import all root packages
             for root_package in root_packages:
+                print(f"Importing PACKAGE '{data_source_data_dir / root_package.name}' --> '{data_source_name}'")
                 dmss_exception_wrapper(
                     import_folder_entity,
                     source_path=data_source_data_dir / root_package.name,
