@@ -59,7 +59,6 @@ def import_document(source_path: Path, destination: str, data_source_id: str, pa
     dmss_api.document_add(
         f"{destination}",
         document_json_str,
-        update_uncontained=True,
         files=[],
     )
 
@@ -98,7 +97,6 @@ def import_folder_entity(
     raw_package_import: bool = False,
     resolve_local_ids: bool = False,
 ) -> dict:
-    print(f"Importing PACKAGE '{source_path.name}' --> '{destination}/'")
     destination_path = Path(destination)
     data_source = destination_path.parts[0]
 

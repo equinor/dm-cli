@@ -64,7 +64,6 @@ def add_package_to_path(name: str, path: Path):
     dmss_api.document_add(
         str(path.parent),
         json.dumps(package.to_dict()),
-        update_uncontained=False,
         files=[],
     )
 
