@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper
 from dm_cli.import_entity import import_folder_entity, import_single_entity
+from dm_cli.utils.utils import destination_is_root
 
 entities_app = typer.Typer()
 
@@ -24,28 +25,54 @@ def import_entity(
             help="Address for the folder or file. Should be on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
         ),
     ],
+    validate: Annotated[bool, typer.Option(help="if True, all entities uploaded will be validated.")] = True,
 ) -> bool:
     """
     Import an entity (file or package) <source> to the given <destination>.
     """
     source_path = Path(source)
     destination = destination.rstrip("/\\")
+    # Not replacing a package, but appending to. Can therefore not use "fast mode"
+    fast = destination_is_root(Path(destination))
     if source_path.is_dir():
         # If source path ends with "/" or windows "\", import content instead of the package itself
         if source[-1] in ("/", "\\"):
-            print(f"Importing all content from '{source}' --> '{destination}'")
+            print(f"Importing all content from '{source}*' --> '{destination}'")
             for file in source_path.iterdir():
                 if file.is_file():
                     dmss_exception_wrapper(import_single_entity, file, destination)
                     continue
-                dmss_exception_wrapper(import_folder_entity, file, destination)
+                dmss_exception_wrapper(import_folder_entity, file, destination, fast)
+                if validate:
+                    print(f"Validating entities in: {destination}/{file.name}")
+                    dmss_api.validate_existing_entity(f"{destination}/{file.name}")
             return True
         print(f"Importing PACKAGE '{source}' --> '{destination}'")
-        dmss_exception_wrapper(import_folder_entity, source_path, destination)
+        dmss_exception_wrapper(import_folder_entity, source_path, destination, fast)
+        if validate:
+            print(f"Validating entities in: {destination}/{source_path.name}")
+            dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
         return True
     else:
         dmss_exception_wrapper(import_single_entity, source_path, destination)
+        if validate:
+            print(f"Validating entities in: {destination}/{source_path.name}")
+            dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
         return True
+
+
+@entities_app.command("validate")
+def validate_entity(
+    destination: Annotated[
+        str,
+        typer.Argument(
+            help="Address for the folder or file. Should be on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
+        ),
+    ]
+) -> bool:
+    """Recursively validate entity at remote target"""
+    print(f"Validating entities recursively in: {destination}")
+    dmss_api.validate_existing_entity(destination)
 
 
 @entities_app.command("delete")
