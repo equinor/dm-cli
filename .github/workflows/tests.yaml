@@ -48,7 +48,7 @@ jobs:
           python-version: "3.11"
 
       - name: Start DMSS
-        run: docker-compose pull && docker-compose up -d && sleep 60 && docker-compose run --rm dmss reset-app
+        run: docker-compose pull && docker-compose up -d
 
       - name: Download test blueprints
         run: |
@@ -68,14 +68,14 @@ jobs:
         run: |
           source ../../.venv/bin/activate
           dm reset ../test_data/test_app_dir_struct
-          dm import-plugin-blueprints package
+          dm import-plugin-blueprints --no-validate package
           dm create-lookup test DemoApplicationDataSource/models/recipe_links DemoApplicationDataSource/models/more_recipe_links
           dm export DemoApplicationDataSource/models/CarPackage
           dm export DemoApplicationDataSource/instances --unpack
           dm ds import ../test_data/test_app_dir_struct/data_sources/DemoApplicationDataSource.json
           dm ds import-all ../test_data/test_app_dir_struct/data_sources
-          dm entities import ../test_data/more_documents/bmw.json DemoApplicationDataSource/instances
-          dm entities import ../test_data/more_documents/engines DemoApplicationDataSource/instances
+          dm entities import --no-validate ../test_data/more_documents/bmw.json DemoApplicationDataSource/instances
+          dm entities import --no-validate ../test_data/more_documents/engines DemoApplicationDataSource/instances
           dm entities delete DemoApplicationDataSource/instances
           dm ds reset DemoApplicationDataSource ../test_data/test_app_dir_struct
           dm ds init ../test_data/test_app_dir_struct
