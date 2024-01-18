@@ -48,12 +48,15 @@ def main(
     dmss_api.api_client.configuration.host = dmss_url
 
 @app.command("import-plugin-blueprints")
-def import_plugin_blueprints(path: Annotated[str, typer.Argument(help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself.")]):
+def import_plugin_blueprints(
+        path: Annotated[str, typer.Argument(help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself.")],
+        validate: Annotated[bool, typer.Option(help="if True, all entities uploaded will be validated.")] = True
+):
     """
     Import blueprints from a plugin into the standard location 'system/Plugins/<plugin-name>'.
     """
     state.force = True
-    import_entity(source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}")
+    import_entity(source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", validate=validate)
 
 @app.command("create-lookup")
 def create_lookup(name: Annotated[str, typer.Argument(help="Name of the lookup (application context) to create.")],
