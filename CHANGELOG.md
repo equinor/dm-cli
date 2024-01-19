@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/equinor/dm-cli/compare/v1.4.3...v1.5.0) (2024-01-19)
+
+
+### Features
+
+* option to validate on 'entity' command + separate validate command ([70a0238](https://github.com/equinor/dm-cli/commit/70a0238a3e49d42114cc30af72257b29dbadae13))
+* option to validate plugin blueprints ([ad28dfc](https://github.com/equinor/dm-cli/commit/ad28dfc85005213e2a64f5fc4e56e043a0b8604e))
+
+
+### Bug Fixes
+
+* _meta_ might not exist in every package.json ([57a5338](https://github.com/equinor/dm-cli/commit/57a5338574a1971fa6dd81a9eff468e6ab5f5226))
+
 ## [1.4.3](https://github.com/equinor/dm-cli/compare/v1.4.2...v1.4.3) (2023-12-18)
 
 
