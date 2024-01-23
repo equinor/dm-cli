@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.2](https://github.com/equinor/dm-cli/compare/v1.5.1...v1.5.2) (2024-01-23)
+
+
+### Bug Fixes
+
+* check for none filepath before resolving ([a9885e8](https://github.com/equinor/dm-cli/commit/a9885e88c1491a440b3e30d44f4da5f87b7bd011))
+* handle upload packages as not root ([3bfc648](https://github.com/equinor/dm-cli/commit/3bfc6480246877c580f673945c996cdb09699e1a))
+* wrap import plugins in exception handler ([938027d](https://github.com/equinor/dm-cli/commit/938027d616ca29d67d711ae0e7e15e85a6219043))
+
 ## [1.5.1](https://github.com/equinor/dm-cli/compare/v1.5.0...v1.5.1) (2024-01-23)
 
 
