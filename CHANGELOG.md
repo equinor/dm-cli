@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/equinor/dm-cli/compare/v1.5.0...v1.5.1) (2024-01-23)
+
+
+### Bug Fixes
+
+* wrapp validate in exception_wrapper ([9761f9d](https://github.com/equinor/dm-cli/commit/9761f9d29f0c30091c6d75ed7d15ea23e771a921))
+
 ## [1.5.0](https://github.com/equinor/dm-cli/compare/v1.4.3...v1.5.0) (2024-01-19)
 
 
