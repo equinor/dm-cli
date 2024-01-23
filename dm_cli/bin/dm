@@ -17,7 +17,7 @@ from dm_cli import VERSION
 from dm_cli.utils.utils import get_root_packages_in_data_sources, validate_entities_in_data_sources
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_short=True)
 app.add_typer(data_source_app, name="ds")
 app.add_typer(entities_app, name="entities")
 

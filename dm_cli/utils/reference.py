@@ -8,9 +8,11 @@ from ..enums import SIMOS, BuiltinDataTypes, ReferenceTypes
 from .utils import Package, resolve_dependency
 
 
-def resolve_reference(reference: str, dependencies: Dict[str, Dependency], destination: str, file_path: str) -> str:
+def resolve_reference(
+    reference: str, dependencies: Dict[str, Dependency], destination: str, file_path: str | None
+) -> str:
     destination = destination.rstrip("/")
-    root_package = file_path.split("/", 1)[0]
+    root_package = file_path.split("/", 1)[0] if file_path else ""
     if "://" in reference or reference == "_default_" or reference[0] == "^" or reference[0] == "~":
         return reference
     if ":" in reference:
@@ -68,9 +70,6 @@ def replace_relative_references(
     dependencies: Dict[str, Dependency],
     destination: str,
     file_path: Union[str, None] = None,
-    # for entities
-    parent_directory: Union[Path, None] = None,
-    # for packages
     zip_file: Union[str, None] = None,
     source_path: Path = None,
 ) -> Union[str, List[str], dict]:
