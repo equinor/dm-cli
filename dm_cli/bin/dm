@@ -56,7 +56,7 @@ def import_plugin_blueprints(
     Import blueprints from a plugin into the standard location 'system/Plugins/<plugin-name>'.
     """
     state.force = True
-    import_entity(source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", validate=validate)
+    dmss_exception_wrapper(import_entity, source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", validate=validate)
 
 @app.command("create-lookup")
 def create_lookup(name: Annotated[str, typer.Argument(help="Name of the lookup (application context) to create.")],

@@ -34,32 +34,34 @@ def import_entity(
     destination = destination.rstrip("/\\")
     # Not replacing a package, but appending to. Can therefore not use "fast mode"
     fast = destination_is_root(Path(destination))
-    if source_path.is_dir():
-        # If source path ends with "/" or windows "\", import content instead of the package itself
-        if source[-1] in ("/", "\\"):
-            print(f"Importing all content from '{source}*' --> '{destination}'")
-            for file in source_path.iterdir():
-                if file.is_file():
-                    dmss_exception_wrapper(import_single_entity, file, destination)
-                    continue
-                dmss_exception_wrapper(import_folder_entity, file, destination, fast)
-                if validate:
-                    print(f"Validating entities in: {destination}/{file.name}")
-                    dmss_api.validate_existing_entity(f"{destination}/{file.name}")
+    def inner_import():
+        if source_path.is_dir():
+            # If source path ends with "/" or windows "\", import content instead of the package itself
+            if source[-1] in ("/", "\\"):
+                print(f"Importing all content from '{source}*' --> '{destination}'")
+                for file in source_path.iterdir():
+                    if file.is_file():
+                        import_single_entity(file, destination)
+                        continue
+                    import_folder_entity(file, destination, fast)
+                    if validate:
+                        print(f"Validating entities in: {destination}/{file.name}")
+                        dmss_api.validate_existing_entity(f"{destination}/{file.name}")
+                return True
+            print(f"Importing PACKAGE '{source}' --> '{destination}'")
+            import_folder_entity(source_path, destination, fast)
+            if validate:
+                print(f"Validating entities in: {destination}/{source_path.name}")
+                dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
             return True
-        print(f"Importing PACKAGE '{source}' --> '{destination}'")
-        dmss_exception_wrapper(import_folder_entity, source_path, destination, fast)
-        if validate:
-            print(f"Validating entities in: {destination}/{source_path.name}")
-            dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
-        return True
-    else:
-        dmss_exception_wrapper(import_single_entity, source_path, destination)
-        if validate:
-            print(f"Validating entities in: {destination}/{source_path.name}")
-            dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
-        return True
+        else:
+            import_single_entity(source_path, destination)
+            if validate:
+                print(f"Validating entities in: {destination}/{source_path.name}")
+                dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
+            return True
 
+    return dmss_exception_wrapper(inner_import)
 
 @entities_app.command("validate")
 def validate_entity(
@@ -87,5 +89,5 @@ def delete_entity(
     """
     Delete an entity from DMSS.
     """
-    # TODO: Add exception handling
-    dmss_api.document_remove(target)
+
+    dmss_exception_wrapper(dmss_api.document_remove, target)
