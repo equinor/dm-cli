@@ -93,8 +93,7 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
             files=[],
         )
 
-    data_source = destination_parts[0]
-    import_package_content(package, data_source, resolve_local_ids)
+    import_package_content(package, data_source, destination, resolve_local_ids)
 
 
 @retry(
@@ -103,7 +102,7 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
     reraise=True,
     retry=retry_if_not_exception_type(ApplicationException),
 )
-def import_package_content(package: Package, data_source: str, resolve_local_ids: bool) -> None:
+def import_package_content(package: Package, data_source: str, destination: str, resolve_local_ids: bool) -> None:
     files: List[File] = []
     entities: List[dict] = []
     package.traverse_documents(
@@ -153,7 +152,7 @@ def import_package_content(package: Package, data_source: str, resolve_local_ids
                         key,
                         value,
                         dependencies,
-                        data_source,
+                        destination,
                         file_path=address,
                         zip_file=None,
                     )
@@ -168,13 +167,13 @@ def import_package_content(package: Package, data_source: str, resolve_local_ids
         with tqdm(entities, desc=f"  Adding entities") as bar:
             for entity in entities:
                 try:
-                    document = replace_file_addresses(entity, data_source, uploaded_file_ids, upload_global_file)
+                    document = replace_file_addresses(entity, destination, uploaded_file_ids, upload_global_file)
                     if resolve_local_ids:
                         name = (
                             f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
                         )
                         document = resolve_local_ids_in_document(document)
-                        print(f"Successfully resolved local IDs in:\t{data_source}{name}")
+                        print(f"Successfully resolved local IDs in:\t{destination}{name}")
                     dmss_api.document_add_simple(data_source, document)
                 except Exception as error:
                     if state.debug:

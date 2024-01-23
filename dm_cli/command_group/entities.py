@@ -34,6 +34,7 @@ def import_entity(
     destination = destination.rstrip("/\\")
     # Not replacing a package, but appending to. Can therefore not use "fast mode"
     fast = destination_is_root(Path(destination))
+
     def inner_import():
         if source_path.is_dir():
             # If source path ends with "/" or windows "\", import content instead of the package itself
@@ -62,6 +63,7 @@ def import_entity(
             return True
 
     return dmss_exception_wrapper(inner_import)
+
 
 @entities_app.command("validate")
 def validate_entity(

@@ -32,8 +32,8 @@ ROOT
 """
 
 test_documents = {
-    "MyRootPackage/package.json": {
-        "name": "MyRootPackage",
+    "MyPackage/package.json": {
+        "name": "MyPackage",
         "type": "CORE:Package",
         "_meta_": {
             "type": "CORE:Meta",
@@ -49,7 +49,7 @@ test_documents = {
             ],
         },
     },
-    "MyRootPackage/WindTurbine.json": {
+    "MyPackage/WindTurbine.json": {
         "name": "WindTurbine",
         "type": "CORE:Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
@@ -84,7 +84,7 @@ test_documents = {
             },
         ],
     },
-    "MyRootPackage/Moorings/Mooring.json": {
+    "MyPackage/Moorings/Mooring.json": {
         "name": "Mooring",
         "type": "dmss://system/SIMOS/Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
@@ -98,7 +98,7 @@ test_documents = {
             }
         ],
     },
-    "MyRootPackage/Moorings/SpecialMooring.json": {
+    "MyPackage/Moorings/SpecialMooring.json": {
         "name": "SpecialMooring",
         "type": "CORE:Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "Moorings/Mooring", "./Mooring"],
@@ -124,7 +124,7 @@ test_documents = {
             },
         ],
     },
-    "MyRootPackage/myTurbine.json": {
+    "MyPackage/myTurbine.json": {
         "name": "myTurbine",
         "type": "/WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
@@ -134,15 +134,15 @@ test_documents = {
             "name": "myTurbineMooring",
         },
     },
-    "MyRootPackage/test_pdf.pdf": None,
-    "MyRootPackage/Moorings/myTurbineMooring.json": {
+    "MyPackage/test_pdf.pdf": None,
+    "MyPackage/Moorings/myTurbineMooring.json": {
         "_id": "fefff0e8-1581-4fa5-a9ed-9ab693e029ca",
         "name": "myTurbineMooring",
         "type": "Moorings/Mooring",
         "description": "",
         "Bigness": 10,
     },
-    "MyRootPackage/A/SubFolder/FileNameDoesNotMatch.json": {
+    "MyPackage/A/SubFolder/FileNameDoesNotMatch.json": {
         "name": "myTurbine2",
         "type": "WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
@@ -152,7 +152,7 @@ test_documents = {
             "name": "myTurbineMooring",
         },
     },
-    "MyRootPackage/B/myTurbine3.json": {
+    "MyPackage/B/myTurbine3.json": {
         "name": "myTurbine3",
         "type": "/WindTurbine",
         "description": "This is a wind turbine demoing uncontained relationships",
@@ -162,13 +162,13 @@ test_documents = {
             "name": "myTurbineMooring",
         },
     },
-    "MyRootPackage/C/": None,
-    "MyRootPackage/D/E/": None,
+    "MyPackage/C/": None,
+    "MyPackage/D/E/": None,
 }
 
 test_documents_with_dependency_conflict = {
-    "MyRootPackage/package.json": {
-        "name": "MyRootPackage",
+    "MyPackage/package.json": {
+        "name": "MyPackage",
         "type": "CORE:Package",
         "_meta_": {
             "type": "CORE:Meta",
@@ -191,7 +191,7 @@ test_documents_with_dependency_conflict = {
             ],
         },
     },
-    "MyRootPackage/WindTurbine.json": {
+    "MyPackage/WindTurbine.json": {
         "name": "WindTurbine",
         "type": "CORE:Blueprint",
         "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
@@ -244,7 +244,7 @@ class ImportPackageTest(unittest.TestCase):
         memory_file.seek(0)
 
         root_package = package_tree_from_zip(
-            data_source_id="test_data_source",
+            destination="test_data_source/XRoot/",
             zip_package=memory_file,
         )
         folder_A = root_package.search("A")
@@ -256,15 +256,15 @@ class ImportPackageTest(unittest.TestCase):
 
         assert mooringBlueprint["type"] == "dmss://system/SIMOS/Blueprint"
 
-        assert myTurbine2["type"] == "dmss://test_data_source/MyRootPackage/WindTurbine"
+        assert myTurbine2["type"] == "dmss://test_data_source/XRoot/MyPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
-        assert myTurbine2["Mooring"]["type"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert myTurbine2["Mooring"]["type"] == "dmss://test_data_source/XRoot/MyPackage/Moorings/Mooring"
         assert myTurbine2["Mooring"]["_id"] == myTurbineMooring["_id"]
 
         windTurbine = root_package.search("WindTurbine")
         assert isinstance(UUID(windTurbine["_id"]), UUID)
         assert (
-            windTurbine["attributes"][0]["attributeType"] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+            windTurbine["attributes"][0]["attributeType"] == "dmss://test_data_source/XRoot/MyPackage/Moorings/Mooring"
         )
         assert (windTurbine["attributes"][1]["attributeType"]) == "http://marine-models.sintef.com/Signals/Default"
         assert windTurbine["extends"] == [
@@ -275,7 +275,7 @@ class ImportPackageTest(unittest.TestCase):
 
         specialMooring = folder_Moorings.search("SpecialMooring")
         assert len(specialMooring["extends"]) == 3
-        assert specialMooring["extends"][2] == "dmss://test_data_source/MyRootPackage/Moorings/Mooring"
+        assert specialMooring["extends"][2] == "dmss://test_data_source/XRoot/MyPackage/Moorings/Mooring"
         assert specialMooring["attributes"][1]["type"] == "dmss://test_data_source/AnotherPackage/MyType"
 
         test_pdf = root_package.search("test_pdf.pdf")
@@ -296,4 +296,4 @@ class ImportPackageTest(unittest.TestCase):
         memory_file.seek(0)
 
         with self.assertRaises(ApplicationException):
-            package_tree_from_zip(data_source_id="test_data_source", zip_package=memory_file)
+            package_tree_from_zip(destination="test_data_source", zip_package=memory_file)

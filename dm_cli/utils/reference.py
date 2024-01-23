@@ -8,7 +8,8 @@ from ..enums import SIMOS, BuiltinDataTypes, ReferenceTypes
 from .utils import Package, resolve_dependency
 
 
-def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_source: str, file_path: str) -> str:
+def resolve_reference(reference: str, dependencies: Dict[str, Dependency], destination: str, file_path: str) -> str:
+    destination = destination.rstrip("/")
     root_package = file_path.split("/", 1)[0]
     if "://" in reference or reference == "_default_" or reference[0] == "^" or reference[0] == "~":
         return reference
@@ -16,10 +17,11 @@ def resolve_reference(reference: str, dependencies: Dict[str, Dependency], data_
         return resolve_dependency(reference, dependencies)
     if reference[0] == ".":
         normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
-        return f"dmss://{data_source}/{normalized_dotted_ref}"
+        return f"dmss://{destination}/{normalized_dotted_ref}"
     if reference[0] == "/":
+        data_source = destination.split("/")[0]
         return f"dmss://{data_source}{reference}"
-    return f"dmss://{data_source}/{root_package}/{reference}"
+    return f"dmss://{destination}/{root_package}/{reference}"
 
 
 def resolve_storage_reference(address: str, source_path: Path):
@@ -64,7 +66,7 @@ def replace_relative_references(
     key: str,
     value,
     dependencies: Dict[str, Dependency],
-    data_source: str,
+    destination: str,
     file_path: Union[str, None] = None,
     # for entities
     parent_directory: Union[Path, None] = None,
@@ -82,7 +84,7 @@ def replace_relative_references(
     @param key: Name of the attribute being checked in the document
     @param value: Value of the attribute being checked in the document
     @param dependencies: A dict containing the dependencies of the document
-    @param data_source: The name of the data source where the document should be stored
+    @param destination: The name of the data source where the document should be stored
     @param file_path: The path to the directory containing the documents
 
     When importing entities, the following additional parameter is required:
@@ -117,7 +119,7 @@ def replace_relative_references(
                     resolve_reference(
                         blueprint,
                         dependencies,
-                        data_source,
+                        destination,
                         file_path,
                     )
                 )
@@ -127,7 +129,7 @@ def replace_relative_references(
         return resolve_reference(
             value,
             dependencies,
-            data_source,
+            destination,
             file_path,
         )
 
@@ -146,7 +148,7 @@ def replace_relative_references(
         resolved_type = resolve_reference(
             value["type"],
             dependencies,
-            data_source,
+            destination,
             file_path,
         )
 
@@ -161,7 +163,7 @@ def replace_relative_references(
 
         return {
             k: replace_relative_references(
-                k, v, dependencies, data_source, file_path=file_path, zip_file=zip_file, source_path=source_path
+                k, v, dependencies, destination, file_path=file_path, zip_file=zip_file, source_path=source_path
             )
             if k not in ignore_attributes
             else v
@@ -170,7 +172,7 @@ def replace_relative_references(
     if isinstance(value, list):
         return [
             replace_relative_references(
-                key, v, dependencies, data_source, file_path=file_path, zip_file=zip_file, source_path=source_path
+                key, v, dependencies, destination, file_path=file_path, zip_file=zip_file, source_path=source_path
             )
             for v in value
         ]

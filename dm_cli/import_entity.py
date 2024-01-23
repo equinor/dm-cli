@@ -33,8 +33,8 @@ from .utils.zip import zip_all
     reraise=True,
     retry=retry_if_not_exception_type(ApplicationException),
 )
-def import_document(source_path: Path, destination: str, data_source_id: str, package: str, document: dict):
-    remote_dependencies = dmss_api.export_meta(f"{data_source_id}/{package}")
+def import_document(source_path: Path, destination: str, document: dict):
+    remote_dependencies = dmss_api.export_meta(destination)
     old_dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
 
     dependencies = concat_dependencies(
@@ -50,8 +50,7 @@ def import_document(source_path: Path, destination: str, data_source_id: str, pa
             key,
             val,
             dependencies,
-            data_source_id,
-            file_path=package,
+            destination,
             parent_directory=source_path.parent,
         )
 
@@ -66,12 +65,11 @@ def import_document(source_path: Path, destination: str, data_source_id: str, pa
 def import_single_entity(source_path: Path, destination: str):
     ensure_package_structure(Path(destination))
     print(f"Importing ENTITY '{source_path.name}' --> '{destination}'")
-    data_source_id, package = destination.split("/", 1)
 
     try:  # Load the JSON document
         with open(source_path, "r") as fh:
             if Path(source_path).suffix == ".json":
-                import_document(source_path, destination, data_source_id, package, json.load(fh))
+                import_document(source_path, destination, json.load(fh))
             else:
                 print(f"Unsupported file type {source_path}")
     except JSONDecodeError:
@@ -98,7 +96,6 @@ def import_folder_entity(
     resolve_local_ids: bool = False,
 ) -> dict:
     destination_path = Path(destination)
-    data_source = destination_path.parts[0]
 
     # Check if target already exists on remote. Then delete or raise exception
     target = f"{destination}/{source_path.name}"
@@ -126,6 +123,6 @@ def import_folder_entity(
     memory_file.seek(0)
 
     package = package_tree_from_zip(
-        data_source, memory_file, is_root=is_root, extra_dependencies=dependencies, source_path=source_path
+        destination, memory_file, is_root=is_root, extra_dependencies=dependencies, source_path=source_path
     )
     import_package_tree(package, destination, raw_package_import, resolve_local_ids)

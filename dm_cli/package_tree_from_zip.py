@@ -19,7 +19,7 @@ from .utils.utils import concat_dependencies
 
 
 def package_tree_from_zip(
-    data_source_id: str,
+    destination: str,
     zip_package: io.BytesIO,
     is_root: bool = True,
     extra_dependencies: Union[Dict[str, Dependency], None] = None,
@@ -31,7 +31,7 @@ def package_tree_from_zip(
     Inserting UUID4's between any references, converting relative paths to absolute paths,
     and dependencyAliases to absolute addresses.
 
-    @param data_source_id: A string with the name/id of an existing data source to import package to
+    @param destination: A string with the documentId for the target. Only a data source is allowed
     @param zip_package: A zip-folder represented as an in-memory io.BytesIO object
     @param source_path: path to the root folder
 
@@ -72,7 +72,7 @@ def package_tree_from_zip(
             if Path(filename).suffix != ".json":
                 file_like = io.BytesIO(zip_file.read(f"{folder_name}/{filename}"))
                 file_like.name = Path(filename).name  # stem
-                file_like.destination = Path(f"/{data_source_id}/{folder_name}/{filename}").parent
+                file_like.destination = Path(f"/{destination}/{folder_name}/{filename}").parent
                 add_object_to_package(Path(filename), root_package, file_like)
                 continue
             try:
@@ -94,7 +94,7 @@ def package_tree_from_zip(
                         key,
                         value,
                         dependencies,
-                        data_source_id,
+                        destination,
                         file_path=file_path,
                         zip_file=zip_file,
                         source_path=source_path,
@@ -110,6 +110,6 @@ def package_tree_from_zip(
         )
 
         # Make sure to replace relative references in _meta_ for all packages
-        replace_relative_references_in_package_meta(root_package, dependencies, data_source_id)
+        replace_relative_references_in_package_meta(root_package, dependencies, destination)
 
     return root_package
