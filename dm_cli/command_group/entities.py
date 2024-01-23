@@ -72,7 +72,7 @@ def validate_entity(
 ) -> bool:
     """Recursively validate entity at remote target"""
     print(f"Validating entities recursively in: {destination}")
-    dmss_api.validate_existing_entity(destination)
+    dmss_exception_wrapper(dmss_api.validate_existing_entity, destination)
 
 
 @entities_app.command("delete")
