@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/equinor/dm-cli/compare/v1.5.2...v1.5.3) (2024-01-30)
+
+
+### Bug Fixes
+
+* validate request should be retried for more robustness ([1be3da6](https://github.com/equinor/dm-cli/commit/1be3da6da6cd828f0f65f36633f6546e1ae9dd61))
+
 ## [1.5.2](https://github.com/equinor/dm-cli/compare/v1.5.1...v1.5.2) (2024-01-23)
 
 
