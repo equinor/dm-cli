@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.4](https://github.com/equinor/dm-cli/compare/v1.5.3...v1.5.4) (2024-01-31)
+
+
+### Bug Fixes
+
+* retry DS import ([1978bfa](https://github.com/equinor/dm-cli/commit/1978bfa1b5c484b62bafe7ade254df7af55958d3))
+
 ## [1.5.3](https://github.com/equinor/dm-cli/compare/v1.5.2...v1.5.3) (2024-01-30)
 
 
