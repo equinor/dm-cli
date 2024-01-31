@@ -4,9 +4,15 @@ from pathlib import Path
 import emoji
 import typer
 from rich import print
+from tenacity import (
+    retry,
+    retry_if_not_exception_type,
+    stop_after_attempt,
+    wait_random_exponential,
+)
 from typing_extensions import Annotated
 
-from dm_cli.dmss import dmss_api, dmss_exception_wrapper
+from dm_cli.dmss import ApplicationException, dmss_api, dmss_exception_wrapper
 from dm_cli.import_entity import import_folder_entity, remove_by_path_ignore_404
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 from dm_cli.utils.utils import (
@@ -24,21 +30,31 @@ def import_data_source(
     """
     Import a single data source definition to DMSS.
     """
-    data_source_path = Path(path)
-    if not data_source_path.is_file():
-        raise FileNotFoundError(f"The path '{path}' is not a file.")
 
-    print(f"IMPORTING DATA SOURCE '{data_source_path.name}'")
+    @retry(
+        wait=wait_random_exponential(multiplier=1, max=60),
+        stop=stop_after_attempt(5),
+        reraise=True,
+        retry=retry_if_not_exception_type(ApplicationException),
+    )
+    def retry_wrapper():
+        data_source_path = Path(path)
+        if not data_source_path.is_file():
+            raise FileNotFoundError(f"The path '{path}' is not a file.")
 
-    # Read the data source definition
-    with open(data_source_path) as file:
-        document = json.load(file)
-        existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
-        if any(existing_document["name"] == document["name"] for existing_document in existing_data_sources):
-            print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
+        print(f"IMPORTING DATA SOURCE '{data_source_path.name}'")
 
-        dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
-        print(f"\tImported data source '{document['name']}' ✓")
+        # Read the data source definition
+        with open(data_source_path) as file:
+            document = json.load(file)
+            existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
+            if any(existing_document["name"] == document["name"] for existing_document in existing_data_sources):
+                print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
+
+            dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
+            print(f"\tImported data source '{document['name']}' ✓")
+
+    retry_wrapper()
 
 
 @data_source_app.command("import-all", help="Import all datasources found in the directory given by 'path'")
