@@ -13,17 +13,21 @@ def resolve_reference(
 ) -> str:
     destination = destination.rstrip("/")
     root_package = file_path.split("/", 1)[0] if file_path else ""
-    if "://" in reference or reference == "_default_" or reference[0] == "^" or reference[0] == "~":
-        return reference
-    if ":" in reference:
-        return resolve_dependency(reference, dependencies)
-    if reference[0] == ".":
-        normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
-        return f"dmss://{destination}/{normalized_dotted_ref}"
-    if reference[0] == "/":
-        data_source = destination.split("/")[0]
-        return f"dmss://{data_source}{reference}"
-    return f"dmss://{destination}/{root_package}/{reference}"
+    try:
+        if "://" in reference or reference == "_default_" or reference[0] == "^" or reference[0] == "~":
+            return reference
+        if ":" in reference:
+            return resolve_dependency(reference, dependencies)
+        if reference[0] == ".":
+            normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
+            return f"dmss://{destination}/{normalized_dotted_ref}"
+        if reference[0] == "/":
+            data_source = destination.split("/")[0]
+            return f"dmss://{data_source}{reference}"
+        return f"dmss://{destination}/{root_package}/{reference}"
+    except ApplicationException as ex:
+        ex.debug = f"File: {file_path}, Destination: {destination}, Root: {root_package}"
+        raise ex
 
 
 def resolve_storage_reference(address: str, source_path: Path):

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import typer
@@ -10,7 +11,8 @@ from tenacity import (
 )
 from typing_extensions import Annotated
 
-from dm_cli.dmss import ApplicationException, dmss_api, dmss_exception_wrapper
+from dm_cli.dmss import ApplicationException, console, dmss_api, dmss_exception_wrapper
+from dm_cli.dmss_api import ApiException
 from dm_cli.import_entity import import_folder_entity, import_single_entity
 from dm_cli.utils.utils import destination_is_root
 
@@ -86,13 +88,19 @@ def validate_entity(
     @retry(
         wait=wait_random_exponential(multiplier=1, max=60),
         stop=stop_after_attempt(5),
-        reraise=True,
         retry=retry_if_not_exception_type(ApplicationException),
     )
-    def retry_wrapper():
-        dmss_exception_wrapper(dmss_api.validate_existing_entity, destination)
+    def validation_error_wrapper():
+        try:
+            dmss_api.validate_existing_entity(destination)
+        except ApiException as e:
+            exception_body = json.loads(e.body)
+            if exception_body["type"] == "ValidationException":
+                console.print(exception_body, style="red1")
+                return
+            raise e
 
-    retry_wrapper()
+    dmss_exception_wrapper(validation_error_wrapper)
 
 
 @entities_app.command("delete")
