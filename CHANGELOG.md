@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/equinor/dm-cli/compare/v1.5.4...v1.6.0) (2024-02-16)
+
+
+### Features
+
+* dont retry request on a validation error ([c8a4a56](https://github.com/equinor/dm-cli/commit/c8a4a56654f80b1b9e714b490150dacbceec9aae))
+
 ## [1.5.4](https://github.com/equinor/dm-cli/compare/v1.5.3...v1.5.4) (2024-01-31)
 
 
