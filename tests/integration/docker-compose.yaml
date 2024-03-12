@@ -2,13 +2,13 @@ version: "3.4"
 
 services:
   dmss:
-    image: datamodelingtool.azurecr.io/dmss:v1.15.1
+    image: datamodelingtool.azurecr.io/dmss:v1.23.1
     restart: unless-stopped
     environment:
       AUTH_ENABLED: 0
       ENVIRONMENT: local
-      MONGO_INITDB_ROOT_USERNAME: maf
-      MONGO_INITDB_ROOT_PASSWORD: maf
+      MONGO_USERNAME: maf
+      MONGO_PASSWORD: maf
       SECRET_KEY: sg9aeUM5i1JO4gNN8fQadokJa3_gXQMLBjSGGYcfscs= # Don't reuse this in production...
     ports:
       - "5000:5000"
@@ -16,7 +16,7 @@ services:
       - db
 
   db:
-    image: mongo:3.4
+    image: mongo:3.6
     command: mongod --quiet
     environment:
       MONGO_INITDB_ROOT_USERNAME: maf

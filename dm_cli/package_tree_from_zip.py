@@ -11,10 +11,7 @@ from .import_package import (
     add_object_to_package,
     add_package_to_package,
 )
-from .utils.reference import (
-    replace_relative_references,
-    replace_relative_references_in_package_meta,
-)
+from .utils.reference import replace_relative_references
 from .utils.utils import concat_dependencies
 
 
@@ -89,18 +86,13 @@ def package_tree_from_zip(
 
         def replace(document, file_path):
             if not isinstance(document, File):
-                document = {
-                    key: replace_relative_references(
-                        key,
-                        value,
-                        dependencies,
-                        destination,
-                        file_path=file_path,
-                        zip_file=zip_file,
-                        source_path=source_path,
-                    )
-                    for key, value in document.items()
-                }
+                document = replace_relative_references(
+                    document,
+                    dependencies,
+                    destination,
+                    file_path=file_path,
+                    source_path=source_path,
+                )
             return document
 
         # Now that we have the entire package as a Package tree, traverse it, and replace relative references
@@ -108,8 +100,21 @@ def package_tree_from_zip(
             lambda document, file_path: replace(document, file_path),
             update=True,
         )
-
-        # Make sure to replace relative references in _meta_ for all packages
-        replace_relative_references_in_package_meta(root_package, dependencies, destination)
+        root_package.meta = replace_relative_references(
+            root_package.meta,
+            dependencies,
+            destination,
+            file_path=root_package.path(),
+            source_path=source_path,
+        )
+        root_package.traverse_package(
+            lambda package: replace_relative_references(
+                package.meta,
+                dependencies,
+                destination,
+                file_path=package.path(),
+                source_path=source_path,
+            )
+        )
 
     return root_package

@@ -122,7 +122,7 @@ def reset(path: Annotated[str, typer.Argument(help="The path on local file syste
             )
             continue
 
-        reset_data_source(data_source=data_source_name, path=path, resolve_local_ids=resolve_local_ids)
+        dmss_exception_wrapper(reset_data_source, data_source=data_source_name, path=path, resolve_local_ids=resolve_local_ids)
     data_source_contents = get_root_packages_in_data_sources(path)
     if (validate_entities):
         dmss_exception_wrapper(validate_entities_in_data_sources, data_source_contents)

@@ -109,6 +109,7 @@ test_documents = {
                 "type": "CORE:BlueprintAttribute",
                 "description": "How small? Not that small really",
                 "attributeType": "integer",
+                "default": 1,
             },
             {
                 "name": "ComplexTypeFromAnotherPacakge",
@@ -121,6 +122,11 @@ test_documents = {
                 "type": "CORE:BlueprintAttribute",
                 "description": "Type from parent folder",
                 "attributeType": "../WindTurbine",
+                "default": {
+                    "name": "myTurbine",
+                    "type": "../WindTurbine",
+                    "description": "This is a wind turbine demoing uncontained relationships",
+                },
             },
         ],
     },
@@ -277,6 +283,10 @@ class ImportPackageTest(unittest.TestCase):
         assert len(specialMooring["extends"]) == 3
         assert specialMooring["extends"][2] == "dmss://test_data_source/XRoot/MyPackage/Moorings/Mooring"
         assert specialMooring["attributes"][1]["type"] == "dmss://test_data_source/AnotherPackage/MyType"
+        assert specialMooring["attributes"][0]["default"] == 1
+        assert (
+            specialMooring["attributes"][2]["default"]["type"] == "dmss://test_data_source/XRoot/MyPackage/WindTurbine"
+        )
 
         test_pdf = root_package.search("test_pdf.pdf")
         assert isinstance(test_pdf, File)

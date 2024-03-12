@@ -5,7 +5,7 @@ from typing import Dict, List, Union
 from ..dmss import ApplicationException
 from ..domain import Dependency
 from ..enums import SIMOS, BuiltinDataTypes, ReferenceTypes
-from .utils import Package, resolve_dependency
+from .utils import resolve_dependency
 
 
 def resolve_reference(
@@ -30,155 +30,100 @@ def resolve_reference(
         raise ex
 
 
-def resolve_storage_reference(address: str, source_path: Path):
-    """
-    Resolve the address into a file path that should points to a file on disk.
-
-    @param address: The address to be resolved that points to a file on disk
-    @param source_path: The source path app_data_dir_name/data_source_name/root_package_name
-    """
-
-    # Remove last item in source path to get to the data source directory
-    source_path_items = str(source_path).split("/")[:-1]
-    app_data_folder = "/".join(source_path_items)
-
-    if address[0] == ".":
-        raise ApplicationException("Relative references by . are not supported")
-
-    return f"{app_data_folder}/{address}"
-
-
-def replace_relative_references_in_package_meta(
-    package: Package, dependencies: Dict[str, Dependency], data_source_id: str
-) -> Package:
-    """
-    Replace relative references in meta attribute of the package and subpackages inside the package's content list.
-    Recursively dig down into the package structure and replace the references inside the meta attribute of the package.
-    """
-
-    package.meta = replace_relative_references(
-        "_meta_", package.meta, dependencies, data_source_id, file_path=package.path()
-    )
-
-    for document in package.content:
-        if type(document) == Package:
-            replace_relative_references_in_package_meta(document, dependencies, data_source_id)
-
-    return package
-
-
 def replace_relative_references(
-    # shared arguments
-    key: str,
-    value,
+    value: dict | list,
     dependencies: Dict[str, Dependency],
     destination: str,
     file_path: Union[str, None] = None,
-    zip_file: Union[str, None] = None,
     source_path: Path = None,
 ) -> Union[str, List[str], dict]:
     """
-    Takes a key-value pair and returns the passed value, with
+    Takes a dict or list, and returns the passed value, with
     relative references replaced with absolute ones.
 
     For Blob-entities; insert the binary data from the file into the entity.
     It digs down on complex types
 
-    @param key: Name of the attribute being checked in the document
-    @param value: Value of the attribute being checked in the document
+    @param value: Dict or list of an entity
     @param dependencies: A dict containing the dependencies of the document
     @param destination: The name of the data source where the document should be stored
     @param file_path: The path to the directory containing the documents
-
-    When importing entities, the following additional parameter is required:
-    @param parent_directory: When importing entities; the path to the directory from which relative paths to other blobs and documents are resolved
 
     When importing packages, the following additional parameter is required:
     @param zip_file:
     @param source_path: path to the root folder
     """
 
-    KEYS_TO_CHECK = (
-        "type",
-        "attributeType",
-        "extends",
-        "_blueprintPath_",
-        "address",
-        "enumType",
-    )  # These keys may contain a reference
+    def _resolve_reference(inner_value: str | None):
+        if not inner_value:
+            return inner_value
+        return resolve_reference(
+            inner_value,
+            dependencies,
+            destination,
+            file_path,
+        )
 
-    if (
-        value == BuiltinDataTypes.OBJECT.value
-        or value == BuiltinDataTypes.BINARY.value
-        or value == BuiltinDataTypes.ANY.value
-    ):
+    def _replace_relative(inner_value: dict | list):
+        return replace_relative_references(inner_value, dependencies, destination, file_path, source_path)
+
+    if isinstance(value, dict):
+        if not value:
+            return value
+
+        if not value.get("type"):
+            raise KeyError(f"Object is missing the required 'type' attribute. File: '{file_path}'")
+
+        value["type"] = _resolve_reference(value["type"])
+
+        match _resolve_reference(value["type"]):
+            case SIMOS.REFERENCE.value:
+                if value["referenceType"] == ReferenceTypes.LINK.value:
+                    value["address"] = _resolve_reference(value["address"])
+                else:
+                    # Handle storage references
+                    local_file_path = "/".join(str(source_path).split("/")[:-1])
+                    if value["address"][0] == ".":
+                        raise ApplicationException(
+                            f"Relative references by . are not supported", data=value, debug=file_path
+                        )
+                    value["address"] = f"{local_file_path}{value['address']}"
+                return value
+
+            case SIMOS.ATTRIBUTE.value:
+                if enum_type := value.get("enumType"):
+                    value["enumType"] = _resolve_reference(enum_type)
+                if value["attributeType"] not in [data_type.value for data_type in BuiltinDataTypes]:
+                    value["attributeType"] = _resolve_reference(value["attributeType"])
+                    if default := value.get("default"):
+                        value["default"] = _replace_relative(default)
+                return value
+
+            case SIMOS.BLUEPRINT.value:
+                value["extends"] = [_resolve_reference(ext_from) for ext_from in value.get("extends", [])]
+                value["attributes"] = [_replace_relative(attr) for attr in value.get("attributes", [])]
+                if meta := value.get("_meta_"):
+                    value["_meta_"] = _replace_relative(meta)
+                return value
+
+            case SIMOS.RECIPE_LINK.value:
+                value["_blueprintPath_"] = _resolve_reference(value["_blueprintPath_"])
+                if initial_recipe := value.get("initialUiRecipe"):
+                    value["initialUiRecipe"] = _replace_relative(initial_recipe)
+                if uiRecipes := value.get("uiRecipes"):
+                    value["uiRecipes"] = _replace_relative(uiRecipes)
+                return value
+
+            case _:  # The value is a dict, but of unknown type. Need to dig through it recursively
+                for key, inner_value in value.items():
+                    if isinstance(inner_value, dict) or isinstance(inner_value, list):
+                        value[key] = _replace_relative(inner_value)
+                return value
+
+    if isinstance(value, list):
+        if value and (isinstance(value[0], dict) or isinstance(value[0], list)):
+            return [_replace_relative(v) for v in value]
+        # It's an empty or primitive list. Dig no further
         return value
 
-    if key in KEYS_TO_CHECK:
-        if key == "extends":  # 'extends' is a list
-            extends_list = []
-            for blueprint in value:
-                extends_list.append(
-                    resolve_reference(
-                        blueprint,
-                        dependencies,
-                        destination,
-                        file_path,
-                    )
-                )
-            return extends_list
-        if key == "attributeType" and value in [data_type.value for data_type in BuiltinDataTypes]:
-            return value
-        return resolve_reference(
-            value,
-            dependencies,
-            destination,
-            file_path,
-        )
-
-    # If the value is a complex type, dig down recursively.
-    if isinstance(value, dict) and value != {}:
-        if not value.get("type"):
-            raise KeyError(f"Object with key '{key}' is missing the required 'type' attribute. File: '{file_path}'")
-
-        if (
-            value.get("type") == BuiltinDataTypes.OBJECT.value
-            or value.get("type") == BuiltinDataTypes.BINARY.value
-            or value.get("type") == BuiltinDataTypes.ANY.value
-        ):
-            return value
-
-        resolved_type = resolve_reference(
-            value["type"],
-            dependencies,
-            destination,
-            file_path,
-        )
-
-        # Do nothing with the address for references of type storage
-        if resolved_type == SIMOS.REFERENCE.value and value.get("referenceType") == ReferenceTypes.STORAGE.value:
-            resolved_path = resolve_storage_reference(value["address"], source_path)
-            return {"type": SIMOS.REFERENCE.value, "address": f"{resolved_path}", "referenceType": "storage"}
-
-        ignore_attributes = []
-        if resolved_type == SIMOS.DEPENDENCY.value:
-            ignore_attributes.append("address")
-
-        return {
-            k: replace_relative_references(
-                k, v, dependencies, destination, file_path=file_path, zip_file=zip_file, source_path=source_path
-            )
-            if k not in ignore_attributes
-            else v
-            for k, v in value.items()
-        }
-    if isinstance(value, list):
-        return [
-            replace_relative_references(
-                key, v, dependencies, destination, file_path=file_path, zip_file=zip_file, source_path=source_path
-            )
-            for v in value
-        ]
-
-    # This means it's a primitive type or an absolute path, return as-is
-    return value
+    raise ValueError(f"Function can only be called on dicts and lists. Got {value}")

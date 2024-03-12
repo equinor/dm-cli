@@ -3,10 +3,7 @@ from pathlib import Path
 
 from dm_cli.dmss import ApplicationException
 from dm_cli.domain import Dependency
-from dm_cli.utils.reference import (
-    replace_relative_references,
-    replace_relative_references_in_package_meta,
-)
+from dm_cli.utils.reference import replace_relative_references
 from dm_cli.utils.utils import Package, concat_dependencies
 
 """
@@ -105,16 +102,13 @@ class ReplaceReferences(unittest.TestCase):
         dependencies = concat_dependencies(document.get("_meta_", {}).get("dependencies", []), {}, src_path.name)
 
         # Replace references
-        prepared_document = {}
-        for key, val in document.items():
-            prepared_document[key] = replace_relative_references(
-                key,
-                val,
-                dependencies,
-                data_source_id,
-                package,
-                src_path.parent,
-            )
+        prepared_document = replace_relative_references(
+            document,
+            dependencies,
+            data_source_id,
+            package,
+            src_path.parent,
+        )
 
         REFERENCE_PREFIX = "dmss://system/SIMOS"
 
@@ -143,16 +137,13 @@ class ReplaceReferences(unittest.TestCase):
 
         with self.assertRaises(ApplicationException):
             # Replace references
-            prepared_document = {}
-            for key, val in document.items():
-                prepared_document[key] = replace_relative_references(
-                    key,
-                    val,
-                    dependencies,
-                    data_source_id,
-                    package,
-                    src_path.parent,
-                )
+            prepared_document = replace_relative_references(
+                document,
+                dependencies,
+                data_source_id,
+                package,
+                src_path.parent,
+            )
 
     def test_replace_relative_references_in_package(self):
         dependencies = {
@@ -180,8 +171,9 @@ class ReplaceReferences(unittest.TestCase):
         root_package.content.append(car_package)
         root_package.content[0].content.append(engine_package)
 
-        root_package = replace_relative_references_in_package_meta(
-            root_package, dependencies=dependencies, data_source_id="DemoApplicationDataSource"
+        root_package.meta = replace_relative_references(root_package.meta, dependencies, "DemoApplicationDataSource")
+        root_package.traverse_package(
+            lambda package: replace_relative_references(package.meta, dependencies, "DemoApplicationDataSource")
         )
 
         assert "CORE" not in root_package.meta["type"]

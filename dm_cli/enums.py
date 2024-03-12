@@ -37,6 +37,9 @@ class SIMOS(Enum):
     REFERENCE = "dmss://system/SIMOS/Reference"
     FILE = "dmss://system/SIMOS/File"
     DEPENDENCY = "dmss://system/SIMOS/Dependency"
+    ATTRIBUTE = "dmss://system/SIMOS/BlueprintAttribute"
+    BLUEPRINT = "dmss://system/SIMOS/Blueprint"
+    RECIPE_LINK = "dmss://system/SIMOS/RecipeLink"
 
 
 class ReferenceTypes(Enum):
