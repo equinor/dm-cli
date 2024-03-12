@@ -5,9 +5,7 @@ from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
-import typer
 from rich.console import Console
-from rich.text import Text
 from tenacity import (
     retry,
     retry_if_not_exception_type,
@@ -16,13 +14,11 @@ from tenacity import (
 )
 from tqdm import tqdm
 
-from dm_cli.state import state
-
 from .dmss import ApplicationException, dmss_api
 from .domain import Dependency, File, Package
 from .utils.reference import replace_relative_references
 from .utils.resolve_local_ids import resolve_local_ids_in_document
-from .utils.utils import concat_dependencies, replace_file_addresses
+from .utils.utils import concat_dependencies, replace_global_addresses
 
 console = Console()
 
@@ -112,20 +108,17 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(files) > 0:
         with tqdm(files, desc=f"  Adding files") as bar:
             for file in files:
-                try:
-                    dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
-                    uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
-                except Exception as error:
-                    if state.debug:
-                        console.print_exception()
-                    text = Text(str(error))
-                    console.print(text, style="red1")
-                    raise typer.Exit(code=1)
+                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
+                uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
                 bar.update()
 
     def upload_global_file(address: str) -> str:
         """Handling uploading of global files."""
         filepath = Path(address)
+        if not filepath.is_file():
+            raise ApplicationException(
+                f"Tried to upload file with address '{address}'. The file was not found", data=package.to_dict()
+            )
         if filepath.suffix != ".json":
             # Binary files
             with open(address, "rb") as f:
@@ -147,17 +140,12 @@ def import_package_content(package: Package, data_source: str, destination: str,
                 dependencies = concat_dependencies(
                     global_document.get("_meta_", {}).get("dependencies", []), dependencies, address
                 )
-                global_document = {
-                    key: replace_relative_references(
-                        key,
-                        value,
-                        dependencies,
-                        destination,
-                        file_path=address,
-                        zip_file=None,
-                    )
-                    for key, value in global_document.items()
-                }
+                global_document = replace_relative_references(
+                    global_document,
+                    dependencies,
+                    destination,
+                    file_path=address,
+                )
                 global_id = dmss_api.document_add_simple(data_source, global_document)
                 return global_id
             except JSONDecodeError:
@@ -166,21 +154,12 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(entities) > 0:
         with tqdm(entities, desc=f"  Adding entities") as bar:
             for entity in entities:
-                try:
-                    document = replace_file_addresses(entity, destination, uploaded_file_ids, upload_global_file)
-                    if resolve_local_ids:
-                        name = (
-                            f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
-                        )
-                        document = resolve_local_ids_in_document(document)
-                        print(f"Successfully resolved local IDs in:\t{destination}{name}")
-                    dmss_api.document_add_simple(data_source, document)
-                except Exception as error:
-                    if state.debug:
-                        console.print_exception()
-                    text = Text(str(error))
-                    console.print(text, style="red1")
-                    raise typer.Exit(code=1)
+                document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
+                if resolve_local_ids:
+                    name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
+                    document = resolve_local_ids_in_document(document)
+                    print(f"Successfully resolved local IDs in:\t{destination}{name}")
+                dmss_api.document_add_simple(data_source, document)
                 bar.update()
 
     packages: List[Package] = []
@@ -188,12 +167,5 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(packages) > 0:
         with tqdm(packages, desc=f"  Adding packages") as bar:
             for package in packages:
-                try:
-                    dmss_api.document_add_simple(data_source, package.to_dict())
-                except Exception as error:
-                    if state.debug:
-                        console.print_exception()
-                    text = Text(str(error))
-                    console.print(text, style="red1")
-                    raise typer.Exit(code=1)
+                dmss_api.document_add_simple(data_source, package.to_dict())
                 bar.update()

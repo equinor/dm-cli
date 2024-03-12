@@ -88,7 +88,7 @@ def validate_entity(
     @retry(
         wait=wait_random_exponential(multiplier=1, max=60),
         stop=stop_after_attempt(5),
-        retry=retry_if_not_exception_type(ApplicationException),
+        retry=retry_if_not_exception_type((ApplicationException, RuntimeError)),
     )
     def validation_error_wrapper():
         try:
@@ -97,7 +97,7 @@ def validate_entity(
             exception_body = json.loads(e.body)
             if exception_body["type"] == "ValidationException":
                 console.print(exception_body, style="red1")
-                return
+                raise typer.Exit(code=1)
             raise e
 
     dmss_exception_wrapper(validation_error_wrapper)

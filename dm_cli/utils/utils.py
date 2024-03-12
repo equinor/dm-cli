@@ -68,12 +68,14 @@ def add_package_to_path(name: str, path: Path):
     )
 
 
-def replace_file_addresses(
+def replace_global_addresses(
     document: dict, data_source_id: str, files_to_upload: dict, upload_global_file: Callable
 ) -> dict:
+    # This is for contained Files(blob data)? If so they should be embedded in the json document, not uploaded as a blob
     if document["type"] == SIMOS.REFERENCE.value and document["address"] in files_to_upload:
         blob_id = files_to_upload[document["address"]]
         document["address"] = f"${blob_id}"
+    # This is for model contained, storage-uncontained documents. They are stored on disk in the "global" folder
     if document["type"] == SIMOS.REFERENCE.value and document["referenceType"] == "storage":
         global_id = upload_global_file(document["address"])
         document["address"] = f"${global_id}"
@@ -81,14 +83,13 @@ def replace_file_addresses(
         if key == "_meta_":  # meta data can never contain blob data.
             return document
         if isinstance(value, dict) and value:
-            document[key] = replace_file_addresses(value, data_source_id, files_to_upload, upload_global_file)
+            document[key] = replace_global_addresses(value, data_source_id, files_to_upload, upload_global_file)
         if isinstance(value, list) and value:
             if len(value) > 0 and isinstance(value[0], dict):
                 document[key] = [
-                    replace_file_addresses(item, data_source_id, files_to_upload, upload_global_file)
+                    replace_global_addresses(item, data_source_id, files_to_upload, upload_global_file)
                     for item in document[key]
                 ]
-
     return document
 
 
@@ -133,7 +134,7 @@ def get_root_packages_in_data_sources(path: str) -> dict:
             # Global folders should be uploaded directly to the data source
             # and should not be included in the root packages of the data source.
             global_folders = data_source_document.get("global_folders", [])
-            data_source = data_source_definition.replace(".json", "")
+            data_source = data_source_document["name"]
             data_source_path = os.path.join(data_dir, data_source)
             root_packages: list[str] = [
                 folder

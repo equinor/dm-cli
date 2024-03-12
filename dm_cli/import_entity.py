@@ -44,9 +44,7 @@ def import_document(source_path: Path, destination: str, document: dict):
     )
 
     # Replace references
-    prepared_document = {}
-    for key, val in document.items():
-        prepared_document[key] = replace_relative_references(key, val, dependencies, destination)
+    prepared_document = replace_relative_references(document, dependencies, destination)
 
     document_json_str = json.dumps(prepared_document)
     dmss_api.document_add(
