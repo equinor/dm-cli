@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/equinor/dm-cli/compare/v1.6.0...v1.7.0) (2024-03-20)
+
+
+### Features
+
+* check context before replacing type references ([37e3a46](https://github.com/equinor/dm-cli/commit/37e3a46345b0f6b14ae6b5f2e1229578683b6ea8))
+
 ## [1.6.0](https://github.com/equinor/dm-cli/compare/v1.5.4...v1.6.0) (2024-02-16)
 
 
