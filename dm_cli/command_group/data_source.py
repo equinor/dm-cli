@@ -20,10 +20,10 @@ from dm_cli.utils.utils import (
     validate_entities_in_data_sources,
 )
 
-data_source_app = typer.Typer()
+data_source_app = typer.Typer(help="Import and reset data sources")
 
 
-@data_source_app.command("import", help="Subcommand for working with data sources")
+@data_source_app.command("import", help="Import a single data source definition")
 def import_data_source(
     path: Annotated[Path, typer.Argument(help="Path on local filesystem to a data source JSON file.")]
 ):
@@ -92,7 +92,7 @@ def initialize_data_source(
 ):
     """
     Initialize the data sources and import all packages.
-    The packages in a data sources will be deleted before data sources are imported.
+    The remote packages in a data source will be deleted before new data sources are imported.
     """
     # Check for presence of expected directories, 'data_sources' and 'data'
     data_sources_dir, data_dir = get_app_dir_structure(Path(path))
