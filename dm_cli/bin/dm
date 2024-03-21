@@ -29,11 +29,11 @@ def version_callback(print_version: bool):
 
 @app.callback()
 def main(
-        force: bool = typer.Option(False,"--force", "-f", help="Force the operation. Overwriting and potentially deleting data."),
+        force: bool = typer.Option(False, "--force", "-f", help="Force the operation. Overwriting and potentially deleting data."),
         dmss_url: str = typer.Option("http://localhost:5000", "--url", "-u", help="URL to the Data Modelling Storage Service (DMSS)."),
-        token: str = typer.Option("no-token","--token","-t", help="Token for authentication against DMSS."),
-        debug: bool = typer.Option(False, "--debug","-d",help="Print stack trace of suppressed exceptions"),
-        version: Optional[bool] = typer.Option(None, "--version", "-v", callback=version_callback, is_eager=True)
+        token: str = typer.Option("no-token", "--token", "-t", help="Token for authentication against DMSS."),
+        debug: bool = typer.Option(False, "--debug", "-d", help="Print stack trace of suppressed exceptions"),
+        version: Optional[bool] = typer.Option(None, "--version", "-v", callback=version_callback, is_eager=True, help="Print version and exit")
 ):
     """
     Command Line Interface (CLI) tool for working with the Data Modelling Framework.

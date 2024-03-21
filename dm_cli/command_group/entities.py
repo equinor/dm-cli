@@ -16,7 +16,7 @@ from dm_cli.dmss_api import ApiException
 from dm_cli.import_entity import import_folder_entity, import_single_entity
 from dm_cli.utils.utils import destination_is_root
 
-entities_app = typer.Typer()
+entities_app = typer.Typer(help="Import, delete, or validate entities and/or blueprints")
 
 
 @entities_app.command("import")
