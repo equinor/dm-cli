@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/equinor/dm-cli/compare/v1.7.0...v1.7.1) (2024-03-22)
+
+
+### Documentation
+
+* README to be up-to-date ([3420fee](https://github.com/equinor/dm-cli/commit/3420fee693ba595e335e650d752f7c7542b92f85))
+
 ## [1.7.0](https://github.com/equinor/dm-cli/compare/v1.6.0...v1.7.0) (2024-03-20)
 
 
