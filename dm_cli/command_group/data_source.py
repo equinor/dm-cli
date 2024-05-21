@@ -6,13 +6,14 @@ import typer
 from rich import print
 from tenacity import (
     retry,
-    retry_if_not_exception_type,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_random_exponential,
 )
 from typing_extensions import Annotated
 
 from dm_cli.dmss import ApplicationException, dmss_api, dmss_exception_wrapper
+from dm_cli.dmss_api.exceptions import ServiceException
 from dm_cli.import_entity import import_folder_entity, remove_by_path_ignore_404
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 from dm_cli.utils.utils import (
@@ -35,7 +36,7 @@ def import_data_source(
         wait=wait_random_exponential(multiplier=1, max=60),
         stop=stop_after_attempt(5),
         reraise=True,
-        retry=retry_if_not_exception_type(ApplicationException),
+        retry=retry_if_exception_type(ServiceException),
     )
     def retry_wrapper():
         data_source_path = Path(path)

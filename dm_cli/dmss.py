@@ -7,14 +7,14 @@ from rich.console import Console
 from rich.text import Text
 from tenacity import (
     retry,
-    retry_if_not_exception_type,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_random_exponential,
 )
 
 from dm_cli.dmss_api import ApiException
 from dm_cli.dmss_api.api.default_api import DefaultApi
-from dm_cli.dmss_api.exceptions import NotFoundException
+from dm_cli.dmss_api.exceptions import NotFoundException, ServiceException
 from dm_cli.state import state
 
 console = Console()
@@ -35,7 +35,9 @@ class ApplicationException(Exception):
         debug: str = "An unknown and unhandled exception occurred in the API",
         data: dict = None,
         status: int = 500,
+        type: str = "ApplicationException",
     ):
+        self.type = type
         self.status = status
         self.type = self.__class__.__name__
         self.message = message
@@ -56,7 +58,7 @@ class ApplicationException(Exception):
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_not_exception_type(ApplicationException),
+    retry=retry_if_exception_type(ServiceException),
 )
 def export(absolute_document_ref: str):
     """Call export endpoint from DMSS to download document(s) as zip.
