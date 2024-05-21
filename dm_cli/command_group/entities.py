@@ -50,7 +50,7 @@ def import_entity(
                 print(f"Importing all content from '{source}*' --> '{destination}'")
                 for file in source_path.iterdir():
                     if file.is_file():
-                        import_single_entity(file, destination)
+                        import_single_entity(file, destination, validate)
                         continue
                     import_folder_entity(file, destination, fast)
                     if validate:
@@ -64,10 +64,7 @@ def import_entity(
                 dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
             return True
         else:
-            import_single_entity(source_path, destination)
-            if validate:
-                print(f"Validating entities in: {destination}/{source_path.name}")
-                dmss_api.validate_existing_entity(f"{destination}/{source_path.name}")
+            import_single_entity(source_path, destination, validate)
             return True
 
     return dmss_exception_wrapper(inner_import)

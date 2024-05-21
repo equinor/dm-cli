@@ -4,16 +4,19 @@ from json import JSONDecodeError
 from pathlib import Path
 from zipfile import ZipFile
 
+from requests import Response
 from rich import print
 from tenacity import (
     retry,
+    retry_if_exception_type,
     retry_if_not_exception_type,
+    retry_if_not_result,
     stop_after_attempt,
     wait_random_exponential,
 )
 
 from .dmss import ApplicationException, dmss_api
-from .dmss_api.exceptions import NotFoundException
+from .dmss_api.exceptions import ApiException, NotFoundException, ServiceException
 from .import_package import import_package_tree
 from .package_tree_from_zip import package_tree_from_zip
 from .state import state
@@ -31,7 +34,7 @@ from .utils.zip import zip_all
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_not_exception_type(ApplicationException),
+    retry=retry_if_exception_type(ServiceException),
 )
 def import_document(source_path: Path, destination: str, document: dict):
     remote_dependencies = dmss_api.export_meta(destination)
@@ -54,14 +57,19 @@ def import_document(source_path: Path, destination: str, document: dict):
     )
 
 
-def import_single_entity(source_path: Path, destination: str):
+def import_single_entity(source_path: Path, destination: str, validate: bool = False):
     ensure_package_structure(Path(destination))
     print(f"Importing ENTITY '{source_path.name}' --> '{destination}'")
 
     try:  # Load the JSON document
         with open(source_path, "r") as fh:
             if Path(source_path).suffix == ".json":
-                import_document(source_path, destination, json.load(fh))
+                content = json.load(fh)
+                if validate:
+                    print(f"Validating {source_path}", end="")
+                    dmss_api.validate_entity(content)
+                    print(" [green]✓[/green]")
+                import_document(source_path, destination, content)
             else:
                 print(f"Unsupported file type {source_path}")
     except JSONDecodeError:
@@ -79,7 +87,7 @@ def remove_by_path_ignore_404(target: str):
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_not_exception_type(ApplicationException),
+    retry=retry_if_exception_type(ServiceException),
 )
 def import_folder_entity(
     source_path: Path,
