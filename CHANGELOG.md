@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.1](https://github.com/equinor/dm-cli/compare/v1.7.0...v1.7.1) (2024-05-22)
+
+
+### Bug Fixes
+
+* validate single entities before upload ([e0c93ce](https://github.com/equinor/dm-cli/commit/e0c93ce5190d4e8edc3db33c9617757db136dd64))
+
+
+### Documentation
+
+* README to be up-to-date ([3420fee](https://github.com/equinor/dm-cli/commit/3420fee693ba595e335e650d752f7c7542b92f85))
+
 ## [1.7.0](https://github.com/equinor/dm-cli/compare/v1.6.0...v1.7.0) (2024-03-20)
 
 
