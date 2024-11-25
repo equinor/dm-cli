@@ -1,4 +1,3 @@
-#!C:\dev\dm-app-simpos\git\.py13env\Scripts\python.exe
 import io
 import os
 from pathlib import Path, PurePosixPath
