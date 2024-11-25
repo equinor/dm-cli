@@ -1,7 +1,7 @@
 import io
 import json
 from json import JSONDecodeError
-from pathlib import Path
+from pathlib import PurePosixPath, Path
 from zipfile import ZipFile
 
 from requests import Response
@@ -58,12 +58,12 @@ def import_document(source_path: Path, destination: str, document: dict):
 
 
 def import_single_entity(source_path: Path, destination: str, validate: bool = False):
-    ensure_package_structure(Path(destination))
+    ensure_package_structure(PurePosixPath(destination))
     print(f"Importing ENTITY '{source_path.name}' --> '{destination}'")
 
     try:  # Load the JSON document
         with open(source_path, "r") as fh:
-            if Path(source_path).suffix == ".json":
+            if PurePosixPath(source_path).suffix == ".json":
                 content = json.load(fh)
                 if validate:
                     print(f"Validating {source_path}", end="")
@@ -95,7 +95,7 @@ def import_folder_entity(
     raw_package_import: bool = False,
     resolve_local_ids: bool = False,
 ) -> dict:
-    destination_path = Path(destination)
+    destination_path = PurePosixPath(destination)
 
     # Check if target already exists on remote. Then delete or raise exception
     target = f"{destination}/{source_path.name}"

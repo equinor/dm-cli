@@ -1,7 +1,7 @@
 import io
 import json
 from json import JSONDecodeError
-from pathlib import Path
+from pathlib import PurePosixPath, Path
 from typing import Dict, List
 from uuid import uuid4
 
@@ -42,7 +42,7 @@ def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> N
         package.content.append(sub_folder)
 
     new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
-    return add_object_to_package(Path(new_path), sub_folder, object)
+    return add_object_to_package(PurePosixPath(new_path), sub_folder, object)
 
 
 def add_file_to_package(path: Path, package: Package, document: dict) -> None:
@@ -61,7 +61,7 @@ def add_file_to_package(path: Path, package: Package, document: dict) -> None:
         package.content.append(sub_folder)
 
     new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
-    return add_file_to_package(Path(new_path), sub_folder, document)
+    return add_file_to_package(PurePosixPath(new_path), sub_folder, document)
 
 
 def add_package_to_package(path: Path, package: Package) -> None:
@@ -75,7 +75,7 @@ def add_package_to_package(path: Path, package: Package) -> None:
         package.content.append(sub_folder)
 
     new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
-    return add_package_to_package(Path(new_path), sub_folder)
+    return add_package_to_package(PurePosixPath(new_path), sub_folder)
 
 
 def import_package_tree(package: Package, destination: str, raw_package_import: bool, resolve_local_ids: bool) -> None:
@@ -116,7 +116,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
 
     def upload_global_file(address: str) -> str:
         """Handling uploading of global files."""
-        filepath = Path(address)
+        filepath = PurePosixPath(address)
         if not filepath.is_file():
             raise ApplicationException(
                 f"Tried to upload file with address '{address}'. The file was not found", data=package.to_dict()
