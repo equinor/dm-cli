@@ -48,7 +48,7 @@ jobs:
           python-version: "3.11"
 
       - name: Start DMSS
-        run: docker-compose pull && docker-compose up -d
+        run: docker compose pull && docker compose up -d
 
       - name: Download test blueprints
         run: |
