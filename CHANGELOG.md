@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.7.2](https://github.com/equinor/dm-cli/compare/v1.7.1...v1.7.2) (2024-12-02)
+
+
+### Bug Fixes
+
+* use docker compose command ([e44fbcb](https://github.com/equinor/dm-cli/commit/e44fbcbcb28a78d3579dbe2b5182868802de9d7e))
+
+
+### Documentation
+
+* add MIT licence ([b14fabf](https://github.com/equinor/dm-cli/commit/b14fabf6f35369ba0e328869a1a99741f2757c7c))
+
+
+### Miscellaneous Chores
+
+* use the compatible release version specifier ([fa923b5](https://github.com/equinor/dm-cli/commit/fa923b53f89b2076408f27a9254c1a88b3198865))
+* wrong syntax ([eed2fec](https://github.com/equinor/dm-cli/commit/eed2fec6c1040ad002136d8982a17f76f3c0c77b))
+
 ## [1.7.1](https://github.com/equinor/dm-cli/compare/v1.7.0...v1.7.1) (2024-05-22)
 
 
