@@ -20,6 +20,7 @@ def resolve_reference(
             return resolve_dependency(reference, dependencies)
         if reference[0] == ".":
             normalized_dotted_ref: str = normpath(f"{file_path}/{reference}")
+            normalized_dotted_ref = Path(normalized_dotted_ref).as_posix()
             return f"dmss://{destination}/{normalized_dotted_ref}"
         if reference[0] == "/":
             data_source = destination.split("/")[0]

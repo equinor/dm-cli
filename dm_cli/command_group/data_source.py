@@ -1,5 +1,5 @@
 import json
-from pathlib import Path
+from pathlib import PurePosixPath, Path
 
 import emoji
 import typer
@@ -96,7 +96,7 @@ def initialize_data_source(
     The remote packages in a data source will be deleted before new data sources are imported.
     """
     # Check for presence of expected directories, 'data_sources' and 'data'
-    data_sources_dir, data_dir = get_app_dir_structure(Path(path))
+    data_sources_dir, data_dir = get_app_dir_structure(PurePosixPath(path))
 
     data_source_definitions = get_json_files_in_dir(data_sources_dir)
     if not data_source_definitions:
@@ -111,7 +111,7 @@ def initialize_data_source(
 def import_data_source_file(
     data_sources_dir: str, data_dir: str, data_source_definition_filename: str, resolve_local_ids: bool
 ):
-    data_source_definition_filepath = Path(data_sources_dir).joinpath(data_source_definition_filename)
+    data_source_definition_filepath = PurePosixPath(data_sources_dir).joinpath(data_source_definition_filename)
     data_source_name = data_source_definition_filename.replace(".json", "")
 
     data_source_data_dir = data_dir / data_source_name
@@ -156,7 +156,7 @@ def reset_data_source(
     """
     Reset a single data source (deletes and re-uploads root-packages)
     """
-    app_dir = Path(path)
+    app_dir = PurePosixPath(path)
     if not app_dir.is_dir():
         raise FileNotFoundError(f"The path '{path}' is not a directory.")
 
