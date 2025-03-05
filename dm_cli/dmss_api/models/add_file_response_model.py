@@ -17,18 +17,23 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictBytes, StrictStr
-from typing import Any, ClassVar, Dict, List, Tuple, Union
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 
-class BodyFileUpload(BaseModel):
+class AddFileResponseModel(BaseModel):
     """
-    BodyFileUpload
+    AddFileResponseModel
     """ # noqa: E501
-    data: StrictStr
-    file: Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]]
-    __properties: ClassVar[List[str]] = ["data", "file"]
+    name: StrictStr
+    type: StrictStr
+    author: StrictStr
+    var_date: StrictStr = Field(alias="date")
+    size: StrictInt
+    filetype: StrictStr
+    content: Dict[str, Any]
+    __properties: ClassVar[List[str]] = ["name", "type", "author", "date", "size", "filetype", "content"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -48,7 +53,7 @@ class BodyFileUpload(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of BodyFileUpload from a JSON string"""
+        """Create an instance of AddFileResponseModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -73,7 +78,7 @@ class BodyFileUpload(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of BodyFileUpload from a dict"""
+        """Create an instance of AddFileResponseModel from a dict"""
         if obj is None:
             return None
 
@@ -81,8 +86,13 @@ class BodyFileUpload(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "data": obj.get("data"),
-            "file": obj.get("file")
+            "name": obj.get("name"),
+            "type": obj.get("type"),
+            "author": obj.get("author"),
+            "date": obj.get("date"),
+            "size": obj.get("size"),
+            "filetype": obj.get("filetype"),
+            "content": obj.get("content")
         })
         return _obj
 

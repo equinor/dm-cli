@@ -261,7 +261,6 @@ class ImportPackageTest(unittest.TestCase):
         myTurbine2 = folder_SubFolder.search("myTurbine2")
 
         assert mooringBlueprint["type"] == "dmss://system/SIMOS/Blueprint"
-        print(myTurbine2)
         assert myTurbine2["type"] == "dmss://test_data_source/XRoot/MyPackage/WindTurbine"
         assert isinstance(UUID(myTurbine2["Mooring"]["_id"]), UUID)
         assert myTurbine2["Mooring"]["type"] == "dmss://test_data_source/XRoot/MyPackage/Moorings/Mooring"

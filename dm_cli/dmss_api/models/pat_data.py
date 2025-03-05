@@ -29,7 +29,7 @@ class PATData(BaseModel):
     PATData
     """ # noqa: E501
     pat_hash: Optional[StrictStr] = None
-    uuid: Optional[StrictStr] = '22a0c774-5de9-487c-a762-d880b339e321'
+    uuid: Optional[StrictStr] = '19b5a1b2-07c0-4ea2-9942-58a9ff490e2e'
     user_id: StrictStr
     roles: Optional[List[StrictStr]] = None
     scope: AccessLevel
@@ -93,7 +93,7 @@ class PATData(BaseModel):
 
         _obj = cls.model_validate({
             "pat_hash": obj.get("pat_hash"),
-            "uuid": obj.get("uuid") if obj.get("uuid") is not None else '22a0c774-5de9-487c-a762-d880b339e321',
+            "uuid": obj.get("uuid") if obj.get("uuid") is not None else '19b5a1b2-07c0-4ea2-9942-58a9ff490e2e',
             "user_id": obj.get("user_id"),
             "roles": obj.get("roles"),
             "scope": obj.get("scope"),

@@ -16,6 +16,7 @@ from tenacity import (
 from tqdm import tqdm
 
 from .dmss import ApplicationException, dmss_api
+from .dmss_api import AddFileResponseModel
 from .dmss_api.exceptions import ServiceException
 from .domain import Dependency, File, Package
 from .utils.reference import replace_relative_references
@@ -108,11 +109,17 @@ def import_package_content(package: Package, data_source: str, destination: str,
     )
     uploaded_file_ids = {}
     if len(files) > 0:
-        with tqdm(files, desc=f"  Adding files") as bar:
-            for file in files:
-                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content.getvalue())
-                uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
-                bar.update()
+        dmss_api.file_uploads(
+            data_source_id=data_source,
+            data=json.dumps({"file_ids": [file.uid for file in files]}),
+            files=[file.content.getvalue() for file in files],
+        )
+        # with tqdm(files, desc=f"  Adding files") as bar:
+        for file in files:
+            # dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content.getvalue())
+            uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
+            # bar.update()
+        console.print(f"  Added {len(files)} files")
 
     def upload_global_file(address: str) -> str:
         """Handling uploading of global files."""

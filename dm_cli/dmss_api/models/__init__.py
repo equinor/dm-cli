@@ -16,6 +16,7 @@
 # import models into model package
 from dm_cli.dmss_api.models.access_control_list import AccessControlList
 from dm_cli.dmss_api.models.access_level import AccessLevel
+from dm_cli.dmss_api.models.add_file_response_model import AddFileResponseModel
 from dm_cli.dmss_api.models.data_source_information import DataSourceInformation
 from dm_cli.dmss_api.models.data_source_request import DataSourceRequest
 from dm_cli.dmss_api.models.dependency import Dependency
