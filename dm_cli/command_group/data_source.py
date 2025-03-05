@@ -13,6 +13,7 @@ from tenacity import (
 from typing_extensions import Annotated
 
 from dm_cli.dmss import ApplicationException, dmss_api, dmss_exception_wrapper
+from dm_cli.dmss_api import DataSourceInformation
 from dm_cli.dmss_api.exceptions import ServiceException
 from dm_cli.import_entity import import_folder_entity, remove_by_path_ignore_404
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
@@ -48,8 +49,8 @@ def import_data_source(
         # Read the data source definition
         with open(data_source_path) as file:
             document = json.load(file)
-            existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
-            if any(existing_document["name"] == document["name"] for existing_document in existing_data_sources):
+            existing_data_sources: list[DataSourceInformation] = dmss_exception_wrapper(dmss_api.data_source_get_all)
+            if any(existing_document.name == document["name"] for existing_document in existing_data_sources):
                 print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
 
             dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)

@@ -25,7 +25,6 @@ setup(
         "dm_cli/dmss_api",
         "dm_cli/dmss_api/api",
         "dm_cli/dmss_api/models",
-        "dm_cli/dmss_api/model",
     ],
     install_requires=[requirements],
     python_requires=">=3.8",

@@ -110,7 +110,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(files) > 0:
         with tqdm(files, desc=f"  Adding files") as bar:
             for file in files:
-                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
+                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content.getvalue())
                 uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
                 bar.update()
 
@@ -127,7 +127,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
                 file_like = io.BytesIO(f.read())
             file_like.name = filepath.stem
             global_id = str(uuid4())
-            dmss_api.blob_upload(data_source, global_id, file_like)
+            dmss_api.blob_upload(data_source, global_id, file_like.getvalue())
             return global_id
         else:
             try:
@@ -154,20 +154,20 @@ def import_package_content(package: Package, data_source: str, destination: str,
                 raise Exception(f"Failed to load the file '{address}' as a JSON document")
 
     if len(entities) > 0:
-        with tqdm(entities, desc=f"  Adding entities") as bar:
-            for entity in entities:
-                document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
-                if resolve_local_ids:
-                    name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
-                    document = resolve_local_ids_in_document(document)
-                    print(f"Successfully resolved local IDs in:\t{destination}{name}")
-                dmss_api.document_add_simple(data_source, document)
-                bar.update()
+        resolved_entities = []
+        for entity in entities:
+            document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
+            if resolve_local_ids:
+                name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
+                document = resolve_local_ids_in_document(document)
+                resolved_entities.append(document)
+                print(f"Successfully resolved local IDs in:\t{destination}{name}")
+            resolved_entities.append(document)
+        dmss_api.document_add_raw_multiple(data_source, resolved_entities)
+        console.print(f"  Added {len(entities)} entities")
 
     packages: List[Package] = []
-    package.traverse_package(lambda package: packages.append(package))
+    package.traverse_package(lambda package: packages.append(package.to_dict()))
     if len(packages) > 0:
-        with tqdm(packages, desc=f"  Adding packages") as bar:
-            for package in packages:
-                dmss_api.document_add_simple(data_source, package.to_dict())
-                bar.update()
+        dmss_api.document_add_raw_multiple(data_source, packages)
+        console.print(f"  Added {len(packages)} packages")

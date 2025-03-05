@@ -16,6 +16,7 @@ from tenacity import (
 )
 
 from .dmss import ApplicationException, dmss_api
+from .dmss_api import ExportMetaResponse
 from .dmss_api.exceptions import ApiException, NotFoundException, ServiceException
 from .import_package import import_package_tree
 from .package_tree_from_zip import package_tree_from_zip
@@ -105,13 +106,16 @@ def import_folder_entity(
             raise ValueError(f"Failed to upload to '{target}' - It already exists.")
         console.print(f"'{target}' already exists.  Replacing it...", style="dark_orange")
         dmss_api.document_remove(target)
+    else:
+        console.print(f"'{target}' does not exists.  Importing it...")
 
     dependencies = {}
     is_root = destination_is_root(destination_path)
     if not is_root:
         ensure_package_structure(destination_path)
-        remote_dependencies = dmss_api.export_meta(f"{destination}")
-        dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
+        remote_dependencies: ExportMetaResponse = dmss_api.export_meta(f"{destination}")
+        dependencies = remote_dependencies.dependencies if remote_dependencies.dependencies else []
+        dependencies = {dependency["alias"]: dependency for dependency in dependencies}
 
     memory_file = io.BytesIO()
     with ZipFile(memory_file, mode="w") as zip_file:
