@@ -95,11 +95,21 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
     import_package_content(package, data_source, destination, resolve_local_ids)
 
 
+def log_attempt_number(retry_state):
+    print(f"Retrying: {retry_state.attempt_number}...")
+    try:
+        retry_state.outcome.result()
+    except Exception as e:
+        print(e)
+        console.print(f"Failed to import package: {e}")
+
+
 @retry(
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
     retry=retry_if_exception_type(ServiceException),
+    after=log_attempt_number,
 )
 def import_package_content(package: Package, data_source: str, destination: str, resolve_local_ids: bool) -> None:
     files: List[File] = []
@@ -114,11 +124,8 @@ def import_package_content(package: Package, data_source: str, destination: str,
             data=json.dumps({"file_ids": [file.uid for file in files]}),
             files=[file.content.getvalue() for file in files],
         )
-        # with tqdm(files, desc=f"  Adding files") as bar:
         for file in files:
-            # dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content.getvalue())
             uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
-            # bar.update()
         console.print(f"  Added {len(files)} files")
 
     def upload_global_file(address: str) -> str:
