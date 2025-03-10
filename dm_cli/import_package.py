@@ -119,14 +119,11 @@ def import_package_content(package: Package, data_source: str, destination: str,
     )
     uploaded_file_ids = {}
     if len(files) > 0:
-        dmss_api.file_uploads(
-            data_source_id=data_source,
-            data=json.dumps({"file_ids": [file.uid for file in files]}),
-            files=[file.content.getvalue() for file in files],
-        )
-        for file in files:
-            uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
-        console.print(f"  Added {len(files)} files")
+        with tqdm(files, desc=f"  Adding files") as bar:
+            for file in files:
+                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content.getvalue())
+                uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
+                bar.update()
 
     def upload_global_file(address: str) -> str:
         """Handling uploading of global files."""
