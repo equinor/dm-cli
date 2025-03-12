@@ -101,6 +101,7 @@ def log_attempt_number(retry_state):
     except Exception as e:
         print(e)
         console.print(f"Failed to import package: {e}")
+        console.print_exception()
 
 
 @retry(
@@ -120,7 +121,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(files) > 0:
         with tqdm(files, desc=f"  Adding files") as bar:
             for file in files:
-                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
+                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content, _request_timeout=3600)
                 uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
                 bar.update()
 
@@ -137,7 +138,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
             with open(address, "rb") as f:
                 file_like = io.BytesIO(f.read())
                 file_like.name = filepath.stem
-                dmss_api.blob_upload(data_source, global_id, file_like)
+                dmss_api.blob_upload(data_source, global_id, file_like, _request_timeout=3600)
             return global_id
         else:
             try:
@@ -171,7 +172,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
                     name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
                     document = resolve_local_ids_in_document(document)
                     print(f"Successfully resolved local IDs in:\t{destination}{name}")
-                dmss_api.document_add_simple(data_source, document)
+                dmss_api.document_add_simple(data_source, document, _request_timeout=3600)
                 bar.update()
 
     packages: List[Package] = []
@@ -179,5 +180,5 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(packages) > 0:
         with tqdm(packages, desc=f"  Adding packages") as bar:
             for package in packages:
-                dmss_api.document_add_simple(data_source, package.to_dict())
+                dmss_api.document_add_simple(data_source, package.to_dict(), _request_timeout=3600)
                 bar.update()
