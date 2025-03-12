@@ -1,5 +1,6 @@
 import io
 import json
+import logging
 from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List
@@ -24,6 +25,10 @@ from .utils.resolve_local_ids import resolve_local_ids_in_document
 from .utils.utils import concat_dependencies, replace_global_addresses
 
 console = Console()
+
+logging.basicConfig(level=logging.DEBUG)
+urllib3_logger = logging.getLogger("urllib3")
+urllib3_logger.setLevel(logging.DEBUG)
 
 
 def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> None:
@@ -191,18 +196,23 @@ def import_package_content(package: Package, data_source: str, destination: str,
                     dmss_api.document_add_simple(data_source, package.to_dict(), _request_timeout=3600)
                     bar.update()
     except urllib3.exceptions.ProtocolError as e:
+        console.print_exception()
         console.print(f"Protocol error occurred: {e}")
         raise e
     except urllib3.exceptions.NewConnectionError as e:
+        console.print_exception()
         console.print(f"New connection error: {e}")
         raise e
     except urllib3.exceptions.MaxRetryError as e:
+        console.print_exception()
         console.print(f"Max retries exceeded: {e}")
         raise e
     except ServiceException as e:
+        console.print_exception()
         console.print(f"Service error occurred: {e}")
         raise e
     except ApplicationException as e:
+        console.print_exception()
         console.print(f"Application error occurred: {e}")
         raise e
     except Exception as e:
