@@ -94,11 +94,21 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
     import_package_content(package, data_source, destination, resolve_local_ids)
 
 
+def log_attempt_number(retry_state):
+    print(f"Retrying: {retry_state.attempt_number}...")
+    try:
+        retry_state.outcome.result()
+    except Exception as e:
+        print(e)
+        console.print(f"Failed to import package: {e}")
+
+
 @retry(
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_exception_type(ServiceException),
+    retry=retry_if_exception_type(Exception),
+    after=log_attempt_number,
 )
 def import_package_content(package: Package, data_source: str, destination: str, resolve_local_ids: bool) -> None:
     files: List[File] = []
@@ -123,11 +133,11 @@ def import_package_content(package: Package, data_source: str, destination: str,
             )
         if filepath.suffix != ".json":
             # Binary files
+            global_id = str(uuid4())
             with open(address, "rb") as f:
                 file_like = io.BytesIO(f.read())
-            file_like.name = filepath.stem
-            global_id = str(uuid4())
-            dmss_api.blob_upload(data_source, global_id, file_like)
+                file_like.name = filepath.stem
+                dmss_api.blob_upload(data_source, global_id, file_like)
             return global_id
         else:
             try:
