@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
+import urllib3
 from rich.console import Console
 from tenacity import (
     retry,
@@ -189,7 +190,22 @@ def import_package_content(package: Package, data_source: str, destination: str,
                 for package in packages:
                     dmss_api.document_add_simple(data_source, package.to_dict(), _request_timeout=3600)
                     bar.update()
+    except urllib3.exceptions.ProtocolError as e:
+        console.print(f"Protocol error occurred: {e}")
+        raise e
+    except urllib3.exceptions.NewConnectionError as e:
+        console.print(f"New connection error: {e}")
+        raise e
+    except urllib3.exceptions.MaxRetryError as e:
+        console.print(f"Max retries exceeded: {e}")
+        raise e
+    except ServiceException as e:
+        console.print(f"Service error occurred: {e}")
+        raise e
+    except ApplicationException as e:
+        console.print(f"Application error occurred: {e}")
+        raise e
     except Exception as e:
-        console.print(f"Failed to import package: {e}")
+        console.print(f"An unexpected error occurred: {e}")
         console.print_exception()
         raise e
