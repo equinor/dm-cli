@@ -83,11 +83,22 @@ def remove_by_path_ignore_404(target: str):
         pass
 
 
+def log_attempt_number(retry_state):
+    print(f"Retrying import folder entity: {retry_state.attempt_number}...")
+    try:
+        retry_state.outcome.result()
+    except Exception as e:
+        print(e)
+        console.print(f"Failed: {e}")
+        console.print_exception()
+
+
 @retry(
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_exception_type(ServiceException),
+    retry=retry_if_exception_type(Exception),
+    after=log_attempt_number,
 )
 def import_folder_entity(
     source_path: Path,
