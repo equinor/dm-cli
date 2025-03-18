@@ -68,7 +68,7 @@ def create_lookup(name: Annotated[str, typer.Argument(help="Name of the lookup (
     # TODO change type of paths argument to be list of str to avoid this path as strings conversion below
     paths_as_strings = [str(path) for path in paths]
     print(f"Creating lookup table from paths: {paths_as_strings}")
-    dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=paths_as_strings, application=name)
+    dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=paths_as_strings, application=name, _request_timeout=3600)
 
 @app.command("export")
 def export_entity(target: Annotated[str, typer.Argument(help="Address to the entity to export. Format: <dataSource>/<path>.")],

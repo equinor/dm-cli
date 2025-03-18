@@ -26,9 +26,9 @@ from .utils.utils import concat_dependencies, replace_global_addresses
 
 console = Console()
 
-logging.basicConfig(level=logging.DEBUG)
-urllib3_logger = logging.getLogger("urllib3")
-urllib3_logger.setLevel(logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
+# urllib3_logger = logging.getLogger("urllib3")
+# urllib3_logger.setLevel(logging.DEBUG)
 
 
 def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> None:
