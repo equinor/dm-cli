@@ -12,14 +12,18 @@ from tenacity import (
     wait_random_exponential,
 )
 
-from dm_cli.dmss_api import ApiException
+from dm_cli.dmss_api import ApiClient, ApiException
 from dm_cli.dmss_api.api.default_api import DefaultApi
 from dm_cli.dmss_api.exceptions import NotFoundException, ServiceException
 from dm_cli.state import state
 
 console = Console()
 
-dmss_api = DefaultApi()
+api_client = ApiClient()
+
+# api_client.configuration.retries
+
+dmss_api = DefaultApi(api_client)
 
 
 class ApplicationException(Exception):

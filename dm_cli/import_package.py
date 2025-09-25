@@ -1,10 +1,12 @@
 import io
 import json
+import logging
 from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
+import urllib3
 from rich.console import Console
 from tenacity import (
     retry,
@@ -23,6 +25,10 @@ from .utils.resolve_local_ids import resolve_local_ids_in_document
 from .utils.utils import concat_dependencies, replace_global_addresses
 
 console = Console()
+
+logging.basicConfig(level=logging.DEBUG)
+urllib3_logger = logging.getLogger("urllib3")
+urllib3_logger.setLevel(logging.DEBUG)
 
 
 def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> None:
@@ -94,80 +100,127 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
     import_package_content(package, data_source, destination, resolve_local_ids)
 
 
+def log_attempt_number(retry_state):
+    print(f"Retrying: {retry_state.attempt_number}...")
+    try:
+        retry_state.outcome.result()
+    except Exception as e:
+        print(e)
+        console.print(f"Failed to import package: {e}")
+        console.print_exception()
+
+
 @retry(
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_exception_type(ServiceException),
+    retry=retry_if_exception_type(Exception),
+    after=log_attempt_number,
 )
 def import_package_content(package: Package, data_source: str, destination: str, resolve_local_ids: bool) -> None:
-    files: List[File] = []
-    entities: List[dict] = []
-    package.traverse_documents(
-        lambda document, **kwargs: files.append(document) if isinstance(document, File) else entities.append(document)
-    )
-    uploaded_file_ids = {}
-    if len(files) > 0:
-        with tqdm(files, desc=f"  Adding files") as bar:
-            for file in files:
-                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
-                uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
-                bar.update()
+    try:
+        files: List[File] = []
+        entities: List[dict] = []
+        package.traverse_documents(
+            lambda document, **kwargs: files.append(document)
+            if isinstance(document, File)
+            else entities.append(document)
+        )
+        uploaded_file_ids = {}
+        if len(files) > 0:
+            with tqdm(files, desc=f"  Adding files") as bar:
+                for file in files:
+                    dmss_api.file_upload(
+                        data_source,
+                        json.dumps({"file_id": file.uid}),
+                        (file.name, file.content.getvalue()),
+                        _request_timeout=3600,
+                    )
+                    uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
+                    bar.update()
 
-    def upload_global_file(address: str) -> str:
-        """Handling uploading of global files."""
-        filepath = Path(address)
-        if not filepath.is_file():
-            raise ApplicationException(
-                f"Tried to upload file with address '{address}'. The file was not found", data=package.to_dict()
-            )
-        if filepath.suffix != ".json":
-            # Binary files
-            with open(address, "rb") as f:
-                file_like = io.BytesIO(f.read())
-            file_like.name = filepath.stem
-            global_id = str(uuid4())
-            dmss_api.blob_upload(data_source, global_id, file_like)
-            return global_id
-        else:
-            try:
-                with open(address) as f:
-                    global_document = json.load(f)
-                # Get dependencies from package
-                dependencies: Dict[str, Dependency] = {
-                    dependency["alias"]: Dependency(**dependency)
-                    for dependency in package.meta.get("dependencies", [])
-                }
-                # Add dependencies from entity
-                dependencies = concat_dependencies(
-                    global_document.get("_meta_", {}).get("dependencies", []), dependencies, address
+        def upload_global_file(address: str) -> str:
+            """Handling uploading of global files."""
+            filepath = Path(address)
+            if not filepath.is_file():
+                raise ApplicationException(
+                    f"Tried to upload file with address '{address}'. The file was not found", data=package.to_dict()
                 )
-                global_document = replace_relative_references(
-                    global_document,
-                    dependencies,
-                    destination,
-                    file_path=address,
-                )
-                global_id = dmss_api.document_add_simple(data_source, global_document)
+            if filepath.suffix != ".json":
+                # Binary files
+                global_id = str(uuid4())
+                with open(address, "rb") as f:
+                    file_like = io.BytesIO(f.read())
+                    file_like.name = filepath.stem
+                    dmss_api.blob_upload(
+                        data_source, global_id, (file_like.name, file_like.getvalue()), _request_timeout=3600
+                    )
                 return global_id
-            except JSONDecodeError:
-                raise Exception(f"Failed to load the file '{address}' as a JSON document")
+            else:
+                try:
+                    with open(address) as f:
+                        global_document = json.load(f)
+                    # Get dependencies from package
+                    dependencies: Dict[str, Dependency] = {
+                        dependency["alias"]: Dependency(**dependency)
+                        for dependency in package.meta.get("dependencies", [])
+                    }
+                    # Add dependencies from entity
+                    dependencies = concat_dependencies(
+                        global_document.get("_meta_", {}).get("dependencies", []), dependencies, address
+                    )
+                    global_document = replace_relative_references(
+                        global_document,
+                        dependencies,
+                        destination,
+                        file_path=address,
+                    )
+                    global_id = dmss_api.document_add_simple(data_source, global_document)
+                    return global_id
+                except JSONDecodeError:
+                    raise Exception(f"Failed to load the file '{address}' as a JSON document")
 
-    if len(entities) > 0:
-        with tqdm(entities, desc=f"  Adding entities") as bar:
-            for entity in entities:
-                document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
-                if resolve_local_ids:
-                    name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
-                    document = resolve_local_ids_in_document(document)
-                    print(f"Successfully resolved local IDs in:\t{destination}{name}")
-                dmss_api.document_add_simple(data_source, document)
-                bar.update()
+        if len(entities) > 0:
+            with tqdm(entities, desc=f"  Adding entities") as bar:
+                for entity in entities:
+                    document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
+                    if resolve_local_ids:
+                        name = (
+                            f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
+                        )
+                        document = resolve_local_ids_in_document(document)
+                        print(f"Successfully resolved local IDs in:\t{destination}{name}")
+                    dmss_api.document_add_simple(data_source, document, _request_timeout=3600)
+                    bar.update()
 
-    packages: List[Package] = []
-    package.traverse_package(lambda package: packages.append(package))
-    if len(packages) > 0:
-        with tqdm(packages, desc=f"  Adding packages") as bar:
-            for package in packages:
-                dmss_api.document_add_simple(data_source, package.to_dict())
-                bar.update()
+        packages: List[Package] = []
+        package.traverse_package(lambda package: packages.append(package))
+        if len(packages) > 0:
+            with tqdm(packages, desc=f"  Adding packages") as bar:
+                for package in packages:
+                    dmss_api.document_add_simple(data_source, package.to_dict(), _request_timeout=3600)
+                    bar.update()
+    except urllib3.exceptions.ProtocolError as e:
+        console.print_exception()
+        console.print(f"Protocol error occurred: {e}")
+        raise e
+    except urllib3.exceptions.NewConnectionError as e:
+        console.print_exception()
+        console.print(f"New connection error: {e}")
+        raise e
+    except urllib3.exceptions.MaxRetryError as e:
+        console.print_exception()
+        console.print(f"Max retries exceeded: {e}")
+        raise e
+    except ServiceException as e:
+        console.print_exception()
+        console.print(f"Service error occurred: {e}")
+        raise e
+    except ApplicationException as e:
+        console.print_exception()
+        console.print(f"Application error occurred: {e}")
+        raise e
+    except Exception as e:
+        console.print(f"An unexpected error occurred: {e}")
+        console.print_exception()
+        raise e

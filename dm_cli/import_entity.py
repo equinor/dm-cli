@@ -16,6 +16,7 @@ from tenacity import (
 )
 
 from .dmss import ApplicationException, dmss_api
+from .dmss_api import ExportMetaResponse
 from .dmss_api.exceptions import ApiException, NotFoundException, ServiceException
 from .import_package import import_package_tree
 from .package_tree_from_zip import package_tree_from_zip
@@ -38,7 +39,7 @@ from .utils.zip import zip_all
 )
 def import_document(source_path: Path, destination: str, document: dict):
     remote_dependencies = dmss_api.export_meta(destination)
-    old_dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
+    old_dependencies = {dependency.alias: dependency for dependency in remote_dependencies.dependencies}
 
     dependencies = concat_dependencies(
         new_dependencies=document.get("_meta_", {}).get("dependencies", []),
@@ -83,11 +84,22 @@ def remove_by_path_ignore_404(target: str):
         pass
 
 
+def log_attempt_number(retry_state):
+    print(f"Retrying: {retry_state.attempt_number}...")
+    try:
+        retry_state.outcome.result()
+    except Exception as e:
+        print(e)
+        console.print(f"Failed to import package: {e}")
+        console.print_exception()
+
+
 @retry(
     wait=wait_random_exponential(multiplier=1, max=60),
     stop=stop_after_attempt(5),
     reraise=True,
-    retry=retry_if_exception_type(ServiceException),
+    retry=retry_if_exception_type(Exception),
+    after=log_attempt_number,
 )
 def import_folder_entity(
     source_path: Path,
@@ -110,8 +122,9 @@ def import_folder_entity(
     is_root = destination_is_root(destination_path)
     if not is_root:
         ensure_package_structure(destination_path)
-        remote_dependencies = dmss_api.export_meta(f"{destination}")
-        dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
+        remote_dependencies: ExportMetaResponse = dmss_api.export_meta(f"{destination}")
+        dependencies = remote_dependencies.dependencies if remote_dependencies.dependencies else []
+        dependencies = {dependency.alias: dependency for dependency in dependencies}
 
     memory_file = io.BytesIO()
     with ZipFile(memory_file, mode="w") as zip_file:
