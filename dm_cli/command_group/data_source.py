@@ -26,7 +26,7 @@ data_source_app = typer.Typer(help="Import and reset data sources")
 
 @data_source_app.command("import", help="Import a single data source definition")
 def import_data_source(
-    path: Annotated[Path, typer.Argument(help="Path on local filesystem to a data source JSON file.")]
+    path: Annotated[Path, typer.Argument(help="Path on local filesystem to a data source JSON file.")],
 ):
     """
     Import a single data source definition to DMSS.
@@ -62,7 +62,7 @@ def import_data_source(
 def import_all_data_sources(
     path: Annotated[
         Path, typer.Argument(help="Path on local filesystem to the folder containing the data sources to import.")
-    ]
+    ],
 ):
     """
     Import all data source definitions to DMSS.

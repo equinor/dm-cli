@@ -77,7 +77,7 @@ def validate_entity(
         typer.Argument(
             help="Address for the folder or file. Should be on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
         ),
-    ]
+    ],
 ) -> bool:
     """Recursively validate entity at remote target"""
     print(f"Validating entities recursively in: {destination}")
@@ -107,7 +107,7 @@ def delete_entity(
         typer.Argument(
             help="Delete an entity from DMSS. Target should be an address on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
         ),
-    ]
+    ],
 ):
     """
     Delete an entity from DMSS.
