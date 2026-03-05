@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.7.2](https://github.com/equinor/dm-cli/compare/v1.7.1...v1.7.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* use docker compose command ([e44fbcb](https://github.com/equinor/dm-cli/commit/e44fbcbcb28a78d3579dbe2b5182868802de9d7e))
+
+
+### Documentation
+
+* add MIT licence ([b14fabf](https://github.com/equinor/dm-cli/commit/b14fabf6f35369ba0e328869a1a99741f2757c7c))
+
+
+### Miscellaneous Chores
+
+* use the compatible release version specifier ([fa923b5](https://github.com/equinor/dm-cli/commit/fa923b53f89b2076408f27a9254c1a88b3198865))
+* wrong syntax ([eed2fec](https://github.com/equinor/dm-cli/commit/eed2fec6c1040ad002136d8982a17f76f3c0c77b))
+
+
+### Build System
+
+* **deps:** bump actions/checkout from 4 to 6 ([d287d1c](https://github.com/equinor/dm-cli/commit/d287d1cf7a0c7de6203d973ebdb739c6a9eb9b65))
+* **deps:** bump actions/setup-python from 5 to 6 ([0435fda](https://github.com/equinor/dm-cli/commit/0435fda8f00c5f35336070409cc051e9791f437e))
+* use hatch instead of setuptools + pyproject ([b77f324](https://github.com/equinor/dm-cli/commit/b77f324afd0fa2fc2e6d65d4c5322ebf44e414c3))
+
+
+### Continuous Integration
+
+* add dependabot.yml ([ded3012](https://github.com/equinor/dm-cli/commit/ded3012594b85bb48bda7f5ef8b13ae9dc658206))
+* add permissions to workflows ([d045d9d](https://github.com/equinor/dm-cli/commit/d045d9dbe2bee40a902d2f09a11308cae26db018))
+* **build:** update deps and versions (python) ([b1633d9](https://github.com/equinor/dm-cli/commit/b1633d9596471639f3547a4476b30d5648f87b48))
+* update release-please ([ba857c4](https://github.com/equinor/dm-cli/commit/ba857c46a8ad62b603b54c6ba60890454bc95abf))
+
 ## [1.7.1](https://github.com/equinor/dm-cli/compare/v1.7.0...v1.7.1) (2024-05-22)
 
 
