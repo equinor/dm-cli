@@ -8,31 +8,28 @@ dynamic = ["version"]
 description = "CLI tool for working with Data Modelling Storage Service"
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "requests>=2.31.0",
-    "emoji>=2.8.0",
-    "tqdm>=4.66.1",
-    "frozendict>=2.3.8",
-    "typing_extensions>=4.7.1",
-    "typer[all]>=0.9.0",
-    "python-dateutil>=2.8.2",
-    "tenacity>=8.2.3",
+    "requests>=2.32.5",
+    "emoji>=2.15.0",
+    "tqdm>=4.67.3",
+    "frozendict>=2.4.7",
+    "typing_extensions>=4.15.0",
+    "typer[all]>=0.24.1",
+    "python-dateutil>=2.9.0.post0",
+    "tenacity>=9.1.4",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
-    "pre-commit>=3.3.3",
+    "pytest>=9.0.2",
+    "pre-commit>=4.5.1",
 ]
 
 [project.scripts]

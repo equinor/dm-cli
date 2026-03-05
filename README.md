@@ -4,7 +4,7 @@ CLI tool for working with [Data Modelling Storage Service](https://github.com/eq
 
 ## Installing
 > [!NOTE]
-> Requires Python version >= 3.11
+> Requires Python version >= 3.13
 
 Install the tool via pip
 ```sh

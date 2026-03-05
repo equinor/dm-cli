@@ -17,12 +17,10 @@ def get_app_dir_structure(path: Path) -> [Path, Path]:
     data_dir = path.joinpath("data")
     if not data_sources_dir.is_dir() or not data_dir.is_dir():
         print(f"The directory '{path.name}' does not have the expected structure. It should contain two directories;")
-        print(
-            """
+        print("""
             ├── data
             └── data_sources
-        """
-        )
+        """)
         raise typer.Exit(code=1)
 
     return data_sources_dir, data_dir
