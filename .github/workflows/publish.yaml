@@ -5,6 +5,9 @@ on:
       PYPI_DM_CLI_TOKEN:
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   build-and-publish:
     name: Publish dm-cli package to PyPI
