@@ -8,11 +8,11 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install pre-commit
         run: pip install pre-commit
@@ -23,14 +23,14 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
-      - name: install requirements
-        run: pip install -r requirements.txt && pip install -r dev-requirements.txt && pip install -e .
+      - name: Install package with dev dependencies
+        run: pip install -e ".[dev]"
 
       - name: run pytest
         run: pytest
@@ -41,11 +41,11 @@ jobs:
       run:
         working-directory: tests/integration
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Start DMSS
         run: docker compose pull && docker compose up -d
@@ -60,9 +60,9 @@ jobs:
           cd ../..
           python -m venv .venv
           source .venv/bin/activate
-          pip install wheel twine
-          python setup.py sdist bdist_wheel
-          pip install ./dist/dm-cli-*.tar.gz
+          pip install build
+          python -m build
+          pip install dist/*.whl
 
       - name: Tests
         run: |

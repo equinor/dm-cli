@@ -105,9 +105,8 @@ $ dm --help
 
 ### Testing
 
-1. Install the dependencies: `pip3 install -r requirements.txt`
-2. Install the dev dependencies: `pip3 install -r dev-requirements.txt`
-3. Run the tests: `pytest`
+1. Install the package with dev dependencies: `pip3 install -e ".[dev]"`
+2. Run the tests: `pytest`
 
 ## Feedback
 Please feel free to leave feedback in issues/PRs.
