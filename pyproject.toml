@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dm-cli"
+dynamic = ["version"]
+description = "CLI tool for working with Data Modelling Storage Service"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "emoji>=2.8.0",
+    "tqdm>=4.66.1",
+    "frozendict>=2.3.8",
+    "typing_extensions>=4.7.1",
+    "typer[all]>=0.9.0",
+    "python-dateutil>=2.8.2",
+    "tenacity>=8.2.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pre-commit>=3.3.3",
+]
+
+[project.scripts]
+dm = "dm_cli.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/equinor/dm-cli"
+Repository = "https://github.com/equinor/dm-cli"
+
+[tool.hatch.version]
+path = "dm_cli/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["dm_cli"]
+
+[tool.black]
+line-length = 119
+
+[tool.isort]
+profile = "black"

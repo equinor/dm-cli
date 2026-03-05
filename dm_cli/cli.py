@@ -2,20 +2,24 @@
 import io
 import os
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
 from zipfile import ZipFile
-import emoji
 
+import emoji
 import typer
 from typing_extensions import Annotated
+
+from dm_cli import VERSION
 from dm_cli.command_group.data_source import data_source_app, reset_data_source
 from dm_cli.command_group.entities import entities_app, import_entity
+from dm_cli.dmss import dmss_api, dmss_exception_wrapper, export
 from dm_cli.state import state
-from dm_cli.dmss import export, dmss_api, dmss_exception_wrapper
-from dm_cli.utils.zip import unpack_and_save_zipfile, save_as_zip_file
-from dm_cli import VERSION
-from dm_cli.utils.utils import get_root_packages_in_data_sources, validate_entities_in_data_sources
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
+from dm_cli.utils.utils import (
+    get_root_packages_in_data_sources,
+    validate_entities_in_data_sources,
+)
+from dm_cli.utils.zip import save_as_zip_file, unpack_and_save_zipfile
 
 app = typer.Typer(pretty_exceptions_short=True)
 app.add_typer(data_source_app, name="ds")
@@ -27,13 +31,20 @@ def version_callback(print_version: bool):
         print(VERSION)
         raise typer.Exit()
 
+
 @app.callback()
 def main(
-        force: bool = typer.Option(False, "--force", "-f", help="Force the operation. Overwriting and potentially deleting data."),
-        dmss_url: str = typer.Option("http://localhost:5000", "--url", "-u", help="URL to the Data Modelling Storage Service (DMSS)."),
-        token: str = typer.Option("no-token", "--token", "-t", help="Token for authentication against DMSS."),
-        debug: bool = typer.Option(False, "--debug", "-d", help="Print stack trace of suppressed exceptions"),
-        version: Optional[bool] = typer.Option(None, "--version", "-v", callback=version_callback, is_eager=True, help="Print version and exit")
+    force: bool = typer.Option(
+        False, "--force", "-f", help="Force the operation. Overwriting and potentially deleting data."
+    ),
+    dmss_url: str = typer.Option(
+        "http://localhost:5000", "--url", "-u", help="URL to the Data Modelling Storage Service (DMSS)."
+    ),
+    token: str = typer.Option("no-token", "--token", "-t", help="Token for authentication against DMSS."),
+    debug: bool = typer.Option(False, "--debug", "-d", help="Print stack trace of suppressed exceptions"),
+    version: Optional[bool] = typer.Option(
+        None, "--version", "-v", callback=version_callback, is_eager=True, help="Print version and exit"
+    ),
 ):
     """
     Command Line Interface (CLI) tool for working with the Data Modelling Framework.
@@ -47,21 +58,37 @@ def main(
     dmss_api.api_client.default_headers["Authorization"] = f"Bearer {token}"
     dmss_api.api_client.configuration.host = dmss_url
 
+
 @app.command("import-plugin-blueprints")
 def import_plugin_blueprints(
-        path: Annotated[str, typer.Argument(help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself.")],
-        validate: Annotated[bool, typer.Option(help="if True, all entities uploaded will be validated.")] = True
+    path: Annotated[
+        str,
+        typer.Argument(
+            help="Path to file or folder on local filesystem to import. Trailing '/' will result in the content being imported instead of the folder itself."
+        ),
+    ],
+    validate: Annotated[bool, typer.Option(help="if True, all entities uploaded will be validated.")] = True,
 ):
     """
     Import blueprints from a plugin into the standard location 'system/Plugins/<plugin-name>'.
     """
     state.force = True
-    dmss_exception_wrapper(import_entity, source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", validate=validate)
+    dmss_exception_wrapper(
+        import_entity, source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", validate=validate
+    )
+
 
 @app.command("create-lookup")
-def create_lookup(name: Annotated[str, typer.Argument(help="Name of the lookup (application context) to create.")],
-                  paths: Annotated[List[Path], typer.Argument(help="one or more remote location for recursively looking for RecipeLinks. "
-                                                                  "A remote location is a path in DMSS on the format <dataSource>/<rootPackage>/<subPacakge>/...")]):
+def create_lookup(
+    name: Annotated[str, typer.Argument(help="Name of the lookup (application context) to create.")],
+    paths: Annotated[
+        List[Path],
+        typer.Argument(
+            help="one or more remote location for recursively looking for RecipeLinks. "
+            "A remote location is a path in DMSS on the format <dataSource>/<rootPackage>/<subPacakge>/..."
+        ),
+    ],
+):
     """
     Create a named Ui-/StorageRecipe-lookup-table from all RecipeLinks in a package existing in DMSS (requires admin privileges).
     """
@@ -70,10 +97,21 @@ def create_lookup(name: Annotated[str, typer.Argument(help="Name of the lookup (
     print(f"Creating lookup table from paths: {paths_as_strings}")
     dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=paths_as_strings, application=name)
 
+
 @app.command("export")
-def export_entity(target: Annotated[str, typer.Argument(help="Address to the entity to export. Format: <dataSource>/<path>.")],
-                  export_location: Annotated[str, typer.Argument(help="Path on local filesystem to store the exported document(s) to. If not provided, will export to current folder.")] = "",
-                  unpack: Annotated[bool, typer.Option(help="Whether or not to unpack the zip file containing the exported entities(s).")] = False):
+def export_entity(
+    target: Annotated[str, typer.Argument(help="Address to the entity to export. Format: <dataSource>/<path>.")],
+    export_location: Annotated[
+        str,
+        typer.Argument(
+            help="Path on local filesystem to store the exported document(s) to. If not provided, will export to current folder."
+        ),
+    ] = "",
+    unpack: Annotated[
+        bool,
+        typer.Option(help="Whether or not to unpack the zip file containing the exported entities(s)."),
+    ] = False,
+):
     """
     Export one or more entities.
 
@@ -95,11 +133,19 @@ def export_entity(target: Annotated[str, typer.Argument(help="Address to the ent
             save_as_zip_file(export_location=export_location, filename=zip_file.filename, data=response.content)
 
 
-
 @app.command("reset")
-def reset(path: Annotated[str, typer.Argument(help="The path on local file system to the data source you want to reset.")],
-          validate_entities: Annotated[bool, typer.Option(help="if True, all entities uploaded to DMSS will be validated.")] = True,
-          resolve_local_ids: Annotated[bool, typer.Option(help="if True, will resolve all local ids found in all entities")] = False):
+def reset(
+    path: Annotated[
+        str,
+        typer.Argument(help="The path on local file system to the data source you want to reset."),
+    ],
+    validate_entities: Annotated[
+        bool, typer.Option(help="if True, all entities uploaded to DMSS will be validated.")
+    ] = True,
+    resolve_local_ids: Annotated[
+        bool, typer.Option(help="if True, will resolve all local ids found in all entities")
+    ] = False,
+):
     """
     Reset all data sources (deletes and re-uploads all packages to DMSS).
     """
@@ -122,10 +168,13 @@ def reset(path: Annotated[str, typer.Argument(help="The path on local file syste
             )
             continue
 
-        dmss_exception_wrapper(reset_data_source, data_source=data_source_name, path=path, resolve_local_ids=resolve_local_ids)
+        dmss_exception_wrapper(
+            reset_data_source, data_source=data_source_name, path=path, resolve_local_ids=resolve_local_ids
+        )
     data_source_contents = get_root_packages_in_data_sources(path)
-    if (validate_entities):
+    if validate_entities:
         dmss_exception_wrapper(validate_entities_in_data_sources, data_source_contents)
+
 
 if __name__ == "__main__":
     app()
