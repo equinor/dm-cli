@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.3](https://github.com/equinor/dm-cli/compare/v1.7.2...v1.7.3) (2026-03-06)
+
+
+### Continuous Integration
+
+* **build:** rename pypi package ([#189](https://github.com/equinor/dm-cli/issues/189)) ([f2c67cb](https://github.com/equinor/dm-cli/commit/f2c67cbf9026f5ae4defeec2d7804d2716637d71))
+
 ## [1.7.2](https://github.com/equinor/dm-cli/compare/v1.7.1...v1.7.2) (2026-03-05)
 
 
