@@ -1,4 +1,4 @@
-# Data Modelling CLI Tool [![PyPi version](https://img.shields.io/pypi/v/development-framework-cli)](https://pypi.org/project/development-framework-cli) [![PyPi downloads](https://img.shields.io/pypi/dm/development-framework-cli)](https://pypi.org/project/development-framework-cli) ![Visitors](https://api.visitorbadge.io/api/visitors?path=equinor%2Fdevelopment-framework-cli&countColor=%23263759&style=flat)
+# Data Modelling CLI Tool [![PyPi version](https://img.shields.io/pypi/v/development-framework-cli)](https://pypi.org/project/development-framework-cli) [![PyPi downloads](https://img.shields.io/pypi/dm/development-framework-cli)](https://pypi.org/project/development-framework-cli) ![Visitors](https://api.visitorbadge.io/api/visitors?path=equinor%2Fdm-cli&countColor=%23263759&style=flat)
 
 CLI tool for working with [Data Modelling Storage Service](https://github.com/equinor/data-modelling-storage-service)
 
