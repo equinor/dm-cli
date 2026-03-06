@@ -1,4 +1,4 @@
-# Data Modelling CLI Tool [![PyPi version](https://img.shields.io/pypi/v/dm-cli)](https://pypi.org/project/dm-cli) [![PyPi downloads](https://img.shields.io/pypi/dm/dm-cli)](https://pypi.org/project/dm-cli) ![Visitors](https://api.visitorbadge.io/api/visitors?path=equinor%2Fdm-cli&countColor=%23263759&style=flat)
+# Data Modelling CLI Tool [![PyPi version](https://img.shields.io/pypi/v/development-framework-cli)](https://pypi.org/project/development-framework-cli) [![PyPi downloads](https://img.shields.io/pypi/dm/development-framework-cli)](https://pypi.org/project/development-framework-cli) ![Visitors](https://api.visitorbadge.io/api/visitors?path=equinor%2Fdevelopment-framework-cli&countColor=%23263759&style=flat)
 
 CLI tool for working with [Data Modelling Storage Service](https://github.com/equinor/data-modelling-storage-service)
 
@@ -8,7 +8,7 @@ CLI tool for working with [Data Modelling Storage Service](https://github.com/eq
 
 Install the tool via pip
 ```sh
-$ pip3 install dm-cli
+$ pip3 install development-framework-cli
 ```
 
 After a successful install, the program `'dm'` will be available in your python environment

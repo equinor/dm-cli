@@ -58,7 +58,7 @@ jobs:
           npm pack @development-framework/dm-core-plugins
           tar -xzf development-framework-dm-core-plugins-*.tgz
 
-      - name: Build and install dm-cli package
+      - name: Build and install development-framework-cli package
         run: |
           cd ../..
           python -m venv .venv
