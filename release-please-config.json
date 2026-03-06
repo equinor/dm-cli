@@ -67,7 +67,7 @@
   ],
   "packages": {
     ".": {
-      "package-name": "dm-cli",
+      "package-name": "development-framework-cli",
       "include-component-in-tag": false
     }
   }
