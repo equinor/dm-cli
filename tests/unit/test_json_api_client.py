@@ -1,15 +1,16 @@
 import json
 import re
 import unittest
+from datetime import date, datetime
 
 from dm_cli.dmss import JsonApiClient, dmss_api
 from dm_cli.dmss_api.api_client import ApiClient
 from dm_cli.dmss_api.models.error_response import ErrorResponse
 
 """
-JsonApiClient replaces the generated 'deserialize' with a faster one for plain JSON. These tests pin
-it to the generated behaviour, so that a regeneration of dm_cli/dmss_api which changes how values
-are deserialized is caught here rather than in production.
+JsonApiClient replaces the generated 'sanitize_for_serialization' and 'deserialize' with faster ones
+for plain JSON. These tests pin them to the generated behaviour, so that a regeneration of
+dm_cli/dmss_api which changes how values are serialized is caught here rather than in production.
 """
 
 DOCUMENT = {
@@ -23,6 +24,42 @@ DOCUMENT = {
     "empty_list": [],
     "empty_dict": {},
 }
+
+
+class JsonApiClientTest(unittest.TestCase):
+    def assert_same_as_generated(self, value):
+        self.assertEqual(
+            JsonApiClient().sanitize_for_serialization(value),
+            ApiClient().sanitize_for_serialization(value),
+        )
+
+    def test_serializes_documents_like_the_generated_client(self):
+        self.assert_same_as_generated(DOCUMENT)
+        self.assert_same_as_generated([DOCUMENT, DOCUMENT])
+
+    def test_serializes_scalars_like_the_generated_client(self):
+        for scalar in ["a string", 1, 1.5, True, False, None]:
+            with self.subTest(scalar=scalar):
+                self.assert_same_as_generated(scalar)
+
+    def test_values_that_are_not_plain_json_fall_through_to_the_generated_client(self):
+        for value in [datetime(2020, 1, 2, 3, 4, 5), date(2021, 6, 7), (1, "a", None)]:
+            with self.subTest(value=value):
+                self.assert_same_as_generated(value)
+
+    def test_falls_through_for_values_nested_inside_a_document(self):
+        self.assert_same_as_generated({"created": datetime(2020, 1, 2), "versions": (date(2021, 6, 7),)})
+
+    def test_documents_are_serialized_to_an_equal_but_separate_structure(self):
+        sanitized = JsonApiClient().sanitize_for_serialization(DOCUMENT)
+
+        self.assertEqual(sanitized, DOCUMENT)
+        self.assertIsNot(sanitized, DOCUMENT)
+        self.assertIsNot(sanitized["mooring"], DOCUMENT["mooring"])
+
+    def test_dmss_api_uses_the_json_api_client(self):
+        # The optimization only applies if the api is wired up with our client rather than the generated default.
+        self.assertIsInstance(dmss_api.api_client, JsonApiClient)
 
 
 class DeserializeTest(unittest.TestCase):
@@ -63,10 +100,6 @@ class DeserializeTest(unittest.TestCase):
         text = json.dumps({"status": 404, "type": "NotFoundException", "message": "gone", "debug": ""})
 
         self.assertIsInstance(self.deserialize("ErrorResponse", text), ErrorResponse)
-
-    def test_dmss_api_uses_the_json_api_client(self):
-        # The workaround only applies if the api is wired up with our client rather than the generated default.
-        self.assertIsInstance(dmss_api.api_client, JsonApiClient)
 
     def test_every_response_type_the_generated_client_declares_is_classified(self):
         """A plain-JSON type must be handled here; anything else must reach the generated client."""
