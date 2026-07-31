@@ -2,7 +2,6 @@ import json
 import re
 from typing import Any, Callable
 
-import requests
 import typer
 from rich.console import Console
 from rich.text import Text
@@ -119,6 +118,9 @@ def export(absolute_document_ref: str):
     The reason dmss_api cannot be used directly is that there were some issues with interpreting the JSON schema,
     which caused the export function in the generated DMSS api to not work properly.
     """
+    # Imported lazily; 'requests' is only needed by this command and costs ~200ms to import.
+    import requests
+
     headers = {"Access-Key": state.token}
 
     response = requests.get(f"{state.dmss_url}/api/export/{absolute_document_ref}", headers=headers)  # nosec
