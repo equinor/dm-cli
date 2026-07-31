@@ -1,5 +1,6 @@
 import io
 import json
+import os
 from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List
@@ -83,7 +84,7 @@ def import_package_tree(package: Package, destination: str, raw_package_import: 
     data_source = destination_parts[0]
 
     if raw_package_import:
-        dmss_api.document_add_simple(data_source, body=package.to_dict())
+        dmss_api.document_add_simple(data_source, package.to_dict())
     else:
         dmss_api.document_add(
             destination,
@@ -110,7 +111,10 @@ def import_package_content(package: Package, data_source: str, destination: str,
     if len(files) > 0:
         with tqdm(files, desc=f"  Adding files") as bar:
             for file in files:
-                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), file.content)
+                # The client takes the uploaded name from a (name, content) tuple, and DMSS splits
+                # that name into the stored document's 'name' and 'filetype'.
+                content = (os.path.basename(file.content.name), file.content.getvalue())
+                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), content)
                 uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
                 bar.update()
 
@@ -127,7 +131,7 @@ def import_package_content(package: Package, data_source: str, destination: str,
                 file_like = io.BytesIO(f.read())
             file_like.name = filepath.stem
             global_id = str(uuid4())
-            dmss_api.blob_upload(data_source, global_id, file_like)
+            dmss_api.blob_upload(data_source, global_id, (os.path.basename(file_like.name), file_like.getvalue()))
             return global_id
         else:
             try:

@@ -4,7 +4,6 @@ from json import JSONDecodeError
 from pathlib import Path
 from zipfile import ZipFile
 
-from requests import Response
 from rich import print
 from tenacity import (
     retry,
@@ -17,6 +16,7 @@ from tenacity import (
 
 from .dmss import ApplicationException, dmss_api
 from .dmss_api.exceptions import ApiException, NotFoundException, ServiceException
+from .dmss_api.models.entity import Entity
 from .import_package import import_package_tree
 from .package_tree_from_zip import package_tree_from_zip
 from .state import state
@@ -38,7 +38,7 @@ from .utils.zip import zip_all
 )
 def import_document(source_path: Path, destination: str, document: dict):
     remote_dependencies = dmss_api.export_meta(destination)
-    old_dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
+    old_dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.dependencies or []}
 
     dependencies = concat_dependencies(
         new_dependencies=document.get("_meta_", {}).get("dependencies", []),
@@ -67,7 +67,7 @@ def import_single_entity(source_path: Path, destination: str, validate: bool = F
                 content = json.load(fh)
                 if validate:
                     print(f"Validating {source_path}", end="")
-                    dmss_api.validate_entity(content)
+                    dmss_api.validate_entity(Entity.from_dict(content))
                     print(" [green]✓[/green]")
                 import_document(source_path, destination, content)
             else:
@@ -111,7 +111,7 @@ def import_folder_entity(
     if not is_root:
         ensure_package_structure(destination_path)
         remote_dependencies = dmss_api.export_meta(f"{destination}")
-        dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.get("dependencies", [])}
+        dependencies = {dependency["alias"]: dependency for dependency in remote_dependencies.dependencies or []}
 
     memory_file = io.BytesIO()
     with ZipFile(memory_file, mode="w") as zip_file:
