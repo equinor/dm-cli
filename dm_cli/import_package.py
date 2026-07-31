@@ -3,7 +3,7 @@ import json
 import os
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Dict, List
+from typing import Callable, Dict, List
 from uuid import uuid4
 
 from rich.console import Console
@@ -17,13 +17,49 @@ from tenacity import (
 from tqdm import tqdm
 
 from .dmss import ApplicationException, dmss_api
-from .dmss_api.exceptions import ServiceException
+from .dmss_api.exceptions import NotFoundException, ServiceException
 from .domain import Dependency, File, Package
 from .utils.reference import replace_relative_references
 from .utils.resolve_local_ids import resolve_local_ids_in_document
 from .utils.utils import concat_dependencies, replace_global_addresses
 
 console = Console()
+
+# Documents are posted in batches to avoid paying the per-request overhead for every document.
+# Batching leaves little for a thread pool to overlap, and DMSS serves an import from a single
+# worker, so uploading concurrently only made it contend with itself. Imports are sequential.
+IMPORT_BATCH_SIZE = max(1, int(os.environ.get("DMSS_IMPORT_BATCH_SIZE", "100")))
+
+
+def run_with_progress(description: str, items: list, task: Callable) -> None:
+    """Run a task for every item, reporting progress as it goes."""
+    if not items:
+        return
+    for item in tqdm(items, desc=description):
+        task(item)
+
+
+def _upload_documents(description: str, data_source: str, documents: List[dict]) -> None:
+    """Upload documents as-is, in batches, falling back to one request per document on older DMSS versions."""
+    if not documents:
+        return
+    batches = [documents[i : i + IMPORT_BATCH_SIZE] for i in range(0, len(documents), IMPORT_BATCH_SIZE)]
+    uploaded = 0
+
+    def upload_batch(batch: List[dict]) -> None:
+        nonlocal uploaded
+        dmss_api.document_add_simple_bulk(data_source, batch)
+        uploaded += len(batch)
+
+    try:
+        run_with_progress(description, batches, upload_batch)
+    except NotFoundException:
+        if uploaded:
+            # Earlier batches were accepted, so the endpoint does exist and this 404 is about the
+            # documents rather than the route. Retrying as single uploads would duplicate them.
+            raise
+        # DMSS does not know the bulk endpoint, so upload one document at a time instead.
+        run_with_progress(description, documents, lambda document: dmss_api.document_add_simple(data_source, document))
 
 
 def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> None:
@@ -109,14 +145,15 @@ def import_package_content(package: Package, data_source: str, destination: str,
     )
     uploaded_file_ids = {}
     if len(files) > 0:
-        with tqdm(files, desc=f"  Adding files") as bar:
-            for file in files:
-                # The client takes the uploaded name from a (name, content) tuple, and DMSS splits
-                # that name into the stored document's 'name' and 'filetype'.
-                content = (os.path.basename(file.content.name), file.content.getvalue())
-                dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), content)
-                uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
-                bar.update()
+
+        def upload_file(file: File) -> None:
+            # The client takes the uploaded name from a (name, content) tuple, and DMSS splits that
+            # name into the stored document's 'name' and 'filetype'.
+            content = (os.path.basename(file.content.name), file.content.getvalue())
+            dmss_api.file_upload(data_source, json.dumps({"file_id": file.uid}), content)
+            uploaded_file_ids[f"dmss:/{file.content.destination}/{file.path.stem}"] = file.uid
+
+        run_with_progress("  Adding files", files, upload_file)
 
     def upload_global_file(address: str) -> str:
         """Handling uploading of global files."""
@@ -158,20 +195,21 @@ def import_package_content(package: Package, data_source: str, destination: str,
                 raise Exception(f"Failed to load the file '{address}' as a JSON document")
 
     if len(entities) > 0:
-        with tqdm(entities, desc=f"  Adding entities") as bar:
-            for entity in entities:
-                document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
-                if resolve_local_ids:
-                    name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
-                    document = resolve_local_ids_in_document(document)
-                    print(f"Successfully resolved local IDs in:\t{destination}{name}")
-                dmss_api.document_add_simple(data_source, document)
-                bar.update()
+
+        def prepare_entity(entity: dict) -> dict:
+            document = replace_global_addresses(entity, destination, uploaded_file_ids, upload_global_file)
+            if resolve_local_ids:
+                name = f"/{document.get('name')}" if document.get("name") else f" of type {document.get('type')}"
+                document = resolve_local_ids_in_document(document)
+                print(f"Successfully resolved local IDs in:\t{destination}{name}")
+            return document
+
+        prepared_entities: List[dict] = []
+        run_with_progress(
+            "  Preparing entities", entities, lambda entity: prepared_entities.append(prepare_entity(entity))
+        )
+        _upload_documents("  Adding entities", data_source, prepared_entities)
 
     packages: List[Package] = []
     package.traverse_package(lambda package: packages.append(package))
-    if len(packages) > 0:
-        with tqdm(packages, desc=f"  Adding packages") as bar:
-            for package in packages:
-                dmss_api.document_add_simple(data_source, package.to_dict())
-                bar.update()
+    _upload_documents("  Adding packages", data_source, [p.to_dict() for p in packages])

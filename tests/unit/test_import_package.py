@@ -2,11 +2,14 @@ import io
 import json
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 from uuid import UUID
 from zipfile import ZipFile
 
 from dm_cli.dmss import ApplicationException
+from dm_cli.dmss_api.exceptions import NotFoundException
 from dm_cli.domain import File
+from dm_cli.import_package import _upload_documents
 from dm_cli.package_tree_from_zip import package_tree_from_zip
 
 """
@@ -307,3 +310,60 @@ class ImportPackageTest(unittest.TestCase):
 
         with self.assertRaises(ApplicationException):
             package_tree_from_zip(destination="test_data_source", zip_package=memory_file)
+
+
+class UploadDocumentsTest(unittest.TestCase):
+    """The bulk endpoint is only available on newer DMSS versions, so uploads fall back to one request per document."""
+
+    def setUp(self):
+        self.documents = [{"_id": str(i), "name": str(i), "type": "Blueprint"} for i in range(5)]
+
+    def _upload(self, bulk, single, documents=None, batch_size=2):
+        with (
+            patch("dm_cli.import_package.dmss_api") as api,
+            patch("dm_cli.import_package.IMPORT_BATCH_SIZE", batch_size),
+        ):
+            api.document_add_simple_bulk = bulk
+            api.document_add_simple = single
+            _upload_documents("  Adding entities", "test_ds", self.documents if documents is None else documents)
+
+    def test_uploads_in_batches_when_dmss_supports_bulk(self):
+        bulk, single = MagicMock(), MagicMock()
+        self._upload(bulk, single)
+
+        self.assertEqual([len(call.args[1]) for call in bulk.call_args_list], [2, 2, 1])
+        single.assert_not_called()
+
+    def test_falls_back_to_single_uploads_when_bulk_endpoint_is_missing(self):
+        bulk = MagicMock(side_effect=NotFoundException(status=404))
+        single = MagicMock()
+        self._upload(bulk, single)
+
+        # Every document is uploaded exactly once, and bulk is not retried after the route turns out to be missing.
+        self.assertEqual([call.args[1] for call in single.call_args_list], self.documents)
+        bulk.assert_called_once()
+
+    def test_does_not_re_upload_documents_when_a_later_batch_is_rejected(self):
+        bulk = MagicMock(side_effect=[None, NotFoundException(status=404)])
+        single = MagicMock()
+
+        with self.assertRaises(NotFoundException):
+            self._upload(bulk, single)
+        single.assert_not_called()
+
+    def test_a_server_without_bulk_support_does_not_affect_later_uploads(self):
+        legacy = MagicMock(side_effect=NotFoundException(status=404))
+        self._upload(legacy, MagicMock())
+
+        bulk, single = MagicMock(), MagicMock()
+        self._upload(bulk, single)
+
+        self.assertEqual(bulk.call_count, 3)
+        single.assert_not_called()
+
+    def test_uploads_nothing_when_there_are_no_documents(self):
+        bulk, single = MagicMock(), MagicMock()
+        self._upload(bulk, single, documents=[])
+
+        bulk.assert_not_called()
+        single.assert_not_called()
