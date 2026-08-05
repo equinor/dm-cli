@@ -11,8 +11,9 @@ from typing_extensions import Annotated
 
 from dm_cli import VERSION
 from dm_cli.command_group.data_source import data_source_app, reset_data_source
-from dm_cli.command_group.entities import entities_app, import_entity
+from dm_cli.command_group.entities import entities_app
 from dm_cli.dmss import dmss_api, dmss_exception_wrapper, export
+from dm_cli.import_entity import import_folders_as_one_package
 from dm_cli.state import state
 from dm_cli.utils.file_structure import get_app_dir_structure, get_json_files_in_dir
 from dm_cli.utils.utils import (
@@ -74,7 +75,11 @@ def import_plugin_blueprints(
     """
     state.force = True
     dmss_exception_wrapper(
-        import_entity, source=f"{path}/blueprints/", destination=f"system/Plugins/{Path(path).name}", validate=validate
+        import_folders_as_one_package,
+        source_path=Path(path) / "blueprints",
+        destination="system/Plugins",
+        package_name=Path(path).name,
+        validate=validate,
     )
 
 

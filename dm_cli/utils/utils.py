@@ -37,6 +37,15 @@ def resolve_dependency(type_ref: str, dependencies: Dict[str, Dependency]) -> st
     raise ApplicationException(f"Protocol '{dependency.protocol}' is not a valid protocol for resolving dependencies")
 
 
+def dependencies_of(package_meta) -> Dict[str, Dependency]:
+    """The dependencies DMSS reports for a package, as the reference resolver expects them.
+
+    DMSS answers with its own description of a dependency, which is not the one the resolver reads
+    the address and protocol off, so they are converted rather than passed along.
+    """
+    return {dependency.alias: Dependency(**dependency.model_dump()) for dependency in package_meta.dependencies or []}
+
+
 def concat_dependencies(
     new_dependencies: List[dict], old_dependencies: Dict[str, Dependency], filename: str
 ) -> Dict[str, Dependency]:
