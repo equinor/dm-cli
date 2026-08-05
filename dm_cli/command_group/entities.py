@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import List, Optional
 
 import typer
 from rich import print
@@ -70,24 +71,63 @@ def import_entity(
     return dmss_exception_wrapper(inner_import)
 
 
+@entities_app.command("import-batch")
+def import_batch(
+    data_directory: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a directory laid out as <dataSource>/<rootPackage>. Every root package found is imported into the data source it is located under."
+        ),
+    ],
+    exclude: Annotated[
+        Optional[List[str]],
+        typer.Option(help="Name of a data source to skip. Can be repeated."),
+    ] = None,
+    validate: Annotated[bool, typer.Option(help="if True, all entities uploaded will be validated.")] = True,
+) -> bool:
+    """
+    Import every root package found under <data_directory> into its data source.
+
+    This is equivalent to running 'entities import <data_directory>/<dataSource>/<rootPackage> <dataSource>'
+    once per root package, but does so in a single process and over a single reused HTTP connection.
+    """
+    if not data_directory.is_dir():
+        raise FileNotFoundError(f"The path '{data_directory}' is not a directory.")
+
+    def visible_entries(directory: Path) -> list[Path]:
+        # Hidden entries are skipped so that incidental files such as '.DS_Store'
+        # are not mistaken for packages.
+        return sorted(entry for entry in directory.iterdir() if not entry.name.startswith("."))
+
+    excluded = set(exclude or [])
+    for data_source_dir in visible_entries(data_directory):
+        if not data_source_dir.is_dir():
+            continue
+        if data_source_dir.name in excluded:
+            print(f"Skipping data source '{data_source_dir.name}'")
+            continue
+        for root_package in visible_entries(data_source_dir):
+            import_entity(str(root_package), data_source_dir.name, validate)
+    return True
+
+
 @entities_app.command("validate")
 def validate_entity(
-    destination: Annotated[
-        str,
+    destinations: Annotated[
+        List[str],
         typer.Argument(
-            help="Address for the folder or file. Should be on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
+            help="Addresses for the folders or files to validate. Should be on the format <DataSource>/<rootPackage>/<subPackage>/<entity>"
         ),
     ],
 ) -> bool:
-    """Recursively validate entity at remote target"""
-    print(f"Validating entities recursively in: {destination}")
+    """Recursively validate one or more entities at remote targets"""
 
     @retry(
         wait=wait_random_exponential(multiplier=1, max=60),
         stop=stop_after_attempt(5),
         retry=retry_if_not_exception_type((ApplicationException, RuntimeError)),
     )
-    def validation_error_wrapper():
+    def validation_error_wrapper(destination: str):
         try:
             dmss_api.validate_existing_entity(destination)
         except ApiException as e:
@@ -97,7 +137,11 @@ def validate_entity(
                 raise typer.Exit(code=1)
             raise e
 
-    dmss_exception_wrapper(validation_error_wrapper)
+    for destination in destinations:
+        print(f"Validating entities recursively in: {destination}")
+        # Validation is CPU bound on the DMSS side, so there is nothing to gain from validating targets
+        # concurrently; doing so only makes the blueprint caches thrash.
+        dmss_exception_wrapper(validation_error_wrapper, destination)
 
 
 @entities_app.command("delete")
