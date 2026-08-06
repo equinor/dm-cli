@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/equinor/dm-cli/compare/v1.7.3...v1.8.0) (2026-08-06)
+
+
+### Features
+
+* optimize package import flow ([8706bc8](https://github.com/equinor/dm-cli/commit/8706bc85ff5cbb9b96b1fb1dbbc688a48d8b75f8))
+
+
+### Miscellaneous Chores
+
+* regenerate the DMSS client with openapi-generator 7.24 ([25d60f4](https://github.com/equinor/dm-cli/commit/25d60f4158d7f2467d6a44a8100b1d1b3fd548cf))
+* update dmss version ([8439519](https://github.com/equinor/dm-cli/commit/8439519ecd69f7ecae3879b20206d507e1d8958e))
+
 ## [1.7.3](https://github.com/equinor/dm-cli/compare/v1.7.2...v1.7.3) (2026-03-06)
 
 
