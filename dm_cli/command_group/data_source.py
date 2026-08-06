@@ -3,6 +3,7 @@ from pathlib import Path
 
 import emoji
 import typer
+import urllib3
 from rich import print
 from tenacity import (
     retry,
@@ -36,7 +37,7 @@ def import_data_source(
         wait=wait_random_exponential(multiplier=1, max=60),
         stop=stop_after_attempt(5),
         reraise=True,
-        retry=retry_if_exception_type(ServiceException),
+        retry=retry_if_exception_type((ServiceException, urllib3.exceptions.HTTPError)),
     )
     def retry_wrapper():
         data_source_path = Path(path)
@@ -48,14 +49,14 @@ def import_data_source(
         # Read the data source definition
         with open(data_source_path) as file:
             document = json.load(file)
-            existing_data_sources = dmss_exception_wrapper(dmss_api.data_source_get_all)
+            existing_data_sources = dmss_api.data_source_get_all()
             if any(existing_document.name == document["name"] for existing_document in existing_data_sources):
                 print(f"WARNING: data source {document['name']} already exists. Updating existing data source.")
 
-            dmss_exception_wrapper(dmss_api.data_source_save, document["name"], document)
+            dmss_api.data_source_save(document["name"], document)
             print(f"\tImported data source '{document['name']}' ✓")
 
-    retry_wrapper()
+    dmss_exception_wrapper(retry_wrapper)
 
 
 @data_source_app.command("import-all", help="Import all datasources found in the directory given by 'path'")
