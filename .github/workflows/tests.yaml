@@ -50,8 +50,26 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Start DMSS
-        run: docker compose pull && docker compose up -d
+      - name: Start DB and DMSS
+        run: |
+          docker compose pull
+          docker compose up -d db redis
+          sleep 10
+          docker compose up -d dmss
+
+      - name: Wait for DMSS healthcheck
+        run: |
+          for i in {1..120}; do
+            if curl --silent --fail http://localhost:5000/api/healthcheck >/dev/null; then
+              echo "DMSS is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "DMSS did not become ready in time" >&2
+          docker compose ps >&2
+          docker compose logs --no-color db dmss >&2
+          exit 1
 
       - name: Download test blueprints
         run: |
