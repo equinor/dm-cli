@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.1](https://github.com/equinor/dm-cli/compare/v1.8.0...v1.8.1) (2026-11-09)
+
+
+### Bug Fixes
+
+* handle DMSS addresses and zip entry names as POSIX paths on Windows ([075b785](https://github.com/equinor/dm-cli/commit/075b785d76d3bae4fb5243793d69ec0fa98c06ac))
+* handle DMSS addresses and zip entry names as POSIX paths on Windows ([b6f652b](https://github.com/equinor/dm-cli/commit/b6f652b06a034509c9416a3b247370bd66b99733))
+
 ## [1.8.0](https://github.com/equinor/dm-cli/compare/v1.7.3...v1.8.0) (2026-08-06)
 
 
