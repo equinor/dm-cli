@@ -98,7 +98,7 @@ class ReplaceReferences(unittest.TestCase):
         data_source_id, package = dst_path.split("/", 1)
 
         # Load the document
-        document = test_documents[str(src_path)]
+        document = test_documents[src_path.as_posix()]
         dependencies = concat_dependencies(document.get("_meta_", {}).get("dependencies", []), {}, src_path.name)
 
         # Replace references
@@ -132,7 +132,7 @@ class ReplaceReferences(unittest.TestCase):
         data_source_id, package = dst_path.split("/", 1)
 
         # Load the document
-        document = test_documents[str(src_path)]
+        document = test_documents[src_path.as_posix()]
         dependencies = concat_dependencies(document.get("_meta_", {}).get("dependencies", []), {}, src_path.name)
 
         with self.assertRaises(ApplicationException):

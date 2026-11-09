@@ -1,7 +1,7 @@
 import json
 import os
 import pprint
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Callable, Dict, List
 
 import typer
@@ -68,7 +68,7 @@ def document_already_exists(api_exception: ApiException) -> bool:
     return False
 
 
-def add_package_to_path(name: str, path: Path):
+def add_package_to_path(name: str, path: PurePosixPath):
     package = Package(name, is_root=len(path.parts) == 2)
     dmss_api.document_add(
         str(path.parent),
@@ -102,14 +102,16 @@ def replace_global_addresses(
     return document
 
 
-def destination_is_root(destination: Path) -> bool:
-    if len(destination.parts) > 1:
+def destination_is_root(destination: str | PurePosixPath) -> bool:
+    if len(PurePosixPath(destination).parts) > 1:
         return False
     return True
 
 
-def ensure_package_structure(path: Path):
+def ensure_package_structure(path: str | PurePosixPath):
     """Create any missing packages in the provided path (mkdir -R)"""
+    # A DMSS address, not a path on disk: keep it '/'-separated on every OS.
+    path = PurePosixPath(path)
     try:
         dmss_api.document_get(f"dmss://{path}/")
     except NotFoundException as e:

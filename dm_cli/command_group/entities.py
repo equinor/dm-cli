@@ -42,7 +42,7 @@ def import_entity(
     source_path = Path(source)
     destination = destination.rstrip("/\\")
     # Not replacing a package, but appending to. Can therefore not use "fast mode"
-    fast = destination_is_root(Path(destination))
+    fast = destination_is_root(destination)
 
     def inner_import():
         if source_path.is_dir():

@@ -1,5 +1,6 @@
-from os.path import normpath
+import os
 from pathlib import Path
+from posixpath import normpath  # references are DMSS addresses, always '/'-separated
 from typing import Dict, List, Union
 
 from ..dmss import ApplicationException
@@ -81,8 +82,9 @@ def replace_relative_references(
                 if value["referenceType"] == ReferenceTypes.LINK.value:
                     value["address"] = _resolve_reference(value["address"])
                 else:
-                    # Handle storage references
-                    local_file_path = "/".join(str(source_path).split("/")[:-1])
+                    # Handle storage references. source_path is a folder on disk: take its parent with
+                    # the OS path rules, the address itself is appended as-is ('/' works on Windows too).
+                    local_file_path = os.path.dirname(str(source_path)) if source_path else ""
                     if value["address"][0] == ".":
                         raise ApplicationException(
                             f"Relative references by . are not supported", data=value, debug=file_path

@@ -3,7 +3,7 @@ import json
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from json import JSONDecodeError
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Callable, Dict, List, Tuple
 from uuid import uuid4
 
@@ -99,7 +99,7 @@ def _upload_documents(description: str, data_source: str, documents: List[dict])
         run_with_progress(description, documents, lambda document: dmss_api.document_add_simple(data_source, document))
 
 
-def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> None:
+def add_object_to_package(path: PurePosixPath, package: Package, object: io.BytesIO) -> None:
     if len(path.parts) == 1:  # End of path means the actual document
         file = File(
             uid=str(uuid4()),  # This UID will be the data source ID for this file
@@ -115,11 +115,11 @@ def add_object_to_package(path: Path, package: Package, object: io.BytesIO) -> N
         sub_folder = Package(name=path.parts[0], parent=package)
         package.content.append(sub_folder)
 
-    new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
-    return add_object_to_package(Path(new_path), sub_folder, object)
+    new_path = PurePosixPath(*path.parts[1:])  # Remove first element in path before stepping down
+    return add_object_to_package(new_path, sub_folder, object)
 
 
-def add_file_to_package(path: Path, package: Package, document: dict) -> None:
+def add_file_to_package(path: PurePosixPath, package: Package, document: dict) -> None:
     if len(path.parts) == 1:  # End of path means the actual document
         if path.name.endswith("package.json"):
             # if document is a package.json file, add meta info to package instead of adding it to content list.
@@ -134,11 +134,11 @@ def add_file_to_package(path: Path, package: Package, document: dict) -> None:
         sub_folder = Package(name=path.parts[0], parent=package)
         package.content.append(sub_folder)
 
-    new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
-    return add_file_to_package(Path(new_path), sub_folder, document)
+    new_path = PurePosixPath(*path.parts[1:])  # Remove first element in path before stepping down
+    return add_file_to_package(new_path, sub_folder, document)
 
 
-def add_package_to_package(path: Path, package: Package) -> None:
+def add_package_to_package(path: PurePosixPath, package: Package) -> None:
     if len(path.parts) == 1:
         package.content.append(Package(name=path.parts[0], parent=package))
         return
@@ -148,8 +148,8 @@ def add_package_to_package(path: Path, package: Package) -> None:
         sub_folder = Package(name=path.parts[0], parent=package)
         package.content.append(sub_folder)
 
-    new_path = str(path).split("/", 1)[1]  # Remove first element in path before stepping down
-    return add_package_to_package(Path(new_path), sub_folder)
+    new_path = PurePosixPath(*path.parts[1:])  # Remove first element in path before stepping down
+    return add_package_to_package(new_path, sub_folder)
 
 
 def import_package_tree(package: Package, destination: str, raw_package_import: bool, resolve_local_ids: bool) -> None:
