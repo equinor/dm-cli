@@ -1,7 +1,7 @@
 import io
 import json
 from json import JSONDecodeError
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Dict, Union
 from zipfile import ZipFile
 
@@ -58,26 +58,27 @@ def package_tree_from_zip(
             is_root=is_root,
             meta=package_entity.get("_meta_"),
         )
-        # Construct a nested Package object of the package to import
+        # Construct a nested Package object of the package to import.
+        # Zip entry names and DMSS addresses always use '/', so they are handled as POSIX paths on every OS.
         for file_info in zip_file.filelist:
             filename = file_info.filename.split("/", 1)[1]  # Remove RootPackage prefix
             if file_info.is_dir():
                 if filename == "":  # Skip rootPackage
                     continue
-                add_package_to_package(Path(filename), root_package)
+                add_package_to_package(PurePosixPath(filename), root_package)
                 continue
-            if Path(filename).suffix != ".json":
+            if PurePosixPath(filename).suffix != ".json":
                 file_like = io.BytesIO(zip_file.read(f"{folder_name}/{filename}"))
-                file_like.name = Path(filename).name  # stem
-                file_like.destination = Path(f"/{destination}/{folder_name}/{filename}").parent
-                add_object_to_package(Path(filename), root_package, file_like)
+                file_like.name = PurePosixPath(filename).name  # stem
+                file_like.destination = PurePosixPath(f"/{destination}/{folder_name}/{filename}").parent
+                add_object_to_package(PurePosixPath(filename), root_package, file_like)
                 continue
             try:
                 json_doc = json.loads(zip_file.read(f"{folder_name}/{filename}"))
             except JSONDecodeError:
                 raise Exception(f"Failed to load the file '{filename}' as a JSON document")
 
-            add_file_to_package(Path(filename), root_package, json_doc)
+            add_file_to_package(PurePosixPath(filename), root_package, json_doc)
 
             # Add dependencies from entity to the global dependencies list
             dependencies = concat_dependencies(

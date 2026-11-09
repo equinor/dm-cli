@@ -59,7 +59,7 @@ def import_document(source_path: Path, destination: str, document: dict):
 
 
 def import_single_entity(source_path: Path, destination: str, validate: bool = False):
-    ensure_package_structure(Path(destination))
+    ensure_package_structure(destination)
     print(f"Importing ENTITY '{source_path.name}' --> '{destination}'")
 
     try:  # Load the JSON document
@@ -96,8 +96,6 @@ def import_folder_entity(
     raw_package_import: bool = False,
     resolve_local_ids: bool = False,
 ) -> dict:
-    destination_path = Path(destination)
-
     # Check if target already exists on remote. Then delete or raise exception
     target = f"{destination}/{source_path.name}"
     exists = dmss_api.document_check(target)
@@ -108,9 +106,9 @@ def import_folder_entity(
         dmss_api.document_remove(target)
 
     dependencies = {}
-    is_root = destination_is_root(destination_path)
+    is_root = destination_is_root(destination)
     if not is_root:
-        ensure_package_structure(destination_path)
+        ensure_package_structure(destination)
         dependencies = dependencies_of(dmss_api.export_meta(destination))
 
     memory_file = io.BytesIO()
@@ -172,7 +170,7 @@ def import_folders_as_one_package(source_path: Path, destination: str, package_n
         console.print(f"'{target}' already exists.  Replacing it...", style="dark_orange")
         dmss_api.document_remove(target)
 
-    ensure_package_structure(Path(destination))
+    ensure_package_structure(destination)
     dependencies = dependencies_of(dmss_api.export_meta(destination))
 
     entries = sorted(source_path.iterdir())

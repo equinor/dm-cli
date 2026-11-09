@@ -87,7 +87,7 @@ def import_plugin_blueprints(
 def create_lookup(
     name: Annotated[str, typer.Argument(help="Name of the lookup (application context) to create.")],
     paths: Annotated[
-        List[Path],
+        List[str],
         typer.Argument(
             help="one or more remote location for recursively looking for RecipeLinks. "
             "A remote location is a path in DMSS on the format <dataSource>/<rootPackage>/<subPacakge>/..."
@@ -97,8 +97,8 @@ def create_lookup(
     """
     Create a named Ui-/StorageRecipe-lookup-table from all RecipeLinks in a package existing in DMSS (requires admin privileges).
     """
-    # TODO change type of paths argument to be list of str to avoid this path as strings conversion below
-    paths_as_strings = [str(path) for path in paths]
+    # DMSS addresses, not local paths: a Path would turn '/' into '\' on Windows.
+    paths_as_strings = [path.rstrip("/") for path in paths]
     print(f"Creating lookup table from paths: {paths_as_strings}")
     dmss_exception_wrapper(dmss_api.create_lookup, recipe_package=paths_as_strings, application=name)
 
